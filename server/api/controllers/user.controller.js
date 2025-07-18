@@ -8,6 +8,8 @@ import {
 import { generateTokens } from "../config/generateToken.js";
 import crypto from "crypto";
 
+//// ----------------- AUTH CONTROLLERS ----------------- ////
+
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -175,20 +177,18 @@ export const forgotPassword = async (req, res) => {
     await user.save();
 
     await sendEmail({
-      to:user.email,
-      subject:"Reset your password",
-      html:PASSWORD_RESET_REQUEST_TEMPLATE.replace(
+      to: user.email,
+      subject: "Reset your password",
+      html: PASSWORD_RESET_REQUEST_TEMPLATE.replace(
         "{resetURL}",
         `${process.env.CLIENT_URL}/reset-password/${randomToken}`
-      )}
-    );
+      ),
+    });
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Reset password link sent to your email",
-      });
+    res.status(200).json({
+      success: true,
+      message: "Reset password link sent to your email",
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, message: "Server Error" });
@@ -241,8 +241,136 @@ export const checkAuth = async (req, res) => {
     const user = await User.findById(req.user).select("-password");
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    res.status(200).json({data: user});
+    res.status(200).json({ data: user });
   } catch (err) {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+//// ----------------- PROFILE CONTROLLER ------------------- ////
+
+export const updateProfile = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { name, bio, avatar, socialLinks } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    if (name !== undefined) user.name = name;
+    if (bio !== undefined) user.bio = bio;
+    if (avatar !== undefined) user.avatar = avatar;
+    if (socialLinks !== undefined) user.socialLinks = socialLinks;
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      user: {
+        name: user.name,
+        bio: user.bio,
+        avatar: user.avatar,
+        socialLinks: user.socialLinks,
+        email: user.email,
+        _id: user._id,
+      },
+    });
+  } catch (error) {
+    console.error("Update profile error:", error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
+export const sendFollowRequest = async (req, res) => {
+  try {
+    const targetUser = await User.findById(req.params.id);
+    const currentUser = await User.findById(req.user.id);
+
+    if (!targetUser || !currentUser)
+      return res.status(404).json({ message: "User not found" });
+
+    if (currentUser.following.includes(targetUser._id)) {
+      return res.status(400).json({ message: "Already following this user" });
+    }
+
+    if (targetUser.followRequests.includes(currentUser._id)) {
+      return res.status(400).json({ message: "Follow request already sent" });
+    }
+
+    targetUser.followRequests.push(currentUser._id);
+    await targetUser.save();
+
+    res.status(200).json({ message: "Follow request sent" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const acceptFollowRequest = async (req, res) => {
+  try {
+    const currentUser = await User.findById(req.user.id);
+    const requesterId = req.params.id;
+
+    if (!currentUser.followRequests.includes(requesterId)) {
+      return res.status(400).json({ message: "No such follow request" });
+    }
+
+    currentUser.followers.push(requesterId);
+    currentUser.followRequests = currentUser.followRequests.filter(
+      (id) => id.toString() !== requesterId
+    );
+
+    const requester = await User.findById(requesterId);
+    requester.following.push(currentUser._id);
+
+    await currentUser.save();
+    await requester.save();
+
+    res.status(200).json({ message: "Follow request accepted" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const unfollowUser = async (req,res)=>{
+  try {
+    const targetUserId = req.params.id; 
+    const currentUserId = req.user.id; 
+
+    const currentUser = await User.findById(currentUserId);
+    const targetUser = await User.findById(targetUserId);
+
+    if (!currentUser || !targetUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    
+    const isFollowing = currentUser.following.includes(targetUserId);
+    if (!isFollowing) {
+      return res.status(400).json({ message: "You're not following this user" });
+    }
+
+    
+    currentUser.following = currentUser.following.filter(
+      (id) => id.toString() !== targetUserId
+    );
+
+    
+    targetUser.followers = targetUser.followers.filter(
+      (id) => id.toString() !== currentUserId
+    );
+
+    await currentUser.save();
+    await targetUser.save();
+
+    res.status(200).json({ message: "Unfollowed successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+}
