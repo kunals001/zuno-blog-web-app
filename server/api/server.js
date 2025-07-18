@@ -18,8 +18,10 @@ app.use(cors({
 }));
 
 import userRoutes from "./routes/user.route.js";
+import commentRoutes from "./routes/comment.route.js";
 
 app.use("/api/users", userRoutes);
+app.use("/api/comments", commentRoutes);
 
 
 app.listen(PORT,()=>{
