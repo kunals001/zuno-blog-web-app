@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { IconMoonFilled, IconSunFilled } from "@tabler/icons-react";
 
 const DarkMode = () => {
-  const [theme, setTheme] = useState("dark");
+  const [theme, setTheme] = useState("light");
   const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
