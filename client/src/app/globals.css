@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
 @theme{
   --font-prime: "Barlow", sans-serif;
 }
@@ -9,3 +11,91 @@ body {
   color: var(--foreground);
   font-family: var(--font-poppins);
 }
+
+
+/*--------------------- DARK MODE TOGGLE ---------------------*/
+
+.toggle-bg {
+  background: #1b1b1b;
+  box-shadow:
+    inset 0 8px 60px rgba(60, 60, 60, 0.711),
+    inset 0 8px 8px rgba(60, 60, 60, 0.583),
+    inset 0 -4px 4px rgba(199, 197, 197, 0.1);
+  transition: all 0.3s ease;
+}
+
+input:checked ~ .toggle-bg {
+  background: #f8f8f8;
+  box-shadow:
+    inset 0 2px 60px rgba(0, 0, 0, 0.1),
+    inset 0 2px 8px rgba(0, 0, 0, 0.1),
+    inset 0 -4px 4px rgba(0, 0, 0, 0.05);
+}
+
+@keyframes rotateIn {
+  0% {
+    transform: rotate(0deg) scale(0);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+@keyframes rotateOut {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  100% {
+    transform: rotate(360deg) scale(0);
+  }
+}
+
+.sun {
+  animation: none;
+  transform: scale(0);
+}
+
+input:checked ~ .sun {
+  animation: rotateIn 0.6s ease forwards;
+}
+
+.moon {
+  animation: none;
+  transform: scale(1);
+}
+
+input:checked ~ .moon {
+  animation: rotateOut 0.6s ease forwards;
+}
+
+input:not(:checked) ~ .moon {
+  animation: none;
+  transform: scale(1);
+}
+
+
+/*--------------------- Skeleton Shimmer ---------------------*/
+
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.skeleton-shimmer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: shimmer 1.6s infinite;
+}
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+

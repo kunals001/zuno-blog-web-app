@@ -17,6 +17,9 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "Zuno",
   description: "Zuno is a social blogging platform to share your thoughts and connect with others.",
+  icons:{
+    icon:"/favicon.ico"
+  }
 };
 
 export default function RootLayout({
