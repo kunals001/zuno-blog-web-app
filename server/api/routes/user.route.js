@@ -11,7 +11,9 @@ import {
     checkAuth,
     updateProfile,
     sendFollowRequest,
-    acceptFollowRequest
+    acceptFollowRequest,
+    unfollowUser,
+    blockUser
 } from "../controllers/user.controller.js";
 
 import {protectRoute} from "../middleware/protectRoute.js";
@@ -32,8 +34,9 @@ router.post("/resetpassword/:resettoken", resetPassword);
 //// ---------------------- PROFILE ROUTES --------------------------- ////
 
 router.post("/update-profile",protectRoute,updateProfile);
-router.post('/user/:id/follow-request', protectRoute, sendFollowRequest);
-router.post('/user/:id/accept-follow', protectRoute, acceptFollowRequest);
-
+router.post('/:id/follow-request', protectRoute, sendFollowRequest);
+router.post('/:id/accept-follow', protectRoute, acceptFollowRequest);
+router.post('/:id/unfollow', protectRoute, unfollowUser);
+router.post('/:id/block', protectRoute, blockUser);
 
 export default router;

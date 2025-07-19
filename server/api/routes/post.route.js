@@ -11,6 +11,8 @@ import {
 
 import {protectRoute} from "../middleware/protectRoute.js";
 
+//// ---------------------- POST ROUTES --------------------------- ////
+
 router.post("/create-post", protectRoute, createPost);
 router.get("/get-posts", getPosts);
 router.get("/get-post-by-slug/:slug", getPostBySlug);

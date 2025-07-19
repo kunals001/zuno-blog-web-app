@@ -374,3 +374,29 @@ export const unfollowUser = async (req,res)=>{
     res.status(500).json({ message: "Server error" });
   }
 }
+
+export const blockUser = async (req, res) => {
+  try {
+    const targetUserId = req.params.id;
+    const currentUserId = req.user._id; // From protectRoute middleware
+
+    // Prevent user from blocking themselves
+    if (targetUserId === currentUserId.toString()) {
+      return res.status(400).json({ message: "You can't block yourself." });
+    }
+
+    const targetUser = await User.findById(targetUserId);
+    if (!targetUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Mark user as blocked
+    targetUser.isBlocked = true;
+    await targetUser.save();
+
+    res.status(200).json({ message: 'User has been blocked successfully' });
+  } catch (error) {
+    console.error('Error blocking user:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
