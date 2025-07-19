@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Barlow,Poppins } from "next/font/google";
+import ReduxProvider from "@/redux/provider";
 import "./globals.css";
 
 const barlow = Barlow({
@@ -33,7 +34,7 @@ export default function RootLayout({
         className={`${barlow.variable} ${poppins.variable} antialiased`}
         cz-shortcut-listen="true"
       >
-        {children}
+        <ReduxProvider>{children}</ReduxProvider>
       </body>
     </html>
   );

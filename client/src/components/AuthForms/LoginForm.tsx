@@ -3,6 +3,7 @@ import AuthLayout from "../Layouts/AuthLayout";
 import Input from "../Layouts/Input";
 
 type InputType = {
+  
   email: string;
   setEmail: React.Dispatch<React.SetStateAction<string>>;
   password: string;
