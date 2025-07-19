@@ -45,6 +45,11 @@ const postSchema = new mongoose.Schema({
     default: []
   },
 
+  status: {
+    type: String,
+    default: "Published"
+  },
+
   category: {
     type: String,
     default: "General"
@@ -67,7 +72,7 @@ const postSchema = new mongoose.Schema({
 
   readTime: {
     type: Number,
-    default: 1
+    default: 1 // estimated read time in minutes
   },
 
   views: {
@@ -75,10 +80,20 @@ const postSchema = new mongoose.Schema({
     default: 0
   },
 
+  totalReadTime: {
+    type: Number,
+    default: 0 // in seconds or minutes
+  },
+
+  averageReadTime: {
+    type: Number,
+    default: 0 // in seconds or minutes
+  },
+
   isFeatured: {
     type: Boolean,
     default: false
-  },
+  }
 }, { timestamps: true });
 
 const Post = mongoose.model("Post", postSchema);

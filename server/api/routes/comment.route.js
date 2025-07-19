@@ -12,7 +12,7 @@ import {protectRoute} from "../middleware/protectRoute.js";
 
 router.post("/create-comment/:postId", protectRoute, createComment);
 router.put("/update-comment/:commentId", protectRoute, updateComment);
-router.get("/get-comments/:postId", protectRoute, getComments);
+router.get("/get-comments/:postId", getComments);
 router.delete("/delete-comment/:commentId", protectRoute, deleteComment);
 
 export default router;
