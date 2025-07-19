@@ -2,7 +2,7 @@ import { WebSocketServer } from "ws";
 import socketHandler from "../sockets/socketHandler.js";
 import { verifyUserFromSocket } from "../utils/verifyUser.js";
 
-const connectedUsers = new Map(); 
+export const connectedUsers = new Map(); 
 
 export function initWebSocket(server) {
   const wss = new WebSocketServer({ server });

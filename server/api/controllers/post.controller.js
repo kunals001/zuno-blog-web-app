@@ -1,10 +1,10 @@
 import User from "../models/user.model.js";
 import Post from "../models/post.model.js";
 import slugify from "slugify";
+import { connectedUsers } from "../config/websocket.js";
 
 export const createPost = async (req, res) => {
   try {
-
     const {
       title,
       description,
@@ -17,40 +17,31 @@ export const createPost = async (req, res) => {
       isFeatured,
     } = req.body;
 
-    // Validation
     if (!title || !description || !content) {
       return res
         .status(400)
         .json({ message: "Title, description, and content are required." });
     }
 
-    const userId = req.user._id; 
+    const userId = req.user._id;
 
-    // Check if user exists
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).populate("followers", "_id");
     if (!user) {
       return res.status(404).json({ message: "User not found." });
     }
 
-    // Generate slug
     const slug = slugify(title, { lower: true, strict: true });
 
-    // Check slug uniqueness
     const existingPost = await Post.findOne({ slug });
     if (existingPost) {
-      return res
-        .status(409)
-        .json({
-          message:
-            "A post with this title already exists. Please use a different title.",
-        });
+      return res.status(409).json({
+        message: "A post with this title already exists.",
+      });
     }
 
-    // Estimated read time (1 min per 200 words)
     const words = content.trim().split(/\s+/).length;
     const estimatedReadTime = Math.ceil(words / 200);
 
-    // Create post
     const newPost = await Post.create({
       author: userId,
       title,
@@ -66,8 +57,27 @@ export const createPost = async (req, res) => {
       readTime: estimatedReadTime,
     });
 
-    // Add post to user's myposts
     await User.findByIdAndUpdate(userId, { $push: { myposts: newPost._id } });
+
+    // ✅ Send real-time notification to followers
+    const notificationData = {
+      type: "NEW_POST",
+      payload: {
+        authorId: userId,
+        postId: newPost._id,
+        title: newPost.title,
+        slug: newPost.slug,
+        createdAt: newPost.createdAt,
+      },
+    };
+
+    user.followers.forEach(follower => {
+      const followerId = follower._id.toString();
+      const ws = connectedUsers.get(followerId);
+      if (ws && ws.readyState === 1) {
+        ws.send(JSON.stringify(notificationData));
+      }
+    });
 
     res.status(201).json({
       message: "Post created successfully",

@@ -7,6 +7,7 @@ import {
 } from "../config/email.js";
 import { generateTokens } from "../config/generateToken.js";
 import crypto from "crypto";
+import {connectedUsers} from "../config/websocket.js"
 
 //// ----------------- AUTH CONTROLLERS ----------------- ////
 
@@ -305,8 +306,22 @@ export const sendFollowRequest = async (req, res) => {
     targetUser.followRequests.push(currentUser._id);
     await targetUser.save();
 
+    // 👇 Realtime notification
+    const targetSocket = connectedUsers.get(targetUser._id.toString());
+    if (targetSocket) {
+      targetSocket.send(JSON.stringify({
+        type: "follow-request-received",
+        fromUser: {
+          _id: currentUser._id,
+          username: currentUser.username,
+          profilePic: currentUser.profilePic
+        }
+      }));
+    }
+
     res.status(200).json({ message: "Follow request sent" });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -337,10 +352,10 @@ export const acceptFollowRequest = async (req, res) => {
   }
 };
 
-export const unfollowUser = async (req,res)=>{
+export const unfollowUser = async (req, res) => {
   try {
-    const targetUserId = req.params.id; 
-    const currentUserId = req.user.id; 
+    const targetUserId = req.params.id;
+    const currentUserId = req.user.id;
 
     const currentUser = await User.findById(currentUserId);
     const targetUser = await User.findById(targetUserId);
@@ -349,18 +364,15 @@ export const unfollowUser = async (req,res)=>{
       return res.status(404).json({ message: "User not found" });
     }
 
-    
     const isFollowing = currentUser.following.includes(targetUserId);
     if (!isFollowing) {
       return res.status(400).json({ message: "You're not following this user" });
     }
 
-    
     currentUser.following = currentUser.following.filter(
       (id) => id.toString() !== targetUserId
     );
 
-    
     targetUser.followers = targetUser.followers.filter(
       (id) => id.toString() !== currentUserId
     );
@@ -368,12 +380,27 @@ export const unfollowUser = async (req,res)=>{
     await currentUser.save();
     await targetUser.save();
 
+    // ✅ Real-time Unfollow Notification (if target user online)
+    const socket = connectedUsers.get(targetUserId.toString());
+    if (socket) {
+      socket.send(JSON.stringify({
+        type: "unfollowed",
+        payload: {
+          fromUser: {
+            _id: currentUser._id,
+            username: currentUser.username,
+            name: currentUser.name
+          }
+        }
+      }));
+    }
+
     res.status(200).json({ message: "Unfollowed successfully" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
   }
-}
+};
 
 export const blockUser = async (req, res) => {
   try {

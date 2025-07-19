@@ -236,6 +236,67 @@ const socketHandler = async (data, ws, connectedUsers) => {
       break;
     }
 
+    case "follow-request": {
+      const { targetUserId, fromUser } = payload;
+      const socket = connectedUsers.get(targetUserId.toString());
+
+      if (socket) {
+        socket.send(
+          JSON.stringify({
+            type: "follow-request-received",
+            payload: { fromUser },
+          })
+        );
+      }
+
+      break;
+    }
+
+    case "unfollowed": {
+      const { targetUserId, fromUser } = payload;
+
+      const socket = connectedUsers.get(targetUserId.toString());
+      if (socket) {
+        socket.send(
+          JSON.stringify({
+            type: "unfollowed",
+            payload: { fromUser },
+          })
+        );
+      }
+
+      break;
+    }
+
+    case "new-post": {
+      const { authorId, postId, title, slug, createdAt } = payload;
+
+      // Fetch followers of the author
+      const author = await User.findById(authorId).select("followers");
+      if (!author) break;
+
+      // Notify each follower if connected
+      for (const followerId of author.followers) {
+        const followerSocket = connectedUsers.get(followerId.toString());
+        if (followerSocket) {
+          followerSocket.send(
+            JSON.stringify({
+              type: "NEW_POST",
+              payload: {
+                authorId,
+                postId,
+                title,
+                slug,
+                createdAt,
+              },
+            })
+          );
+        }
+      }
+
+      break;
+    }
+
     default:
       console.warn("❓ Unknown WS event type:", type);
   }
