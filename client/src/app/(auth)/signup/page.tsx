@@ -37,7 +37,7 @@ const Signup = () => {
     try {
       await dispatch(signupUser({ name, email, password })).unwrap();
       if (!registerError) {
-        router.push("/");
+        router.push("/verify-account");
       }
     } catch (error) {}
   };

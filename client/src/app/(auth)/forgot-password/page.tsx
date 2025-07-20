@@ -31,9 +31,6 @@ const ForgotPage = () => {
 
     try {
       await dispatch(forgotPassword({email})).unwrap();
-      if (!forgotPasswordError) {
-        router.push("/");
-      }
     } catch (error) {}
   };
 
