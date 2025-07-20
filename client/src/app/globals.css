@@ -104,5 +104,18 @@ input:not(:checked) ~ .moon {
 /* ----------------------------- ERROR ANIMATION ----------------------------- */
 
 
+@keyframes slideDownFade {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
 
+.slide-down-fade {
+  animation: slideDownFade 0.4s ease-out forwards;
+}
 

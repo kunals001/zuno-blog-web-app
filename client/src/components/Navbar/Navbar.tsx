@@ -4,6 +4,18 @@ import Skeleton from "../Layouts/Skeleton";
 import { IconMenu2, IconSearch } from "@tabler/icons-react";
 import { useState } from "react";
 
+const NavUserShow = dynamic(() => import("../Layouts/NavUserShow"), {
+  ssr: false,
+  loading: () => (
+    <Skeleton
+      width={"w-[5vh] md:w-[2.5vw]"}
+      height={"h-[5vh] md:h-[2.5vw]"}
+      rounded={"rounded-full"}
+      animation="shimmer"
+    />
+  ),
+});
+
 const DarkMode = dynamic(() => import("@/components/Layouts/DarkMode"), {
   ssr: false,
   loading: () => (
@@ -38,9 +50,8 @@ const Navbar = () => {
   return (
     <nav className="w-full md:h-[4vw] h-[7vh] md:px-[10vw] px-[1vh] flex items-center justify-between bg-zinc-200 dark:bg-zinc-800 border-b-1 border-zinc-400 dark:border-zinc-600 md:border-b-0">
       <div className="w-full h-[100%] flex items-center justify-between md:border-b-2 border-zinc-400 dark:border-zinc-600">
-
         {/* navbar logo*/}
-        
+
         <div
           onClick={() => {
             window.location.href = "/";
@@ -81,12 +92,13 @@ const Navbar = () => {
             }}
             className="size-[3vh] text-zinc-700 dark:text-zinc-200 md:hidden"
           />
+
+          <div className="">
+            <NavUserShow />
+          </div>
         </div>
 
-        
         <MobileMenu open={open} setOpen={setOpen} />
-
-        
       </div>
     </nav>
   );

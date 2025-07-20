@@ -31,7 +31,7 @@ const ErrorToast = ({ message, duration = 3000, onClose }: Props) => {
       className={clsx(
         "fixed top-4 left-1/2 transform -translate-x-1/2 z-[9999]",
         "bg-red-600 text-white px-6 py-3 rounded-xl shadow-lg max-w-[90%] text-center text-sm sm:text-base",
-        "animate-slideDownFade"
+        "slide-down-fade"
       )}
     >
       {message}

@@ -68,7 +68,7 @@ const LoginForm: React.FC<InputType> = ({
           <button
             type="submit"
             disabled={loginLoading}
-            className="md:py-[.3vw] py-[.4vh] rounded-md bg-[#0ABAB5] text-zinc-50 text-[1.5vh] md:text-[1vw] hover:bg-[#0ABAB5] transition ease-in-out duration-200 cursor-pointer"
+            className="md:py-[.3vw] py-[1vh] rounded-md bg-[#0ABAB5] text-zinc-50 text-[2vh] md:text-[1vw] hover:bg-[#0ABAB5] transition ease-in-out duration-200 cursor-pointer"
           >
             {loginLoading ? (
               <div className="w-full h-full flex items-center justify-center gap-1">
@@ -79,6 +79,16 @@ const LoginForm: React.FC<InputType> = ({
               "Login"
             )}
           </button>
+
+          <p className="md:py-[.5vw] py-[1.5vh] text-zinc-600 text-[1.6vh] md:text-[.8vw] text-center">
+            Don&apos;t have an account?{" "}
+            <Link
+              href="/signup"
+              className="text-[#0ABAB5] hover:underline font-[600]"
+            >
+              Sign up
+            </Link>
+          </p>
         </form>
       </div>
     </AuthLayout>
