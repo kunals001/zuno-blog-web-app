@@ -43,7 +43,7 @@ const VerifyForm: React.FC<InputType> = ({
           >
             {verifyLoading ? (
               <div className="w-full h-full flex items-center justify-center gap-1">
-                <IconLoader className="animate-spin md:size-[3vw] size-[3vh] text-[#0ABAB5]" />
+                <IconLoader className="animate-spin md:size-[1.5vw] size-[3vh] text-[#ededed]" />
                 Verifying...
               </div>
             ) : (
