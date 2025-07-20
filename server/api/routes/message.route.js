@@ -7,7 +7,8 @@ import {
     updateMessage,
     replyMessage,
     addReaction,
-    deleteMessage
+    deleteMessage,
+    clearChat
 } from "../controllers/message.controller.js";
 
 import {protectRoute} from "../middleware/protectRoute.js";

@@ -22,9 +22,7 @@ export const signupUser = createAsyncThunk(
       return response.data.message;
     } catch (error) {
       if (error instanceof AxiosError) {
-        return rejectWithValue(
-          (error.response?.data.message as string) || "Something went wrong"
-        );
+        return rejectWithValue(error.response?.data.message || "Signup failed");
       }
     }
   }
@@ -54,11 +52,11 @@ export const verifyUser = createAsyncThunk<VerifyResponse, { code: string }>(
 
 //// ---------------------- LOGIN USER --------------------------- ////
 
-export const loginUser = createAsyncThunk<VerifyResponse, { data: string }>(
+export const loginUser = createAsyncThunk<VerifyResponse, { email: string; password: string }>(
   "user/loginUser",
-  async ({ data }: { data: string }, { rejectWithValue }) => {
+  async ({ email,password }: { email: string; password: string }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}/user/login`, data);
+      const response = await axios.post(`${API_URL}/user/login`, { email,password });
       return {
         user: response.data.user,
         accessToken: response.data.accessToken,
@@ -157,12 +155,12 @@ interface AuthState {
   resetPasswordLoading: boolean;
   logoutLoading: boolean;
 
-  registerError: string | unknown;
-  verifyError: string | unknown;
-  loginError: string | unknown;
-  forgotPasswordError: string | unknown;
-  resetPasswordError: string | unknown;
-  logoutError: string | unknown;
+  registerError: string | null;
+  verifyError: string | null;
+  loginError: string | null;
+  forgotPasswordError: string | null;
+  resetPasswordError: string | null;
+  logoutError: string | null;
 
   isAuthenticated: boolean;
   isCheckingAuth: boolean;
@@ -210,7 +208,7 @@ export const userSlice = createSlice({
       })
       .addCase(signupUser.rejected, (state, action) => {
         state.signupLoading = false;
-        state.registerError = action.payload;
+        state.registerError = action.payload as string;
       })
 
       /// ---------------------- VERIFY USER --------------------------- ///
@@ -226,7 +224,7 @@ export const userSlice = createSlice({
       })
       .addCase(verifyUser.rejected, (state, action) => {
         state.verifyLoding = false;
-        state.verifyError = action.payload;
+        state.verifyError = action.payload as string;
       })
 
       /// ---------------------- LOGIN USER --------------------------- ///
@@ -242,7 +240,7 @@ export const userSlice = createSlice({
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loginLoading = false;
-        state.loginError = action.payload;
+        state.loginError = action.payload as string;
       })
 
       /// ---------------------- LOGOUT USER --------------------------- ///
@@ -258,7 +256,7 @@ export const userSlice = createSlice({
       })
       .addCase(logoutUser.rejected, (state, action) => {
         state.logoutLoading = false;
-        state.logoutError = action.payload;
+        state.logoutError = action.payload as string;
       })
 
       /// ---------------------- FORGOT PASSWORD --------------------------- ///
@@ -272,7 +270,7 @@ export const userSlice = createSlice({
       })
       .addCase(forgotPassword.rejected, (state, action) => {
         state.forgotPasswordLoading = false;
-        state.forgotPasswordError = action.payload;
+        state.forgotPasswordError = action.payload as string;
       })
 
       /// ---------------------- RESET PASSWORD --------------------------- ///
@@ -286,7 +284,7 @@ export const userSlice = createSlice({
       })
       .addCase(resetPassword.rejected, (state, action) => {
         state.resetPasswordLoading = false;
-        state.resetPasswordError = action.payload;
+        state.resetPasswordError = action.payload as string;
       })
 
       // ---------------------- CHECK AUTH --------------------------- ///
