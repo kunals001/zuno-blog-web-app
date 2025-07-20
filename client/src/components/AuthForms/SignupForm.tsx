@@ -62,7 +62,7 @@ const SignupForm: React.FC<InputType> = ({
           <button
             type="submit"
             disabled={signupLoading}
-            className="md:py-[.3vw] py-[1vh] rounded-md bg-[#0ABAB5] text-zinc-50 text-[2vh] md:text-[1vw] hover:bg-[#0ABAB5] transition ease-in-out duration-200 cursor-pointer"
+            className="md:py-[.3vw] py-[1vh] rounded-md bg-[#0ABAB5] text-zinc-50 text-[2vh] md:text-[1vw] hover:bg-[#0ABAB5] transition ease-in-out duration-200 cursor-pointer mt-3"
           >
             {signupLoading ? (
               <div className="w-full h-full flex items-center justify-center gap-1">

@@ -30,7 +30,7 @@ const LoginForm: React.FC<InputType> = ({
           onSubmit={handelLogin}
           className="md:w-[25vw] w-full flex flex-col gap-[1vh] md:gap-[.5vw]"
         >
-          <h1 className="capitalize md:text-[2vw] text-[3.5vh] font-prime font-[700] text-zinc-700 text-center pb-4">
+          <h1 className="capitalize md:text-[2vw] text-[3.5vh] font-prime font-[700] text-zinc-700 text-center pb-3">
             Welcome back
           </h1>
 
@@ -59,7 +59,7 @@ const LoginForm: React.FC<InputType> = ({
           <button
             type="submit"
             disabled={loginLoading}
-            className="md:py-[.3vw] py-[1vh] rounded-md bg-[#0ABAB5] text-zinc-50 text-[2vh] md:text-[1vw] hover:bg-[#0ABAB5] transition ease-in-out duration-200 cursor-pointer"
+            className="md:py-[.3vw] py-[1vh] rounded-md bg-[#0ABAB5] text-zinc-50 text-[2vh] md:text-[1vw] hover:bg-[#0ABAB5] transition ease-in-out duration-200 cursor-pointer mt-3"
           >
             {loginLoading ? (
               <div className="w-full h-full flex items-center justify-center gap-1">
