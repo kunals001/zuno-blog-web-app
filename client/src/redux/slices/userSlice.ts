@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 import type { User } from "../type";
+import API from "../../lib/axios";
 
 axios.defaults.withCredentials = true;
 
@@ -132,6 +133,20 @@ export const resetPassword = createAsyncThunk(
     }
   }
 );
+
+//// ----------------- Check Auth ----------------- ////
+
+export const checkAuth = createAsyncThunk("user/checkAuth", async (_, thunkAPI) => {
+  try {
+    const res = await API.get("/user/checkauth"); 
+    return res.data.accessToken;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      return thunkAPI.rejectWithValue(error.response?.data.message);
+    }
+    return thunkAPI.rejectWithValue("Something went wrong");
+  }
+});
 
 interface AuthState {
   user: User | null;
@@ -272,6 +287,20 @@ export const userSlice = createSlice({
       .addCase(resetPassword.rejected, (state, action) => {
         state.resetPasswordLoading = false;
         state.resetPasswordError = action.payload;
+      })
+
+      // ---------------------- CHECK AUTH --------------------------- ///
+
+      .addCase(checkAuth.pending, (state) => {
+        state.isCheckingAuth = true;
+      })
+      .addCase(checkAuth.fulfilled, (state) => {
+        state.isCheckingAuth = false;
+        state.isAuthenticated = true;
+      })
+      .addCase(checkAuth.rejected, (state) => {
+        state.isCheckingAuth = false;
+        state.isAuthenticated = false;
       });
   },
 });
