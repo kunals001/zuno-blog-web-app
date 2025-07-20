@@ -3,15 +3,15 @@ import React, { useState } from "react";
 import dynamic from "next/dynamic";
 import { IconLoader } from "@tabler/icons-react";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { loginUser } from "@/redux/slices/userSlice";
+import { signupUser } from "@/redux/slices/userSlice";
 import { useRouter } from "next/navigation";
-import { clearLoginError } from "@/redux/slices/userSlice";
+import { clearRegisterError } from "@/redux/slices/userSlice";
 
 const ErrorToast = dynamic(() => import("@/components/Layouts/ErrorLayout"), {
   ssr: false,
 });
 
-const LoginForm = dynamic(() => import("@/components/AuthForms/LoginForm"), {
+const SignupForm = dynamic(() => import("@/components/AuthForms/SignupForm"), {
   ssr: false,
   loading: () => (
     <div className="w-full h-screen flex items-center justify-center">
@@ -20,20 +20,23 @@ const LoginForm = dynamic(() => import("@/components/AuthForms/LoginForm"), {
   ),
 });
 
-const Login = () => {
+const Signup = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const { loginLoading, loginError } = useAppSelector((state) => state.user);
+  const { signupLoading, registerError } = useAppSelector(
+    (state) => state.user
+  );
 
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handelLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handelSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
-      await dispatch(loginUser({ email, password })).unwrap();
-      if (!loginError) {
+      await dispatch(signupUser({ name, email, password })).unwrap();
+      if (!registerError) {
         router.push("/");
       }
     } catch (error) {}
@@ -41,24 +44,26 @@ const Login = () => {
 
   return (
     <div>
-      {typeof loginError === "string" && (
+      {typeof registerError === "string" && (
         <ErrorToast
-          message={loginError}
+          message={registerError}
           duration={4000}
-          onClose={() => dispatch(clearLoginError())}
+          onClose={() => dispatch(clearRegisterError())}
         />
       )}
 
-      <LoginForm
+      <SignupForm
+        name={name}
+        setName={setName}
         email={email}
         setEmail={setEmail}
         password={password}
         setPassword={setPassword}
-        handelLogin={handelLogin}
-        loginLoading={loginLoading}
+        handelSignup={handelSignup}
+        signupLoading={signupLoading}
       />
     </div>
   );
 };
 
-export default Login;
+export default Signup;

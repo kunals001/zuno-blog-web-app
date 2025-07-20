@@ -1,51 +1,84 @@
-// lib/axios.ts
-import axios from "axios";
-import { store } from "../redux/store";
-import { setAccessToken } from "../redux/slices/userSlice";
+import axios, { AxiosRequestConfig, AxiosError, InternalAxiosRequestConfig } from "axios";
+import { getToken, setToken } from "./tokenService"; 
 
 const API = axios.create({
   baseURL: process.env.NEXT_PUBLIC_SERVER_URL,
   withCredentials: true,
 });
 
-API.interceptors.request.use((config) => {
-  const token = store.getState().user.accessToken;
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+API.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+  const token = getToken();
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
-// Response Interceptor
+let isRefreshing = false;
+
+type FailedRequest = {
+  resolve: (token: string | null) => void;
+  reject: (error: unknown) => void;
+};
+
+let failedQueue: FailedRequest[] = [];
+
+const processQueue = (error: unknown, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) prom.reject(error);
+    else prom.resolve(token);
+  });
+  failedQueue = [];
+};
+
 API.interceptors.response.use(
   (res) => res,
-  async (error) => {
-    const originalRequest = error.config;
+  async (err: AxiosError) => {
+    const originalRequest = err.config as AxiosRequestConfig & { _retry?: boolean };
 
     if (
-      error.response?.status === 403 &&
+      err.response?.status === 403 &&
       !originalRequest._retry &&
-      error.response.data.message === "Access token invalid or expired"
+      (err.response.data as { message: string }).message === "Access token invalid or expired"
     ) {
       originalRequest._retry = true;
 
-      try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/user/refresh`, {
-          withCredentials: true,
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({
+            resolve: (token) => {
+              if (token)
+                originalRequest.headers = {
+                  ...originalRequest.headers,
+                  Authorization: `Bearer ${token}`,
+                };
+              resolve(API(originalRequest));
+            },
+            reject,
+          });
         });
+      }
 
-        const newAccessToken = res.data.accessToken;
-        store.dispatch(setAccessToken(newAccessToken));
+      isRefreshing = true;
 
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+      try {
+        const res = await API.get("/users/refresh");
+        const newAccessToken = (res.data as { accessToken: string }).accessToken;
+
+        setToken(newAccessToken);
+        originalRequest.headers = {
+          ...originalRequest.headers,
+          Authorization: `Bearer ${newAccessToken}`,
+        };
+        processQueue(null, newAccessToken);
         return API(originalRequest);
-      } catch (refreshError) {
-        console.error("Refresh token failed");
-        return Promise.reject(refreshError);
+      } catch (refreshErr) {
+        processQueue(refreshErr, null);
+        return Promise.reject(refreshErr);
+      } finally {
+        isRefreshing = false;
       }
     }
 
-    return Promise.reject(error);
+    return Promise.reject(err);
   }
 );
 

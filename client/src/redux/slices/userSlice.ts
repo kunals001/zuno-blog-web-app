@@ -16,9 +16,20 @@ type VerifyResponse = {
 
 export const signupUser = createAsyncThunk(
   "user/signupUser",
-  async ({ data }: { data: string }, { rejectWithValue }) => {
+  async (
+    {
+      name,
+      email,
+      password,
+    }: { name: string; email: string; password: string },
+    { rejectWithValue }
+  ) => {
     try {
-      const response = await axios.post(`${API_URL}/user/register`, data);
+      const response = await axios.post(`${API_URL}/users/register`, {
+        name,
+        email,
+        password,
+      });
       return response.data.message;
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -34,7 +45,7 @@ export const verifyUser = createAsyncThunk<VerifyResponse, { code: string }>(
   "user/verifyUser",
   async ({ code }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}/user/verify`, { code });
+      const response = await axios.post(`${API_URL}/users/verify`, { code });
       return {
         user: response.data.user,
         accessToken: response.data.accessToken,
@@ -52,11 +63,19 @@ export const verifyUser = createAsyncThunk<VerifyResponse, { code: string }>(
 
 //// ---------------------- LOGIN USER --------------------------- ////
 
-export const loginUser = createAsyncThunk<VerifyResponse, { email: string; password: string }>(
+export const loginUser = createAsyncThunk<
+  VerifyResponse,
+  { email: string; password: string }>(
   "user/loginUser",
-  async ({ email,password }: { email: string; password: string }, { rejectWithValue }) => {
+  async (
+    { email, password }: { email: string; password: string },
+    { rejectWithValue }
+  ) => {
     try {
-      const response = await axios.post(`${API_URL}/users/login`, { email,password });
+      const response = await axios.post(`${API_URL}/users/login`, {
+        email,
+        password,
+      });
       return {
         user: response.data.user,
         accessToken: response.data.accessToken,
@@ -76,7 +95,7 @@ export const loginUser = createAsyncThunk<VerifyResponse, { email: string; passw
 
 export const logoutUser = createAsyncThunk("user/logoutUser", async () => {
   try {
-    await axios.post(`${API_URL}/user/logout`);
+    await axios.post(`${API_URL}/users/logout`);
   } catch (error) {
     if (axios.isAxiosError(error)) {
       return error.response?.data.message;
@@ -90,7 +109,7 @@ export const forgotPassword = createAsyncThunk(
   "auth/forgotPassword",
   async (email: string, { rejectWithValue }) => {
     try {
-      const res = await axios.post(`${API_URL}/api/auth/forgot-password`, {
+      const res = await axios.post(`${API_URL}/users/forgot-password`, {
         email,
       });
       return res.data.message;
@@ -115,7 +134,7 @@ export const resetPassword = createAsyncThunk(
   ) => {
     try {
       const res = await axios.post(
-        `${API_URL}/api/auth/reset-password/${token}`,
+        `${API_URL}/users/reset-password/${token}`,
         {
           password,
         }
@@ -134,17 +153,20 @@ export const resetPassword = createAsyncThunk(
 
 //// ----------------- Check Auth ----------------- ////
 
-export const checkAuth = createAsyncThunk("user/checkAuth", async (_, thunkAPI) => {
-  try {
-    const res = await API.get("/user/checkauth"); 
-    return res.data.accessToken;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      return thunkAPI.rejectWithValue(error.response?.data.message);
+export const checkAuth = createAsyncThunk(
+  "user/checkAuth",
+  async (_, thunkAPI) => {
+    try {
+      const res = await API.get("/users/checkauth");
+      return res.data.accessToken;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return thunkAPI.rejectWithValue(error.response?.data.message);
+      }
+      return thunkAPI.rejectWithValue("Something went wrong");
     }
-    return thunkAPI.rejectWithValue("Something went wrong");
   }
-});
+);
 
 interface AuthState {
   user: User | null;
@@ -194,6 +216,24 @@ export const userSlice = createSlice({
   reducers: {
     setAccessToken: (state, action) => {
       state.accessToken = action.payload;
+    },
+    clearRegisterError: (state) => {
+      state.registerError = null;
+    },
+    clearVerifyError: (state) => {
+      state.verifyError = null;
+    },
+    clearLoginError: (state) => {
+      state.loginError = null;
+    },
+    clearForgotPasswordError: (state) => {
+      state.forgotPasswordError = null;
+    },
+    clearResetPasswordError: (state) => {
+      state.resetPasswordError = null;
+    },
+    clearLogoutError: (state) => {
+      state.logoutError = null;
     },
   },
   extraReducers: (builder) => {
@@ -303,5 +343,13 @@ export const userSlice = createSlice({
   },
 });
 
-export const { setAccessToken } = userSlice.actions;
+export const {
+  setAccessToken,
+  clearRegisterError,
+  clearVerifyError,
+  clearLoginError,
+  clearForgotPasswordError,
+  clearResetPasswordError,
+  clearLogoutError,
+} = userSlice.actions;
 export default userSlice.reducer;

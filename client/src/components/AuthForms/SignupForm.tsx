@@ -4,35 +4,47 @@ import Input from "../Layouts/Input";
 import Link from "next/link";
 import { IconLoader } from "@tabler/icons-react";
 
-
-
 type InputType = {
+  name: string;
+  setName: React.Dispatch<React.SetStateAction<string>>;
   email: string;
   setEmail: React.Dispatch<React.SetStateAction<string>>;
   password: string;
   setPassword: React.Dispatch<React.SetStateAction<string>>;
-  handelLogin: (e: React.FormEvent<HTMLFormElement>) => void;
-  loginLoading: boolean;
+  handelSignup: (e: React.FormEvent<HTMLFormElement>) => void;
+  signupLoading: boolean;
 };
 
-const LoginForm: React.FC<InputType> = ({
+const SignupForm: React.FC<InputType> = ({
+  name,
+  setName,
   email,
   setEmail,
   password,
   setPassword,
-  handelLogin,
-  loginLoading
+  handelSignup,
+  signupLoading
 }) => {
   return (
     <AuthLayout>
       <div className="w-full md:w-[25vw] px-[2vh] mx:px-0 flex items-center justify-center md:py-[2vw] md:rounded-lg md:bg-[#c2f6f4]">
         <form
-          onSubmit={handelLogin}
+          onSubmit={handelSignup}
           className="md:w-[25vw] w-full flex flex-col gap-[1vh] md:gap-[.5vw]"
         >
-          <h1 className="capitalize md:text-[2vw] text-[3.5vh] font-prime font-[700] text-zinc-700 text-center pb-4">
-            Welcome back
+          <h1 className="capitalize md:text-[2vw] text-[3.5vh] font-prime font-[700] text-zinc-700 text-center laeding-none">
+            Create an account
           </h1>
+
+          <p className="pb-3 text-zinc-600 text-[1.6vh] md:text-[.9vw] text-center">
+            Please fill in this form to create an account
+          </p>
+          <Input
+            label="Fukk Name"
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
 
           <Input
             label="Email"
@@ -47,37 +59,28 @@ const LoginForm: React.FC<InputType> = ({
             onChange={(e) => setPassword(e.target.value)}
           />
 
-          {
-            <Link
-              href="/forgot-password"
-              className="md:py-[.5vw] py-[1.5vh] text-zinc-600 text-[1.5vh] md:text-[.7vw] hover:underline"
-            >
-              Forgot Password?
-            </Link>
-          }
-
           <button
             type="submit"
-            disabled={loginLoading}
+            disabled={signupLoading}
             className="md:py-[.3vw] py-[1vh] rounded-md bg-[#0ABAB5] text-zinc-50 text-[2vh] md:text-[1vw] hover:bg-[#0ABAB5] transition ease-in-out duration-200 cursor-pointer"
           >
-            {loginLoading ? (
+            {signupLoading ? (
               <div className="w-full h-full flex items-center justify-center gap-1">
                 <IconLoader className="animate-spin md:size-[3vw] size-[3vh] text-[#0ABAB5]" />
-                Loging...
+                Signing...
               </div>
             ) : (
-              "Login"
+              "Sign Up"
             )}
           </button>
 
           <p className="md:py-[.5vw] py-[1.5vh] text-zinc-600 text-[1.6vh] md:text-[.8vw] text-center">
-            Don&apos;t have an account?{" "}
+            Already have an account{" "}
             <Link
-              href="/signup"
+              href="/login"
               className="text-[#0ABAB5] hover:underline font-[600]"
             >
-              Sign up
+              Login
             </Link>
           </p>
         </form>
@@ -86,4 +89,4 @@ const LoginForm: React.FC<InputType> = ({
   );
 };
 
-export default LoginForm;
+export default SignupForm;
