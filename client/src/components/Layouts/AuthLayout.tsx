@@ -4,7 +4,7 @@ import Image from "next/image";
 const AuthLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="w-full h-screen flex items-center justify-center">
-      <div className="absolute md:top-[2vw] top-[1vh] md:left-[2vw] left-[1vh] flex items-center justify-center gap-1">
+      <div aria-label="web-logo" onClick={() => window.location.href = "/"} className="absolute md:top-[2vw] top-[1vh] md:left-[2vw] left-[1vh] flex items-center justify-center gap-1">
         <Image
           src={"/zuno.png"}
           alt="nav-logo"
@@ -14,7 +14,7 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
           priority
         />
 
-        <h1 className="md:text-[2.2vw] text-[3.5vh] font-prime font-[700] text-zinc-700 dark:text-zinc-200 hover:text-[#0ABAB5] transition ease-in-out duration-200">
+        <h1 className="md:text-[2.2vw] text-[3.5vh] font-prime font-[700] text-zinc-700 dark:text-zinc-200 hover:text-[#0ABAB5] transition ease-in-out duration-200 select-none">
           Zuno
         </h1>
       </div>
