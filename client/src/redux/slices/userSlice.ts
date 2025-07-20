@@ -45,7 +45,7 @@ export const verifyUser = createAsyncThunk<VerifyResponse, { code: string }>(
   "user/verifyUser",
   async ({ code }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}/users/verify`, { code });
+      const response = await axios.post(`${API_URL}/users/verifyemail`, { code });
       return {
         user: response.data.user,
         accessToken: response.data.accessToken,
