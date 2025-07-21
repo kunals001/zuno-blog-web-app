@@ -36,7 +36,7 @@ const Login = () => {
       if (!loginError) {
         router.push("/");
       }
-    } catch (error) {}
+    } catch (error) {console.log(error)}
   };
 
   return (

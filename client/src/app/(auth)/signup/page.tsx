@@ -39,7 +39,7 @@ const Signup = () => {
       if (!registerError) {
         router.push("/verify-account");
       }
-    } catch (error) {}
+    } catch (error) {console.log(error)}
   };
 
   return (

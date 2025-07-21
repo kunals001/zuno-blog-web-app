@@ -48,7 +48,7 @@ const ForgotPage = () => {
     try {
       await dispatch(forgotPassword({ email })).unwrap();
       setSubmit(false);
-    } catch (error) {}
+    } catch (error) {console.log(error)}
   };
 
   return (

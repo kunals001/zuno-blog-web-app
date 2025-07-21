@@ -50,7 +50,7 @@ const ResetPasswordPage = () => {
       if (!resetPasswordError) {
         router.push("/login");
       }
-    } catch (error) {}
+    } catch (error) {console.log(error)}
   };
 
   return (
