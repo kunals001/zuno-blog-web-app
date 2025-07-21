@@ -13,49 +13,51 @@ import {connectedUsers} from "../config/websocket.js"
 
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { password, email, name} = req.body;
 
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: "All fields are required" });
+    if (!password || !email || !name) {
+      res
+        .status(401)
+        .json({ success: false, message: "All fields are required" });
     }
 
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
+    if (password.length < 6) {
+      res
+        .status(401)
+        .json({
+          success: false,
+          message: "Password must be at leadt 6 characters",
+        });
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const existUser = await User.findOne({ email });
 
-    const verifytoken = Math.floor(100000 + Math.random() * 900000).toString();
+    if (existUser) {
+      res.status(401).json({ success: false, message: "User already exist" });
+    }
 
-    const verifytokenexpire = Date.now() + 10 * 60 * 1000;
+    const verifyToken = Math.floor(100000 + Math.random() * 900000).toString();
 
-    const user = await User.create({
+    const newUser = await User.create({
       name,
       email,
-      password: hashedPassword,
-      verifytoken,
-      verifytokenexpire,
+      password,
+      verifytoken: verifyToken,
+      verifytokenexpire: Date.now() + 1 * 60 * 60 * 1000,
     });
 
-    await user.save();
+    await newUser.save();
 
-    await sendEmail({
-      to: user.email,
-      subject: "Verify Your Email",
-      html: VERIFICATION_EMAIL_TEMPLATE.replace(
-        "{verificationCode}",
-        verifytoken
-      ),
-    });
+    await sendEmail(
+      newUser.email,
+      "Verify your email",
+      VERIFICATION_EMAIL_TEMPLATE.replace("{verificationCode}", verifyToken)
+    );
 
-    res.status(201).json({
-      message: "Verification email sent",
-    });
+    res.status(201).json({ success: true, message: "Verify your email" });
   } catch (error) {
-    console.error("Register error:", error);
-    res.status(500).json({ message: "Server error" });
+    console.log(error);
+    res.status(500).json({ success: false, message: "Server Error" });
   }
 };
 
@@ -68,15 +70,15 @@ export const verifyUser = async (req, res) => {
       verifytokenexpire: { $gt: Date.now() },
     }).select("-password");
 
-    if (user) {
-      res.status(200).json({
-        message: "User verified successfully",
-      });
+    if (!user) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid verification code" });
     }
-
     user.verified = true;
     user.verifytoken = undefined;
     user.verifytokenexpire = undefined;
+
     await user.save();
 
     const { accessToken, refreshToken } = generateTokens(user._id);
@@ -88,23 +90,26 @@ export const verifyUser = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    return res.status(200).json({
-      success: true,
-      message: "Email verified successfully",
-      accessToken,
-      user,
-    });
+    return res
+      .status(200)
+      .json({
+        success: true,
+        message: "Email verified successfully",
+        accessToken,
+        user,
+      });
   } catch (error) {
     console.log(error);
-    res.status(500).json(error.message);
+    res.status(500).json({ success: false, message: "Server Error" });
   }
 };
+
 
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email }).select("+password");
+    const user = await User.findOne({ email }).select("+password"); // FIXED
 
     if (!user) {
       return res
@@ -143,6 +148,7 @@ export const loginUser = async (req, res) => {
   }
 };
 
+
 export const logoutUser = (req, res) => {
   res.clearCookie("refreshToken", {
     httpOnly: true,
@@ -177,19 +183,21 @@ export const forgotPassword = async (req, res) => {
 
     await user.save();
 
-    await sendEmail({
-      to: user.email,
-      subject: "Reset your password",
-      html: PASSWORD_RESET_REQUEST_TEMPLATE.replace(
+    await sendEmail(
+      user.email,
+      "Reset your password",
+      PASSWORD_RESET_REQUEST_TEMPLATE.replace(
         "{resetURL}",
         `${process.env.CLIENT_URL}/reset-password/${randomToken}`
-      ),
-    });
+      )
+    );
 
-    res.status(200).json({
-      success: true,
-      message: "Reset password link sent to your email",
-    });
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "Reset password link sent to your email",
+      });
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, message: "Server Error" });
@@ -239,7 +247,6 @@ export const resetPassword = async (req, res) => {
 
 export const checkAuth = async (req, res) => {
   try {
-    console.log(req.user);
     const user = await User.findById(req.user).select("-password");
     if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -248,6 +255,7 @@ export const checkAuth = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 //// ----------------- PROFILE CONTROLLER ------------------- ////
 

@@ -23,13 +23,13 @@ import {refreshAccessToken} from "../utils/refreshAccessToken.js";
 //// ---------------------- AUTH ROUTES --------------------------- ////
 
 router.get("/refresh", refreshAccessToken);
-router.get("/checkauth", protectRoute,checkAuth);
+router.get("/check-auth", protectRoute, checkAuth);
 router.post("/register", registerUser);
-router.post("/verifyemail",verifyUser)
+router.post("/verify", verifyUser);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
-router.post("/forgotpassword", forgotPassword);
-router.post("/resetpassword/:token", resetPassword);
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password/:token", resetPassword);
 
 //// ---------------------- PROFILE ROUTES --------------------------- ////
 

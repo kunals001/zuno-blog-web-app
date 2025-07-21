@@ -46,7 +46,7 @@ export const verifyUser = createAsyncThunk<VerifyResponse, { code: string }>(
   "user/verifyUser",
   async ({ code }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}/users/verifyemail`, {
+      const response = await axios.post(`${API_URL}/users/verify`, {
         code,
       });
       return {
@@ -113,7 +113,7 @@ export const forgotPassword = createAsyncThunk(
   "auth/forgotPassword",
   async ({ email }: { email: string }, { rejectWithValue }) => {
     try {
-      const res = await axios.post(`${API_URL}/users/forgotpassword`, {
+      const res = await axios.post(`${API_URL}/users/forgot-password`, {
         email,
       });
       return res.data.message;
@@ -137,7 +137,7 @@ export const resetPassword = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const res = await axios.post(`${API_URL}/users/resetpassword/${token}`, {
+      const res = await axios.post(`${API_URL}/users/reset-password/${token}`, {
         password,
       });
       return res.data.message;
@@ -158,7 +158,7 @@ export const checkAuth = createAsyncThunk(
   "auth/checkAuth",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await api.get("/users/checkauth");
+      const res = await api.get("/users/check-auth");
       return res.data.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
