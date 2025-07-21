@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 import type { User } from "../type";
-import API from "../../lib/axios";
+import api from "@/lib/axios";
+import { setToken } from "@/lib/tokenService";
 
 axios.defaults.withCredentials = true;
 
@@ -157,7 +158,7 @@ export const checkAuth = createAsyncThunk(
   "auth/checkAuth",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await API.get("/users/checkauth");
+      const res = await api.get("/users/checkauth");
       return res.data.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -263,6 +264,8 @@ export const userSlice = createSlice({
         state.verifyLoding = false;
         state.user = action.payload.user;
         state.accessToken = action.payload.accessToken;
+
+        setToken(action.payload.accessToken);
       })
       .addCase(verifyUser.rejected, (state, action) => {
         state.verifyLoding = false;
@@ -279,6 +282,8 @@ export const userSlice = createSlice({
         state.loginLoading = false;
         state.user = action.payload.user;
         state.accessToken = action.payload.accessToken;
+
+        setToken(action.payload.accessToken);
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loginLoading = false;
@@ -299,6 +304,8 @@ export const userSlice = createSlice({
       .addCase(logoutUser.rejected, (state, action) => {
         state.logoutLoading = false;
         state.logoutError = action.payload as string;
+
+        setToken(null);
       })
 
       /// ---------------------- FORGOT PASSWORD --------------------------- ///
@@ -334,9 +341,10 @@ export const userSlice = createSlice({
       .addCase(checkAuth.pending, (state) => {
         state.isCheckingAuth = true;
       })
-      .addCase(checkAuth.fulfilled, (state) => {
+      .addCase(checkAuth.fulfilled, (state, action) => {
         state.isCheckingAuth = false;
         state.isAuthenticated = true;
+        state.user = action.payload;
       })
       .addCase(checkAuth.rejected, (state) => {
         state.isCheckingAuth = false;

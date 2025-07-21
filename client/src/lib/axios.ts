@@ -1,12 +1,12 @@
 import axios, { AxiosRequestConfig, AxiosError, InternalAxiosRequestConfig } from "axios";
 import { getToken, setToken } from "./tokenService"; 
 
-const API = axios.create({
+const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_SERVER_URL,
   withCredentials: true,
 });
 
-API.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const token = getToken();
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
@@ -29,7 +29,7 @@ const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue = [];
 };
 
-API.interceptors.response.use(
+api.interceptors.response.use(
   (res) => res,
   async (err: AxiosError) => {
     const originalRequest = err.config as AxiosRequestConfig & { _retry?: boolean };
@@ -50,7 +50,7 @@ API.interceptors.response.use(
                   ...originalRequest.headers,
                   Authorization: `Bearer ${token}`,
                 };
-              resolve(API(originalRequest));
+              resolve(api(originalRequest));
             },
             reject,
           });
@@ -60,7 +60,7 @@ API.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const res = await API.get("/users/refresh");
+        const res = await api.get("/users/refresh");
         const newAccessToken = (res.data as { accessToken: string }).accessToken;
 
         setToken(newAccessToken);
@@ -69,7 +69,7 @@ API.interceptors.response.use(
           Authorization: `Bearer ${newAccessToken}`,
         };
         processQueue(null, newAccessToken);
-        return API(originalRequest);
+        return api(originalRequest);
       } catch (refreshErr) {
         processQueue(refreshErr, null);
         return Promise.reject(refreshErr);
@@ -82,4 +82,4 @@ API.interceptors.response.use(
   }
 );
 
-export default API;
+export default api;

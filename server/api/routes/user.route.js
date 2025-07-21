@@ -23,7 +23,7 @@ import {refreshAccessToken} from "../utils/refreshAccessToken.js";
 //// ---------------------- AUTH ROUTES --------------------------- ////
 
 router.get("/refresh", refreshAccessToken);
-router.post("/checkauth", protectRoute,checkAuth);
+router.get("/checkauth", protectRoute,checkAuth);
 router.post("/register", registerUser);
 router.post("/verifyemail",verifyUser)
 router.post("/login", loginUser);
