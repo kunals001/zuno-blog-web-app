@@ -3,8 +3,10 @@ import React, { useState } from "react";
 import dynamic from "next/dynamic";
 import { IconLoader } from "@tabler/icons-react";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { clearForgotPasswordError, forgotPassword } from "@/redux/slices/userSlice";
-import { useRouter } from "next/navigation";
+import {
+  clearForgotPasswordError,
+  forgotPassword,
+} from "@/redux/slices/userSlice";
 
 const ErrorToast = dynamic(() => import("@/components/Layouts/ErrorLayout"), {
   ssr: false,
@@ -19,18 +21,33 @@ const ForgotForm = dynamic(() => import("@/components/AuthForms/ForgotForm"), {
   ),
 });
 
+const ResetForm = dynamic(
+  () => import("@/components/AuthForms/ResetPasswordLinkSend"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-screen flex items-center justify-center">
+        <IconLoader className="animate-spin md:size-[3vw] size-[3vh] text-[#0ABAB5]" />
+      </div>
+    ),
+  }
+);
+
 const ForgotPage = () => {
   const dispatch = useAppDispatch();
-  const router = useRouter();
-  const { forgotPasswordError,forgotPasswordLoading } = useAppSelector((state) => state.user);
+  const { forgotPasswordError, forgotPasswordLoading } = useAppSelector(
+    (state) => state.user
+  );
 
   const [email, setEmail] = useState("");
+  const [submit, setSubmit] = useState(true);
 
   const handelLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
-      await dispatch(forgotPassword({email})).unwrap();
+      await dispatch(forgotPassword({ email })).unwrap();
+      setSubmit(false);
     } catch (error) {}
   };
 
@@ -44,12 +61,16 @@ const ForgotPage = () => {
         />
       )}
 
-      <ForgotForm
-        email={email}
-        setEmail={setEmail}
-        handelForgot={handelLogin}
-        forgotLoading={forgotPasswordLoading}
-      />
+      {submit ? (
+        <ForgotForm
+          email={email}
+          setEmail={setEmail}
+          handelForgot={handelLogin}
+          forgotLoading={forgotPasswordLoading}
+        />
+      ) : (
+        <ResetForm />
+      )}
     </div>
   );
 };

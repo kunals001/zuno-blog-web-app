@@ -27,10 +27,10 @@ const SignupForm: React.FC<InputType> = ({
 }) => {
   return (
     <AuthLayout>
-      <div className="w-full md:w-[25vw] px-[2vh] mx:px-0 flex items-center justify-center md:py-[2vw] md:rounded-lg md:bg-[#c2f6f4]">
+      <div className="w-full md:w-[25vw] px-[2vh] mx:px-0 flex items-center justify-center md:py-[2vw] md:rounded-lg md:bg-[#c2f6f4] slide-up">
         <form
           onSubmit={handelSignup}
-          className="md:w-[25vw] w-full flex flex-col gap-[1vh] md:gap-[.5vw]"
+          className="md:w-[25vw] w-full flex flex-col gap-[1vh] md:gap-[.5vw] "
         >
           <h1 className="capitalize md:text-[2vw] text-[3.5vh] font-prime font-[700] text-zinc-700 text-center laeding-none">
             Create an account

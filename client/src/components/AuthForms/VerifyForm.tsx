@@ -20,7 +20,7 @@ const VerifyForm: React.FC<InputType> = ({
 }) => {
   return (
     <AuthLayout>
-      <div className="w-full md:w-[25vw] px-[2vh] mx:px-0 flex items-center justify-center md:py-[2vw] md:rounded-lg md:bg-[#c2f6f4]">
+      <div className="w-full md:w-[25vw] px-[2vh] mx:px-0 flex items-center justify-center md:py-[2vw] md:rounded-lg md:bg-[#c2f6f4] slide-up">
         <form
           onSubmit={handelVerify}
           className="md:w-[25vw] w-full flex flex-col gap-[1vh] md:gap-[.5vw]"

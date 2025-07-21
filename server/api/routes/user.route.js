@@ -29,7 +29,7 @@ router.post("/verifyemail",verifyUser)
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
 router.post("/forgotpassword", forgotPassword);
-router.post("/resetpassword/:resettoken", resetPassword);
+router.post("/resetpassword/:token", resetPassword);
 
 //// ---------------------- PROFILE ROUTES --------------------------- ////
 

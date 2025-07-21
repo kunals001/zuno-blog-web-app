@@ -45,7 +45,9 @@ export const verifyUser = createAsyncThunk<VerifyResponse, { code: string }>(
   "user/verifyUser",
   async ({ code }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}/users/verifyemail`, { code });
+      const response = await axios.post(`${API_URL}/users/verifyemail`, {
+        code,
+      });
       return {
         user: response.data.user,
         accessToken: response.data.accessToken,
@@ -65,7 +67,8 @@ export const verifyUser = createAsyncThunk<VerifyResponse, { code: string }>(
 
 export const loginUser = createAsyncThunk<
   VerifyResponse,
-  { email: string; password: string }>(
+  { email: string; password: string }
+>(
   "user/loginUser",
   async (
     { email, password }: { email: string; password: string },
@@ -109,7 +112,7 @@ export const forgotPassword = createAsyncThunk(
   "auth/forgotPassword",
   async ({ email }: { email: string }, { rejectWithValue }) => {
     try {
-      const res = await axios.post(`${API_URL}/users/forgot-password`, {
+      const res = await axios.post(`${API_URL}/users/forgotpassword`, {
         email,
       });
       return res.data.message;
@@ -133,12 +136,9 @@ export const resetPassword = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const res = await axios.post(
-        `${API_URL}/users/reset-password/${token}`,
-        {
-          password,
-        }
-      );
+      const res = await axios.post(`${API_URL}/users/resetpassword/${token}`, {
+        password,
+      });
       return res.data.message;
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -154,16 +154,18 @@ export const resetPassword = createAsyncThunk(
 //// ----------------- Check Auth ----------------- ////
 
 export const checkAuth = createAsyncThunk(
-  "user/checkAuth",
-  async (_, thunkAPI) => {
+  "auth/checkAuth",
+  async (_, { rejectWithValue }) => {
     try {
       const res = await API.get("/users/checkauth");
-      return res.data.accessToken;
+      return res.data.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        return thunkAPI.rejectWithValue(error.response?.data.message);
+        return rejectWithValue(
+          error.response?.data.message || "Check Auth failed"
+        );
       }
-      return thunkAPI.rejectWithValue("Something went wrong");
+      return rejectWithValue("Something went wrong");
     }
   }
 );
