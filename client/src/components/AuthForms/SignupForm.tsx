@@ -3,6 +3,7 @@ import AuthLayout from "../Layouts/AuthLayout";
 import Input from "../Layouts/Input";
 import Link from "next/link";
 import { IconLoader } from "@tabler/icons-react";
+import GoogleSignup from "@/firebase/GoogleSignup";
 
 type InputType = {
   name: string;
@@ -73,6 +74,15 @@ const SignupForm: React.FC<InputType> = ({
               "Sign up"
             )}
           </button>
+
+
+          <div className="relative flex items-center w-full my-2">
+            <div className="flex-grow border-t border-zinc-200 md:border-zinc-500"></div>
+            <span className="mx-4 text-zinc-700 text-md font-medium">Or</span>
+            <div className="flex-grow border-t border-zinc-200 md:border-zinc-500"></div>
+          </div>
+
+          <GoogleSignup />
 
           <p className="md:py-[.5vw] py-[1.5vh] text-zinc-600 text-[1.6vh] md:text-[.8vw] text-center">
             Already have an account{" "}

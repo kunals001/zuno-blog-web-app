@@ -20,10 +20,6 @@ const userSchema = new mongoose.Schema(
       required: true,
       select: false
     },
-    phone: {
-      type: String,
-      trim: true
-    },
     
     isVerified: { type: Boolean, default: false },
     verificationToken: String,
@@ -105,7 +101,10 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
 
-    profilePic: String,
+    profilePic:{
+      type: String,
+      default: ""
+    },
     
     signupSource: {
       type: String,

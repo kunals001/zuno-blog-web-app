@@ -7,12 +7,12 @@ import Link from "next/link";
 const NavUserShow = () => {
   const { user } = useAppSelector((state) => state.user);
 
-  const isUserLoggedIn = user && user.verified;
+  const isUserLoggedIn = user && user.isVerified;
 
   return (
     <div aria-label="show user">
       {isUserLoggedIn ? (
-        <div className="md:w-[3.5vw] md:h-[3.5vw] h-[6vh] w-[6vh] rounded-full">
+        <div className="md:w-[2.5vw] md:h-[2.5vw] h-[4.7vh] w-[4.7vh] rounded-full overflow-hidden">
           <Image
             src={user.profilePic || ""}
             alt="user-profile"

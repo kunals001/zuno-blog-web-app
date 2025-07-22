@@ -20,7 +20,7 @@ export type User = {
   verifytokenexpire?: string;
   resetpasswordtoken?: string;
   resetpasswordtokenexpire?: string;
-  verified: boolean;
+  isVerified: boolean;
   profilePic?: string;
   bio: string;
   socialLinks: SocialLink[];

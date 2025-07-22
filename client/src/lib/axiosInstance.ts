@@ -60,7 +60,7 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const res = await api.get("/api/auth/refresh");
+        const res = await api.get("/api/users/refresh");
         const newAccessToken = (res.data as { accessToken: string }).accessToken;
 
         setToken(newAccessToken);

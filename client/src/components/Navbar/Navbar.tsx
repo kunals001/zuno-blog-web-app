@@ -86,16 +86,16 @@ const Navbar = () => {
 
           <DarkMode />
 
+          <div className="">
+            <NavUserShow />
+          </div>
+
           <IconMenu2
             onClick={() => {
               setOpen(!open);
             }}
             className="size-[3vh] text-zinc-700 dark:text-zinc-200 md:hidden"
           />
-
-          <div className="">
-            <NavUserShow />
-          </div>
         </div>
 
         <MobileMenu open={open} setOpen={setOpen} />
