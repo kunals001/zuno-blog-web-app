@@ -35,6 +35,7 @@ const GoogleSignup = () => {
 
       await dispatch(googleSignup(userInfo)).unwrap();
       router.replace("/");
+      window.location.reload();
     } catch (error) {
       console.log(error);
     }

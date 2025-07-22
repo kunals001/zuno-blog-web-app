@@ -11,7 +11,7 @@ export const refreshAccessToken = (req, res) => {
     const accessToken = jwt.sign(
       { userId: decoded.userId },
       process.env.JWT_ACCESS_SECRET,
-      { expiresIn: "1m" }
+      { expiresIn: "15m" }
     );
     res.json({ accessToken });
   } catch (err) {

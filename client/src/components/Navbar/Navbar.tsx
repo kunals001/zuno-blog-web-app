@@ -44,8 +44,13 @@ const MobileMenu = dynamic(() => import("../Layouts/MobileMenu"), {
   ssr: false,
 });
 
+const OpenSearchSection = dynamic(() => import("../Layouts/OpenSearchSection"), {
+  ssr: false,
+});
+
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const [openSearch, setOpenSearch] = useState(false);
 
   return (
     <nav className="w-full md:h-[4vw] h-[7vh] md:px-[10vw] px-[1vh] flex items-center justify-between bg-zinc-200 dark:bg-zinc-800 border-b-1 border-zinc-400 dark:border-zinc-600 md:border-b-0">
@@ -82,7 +87,9 @@ const Navbar = () => {
         {/* Dark mode toggle and mobile menu */}
 
         <div className="flex items-center md:gap-[.5vw] gap-[1.5vh]">
-          <IconSearch className="md:size-[2.6vw] size-[3vh] text-zinc-700 dark:text-zinc-200 cursor-pointer hover:bg-zinc-300 dark:hover:bg-zinc-700 transition ease-in-out duration-200 md:p-[.5vw] rounded-full" />
+          <IconSearch onClick={() => setOpenSearch(!openSearch)} className="md:size-[2.6vw] size-[3vh] text-zinc-700 dark:text-zinc-200 cursor-pointer hover:bg-zinc-300 dark:hover:bg-zinc-700 transition ease-in-out duration-200 md:p-[.5vw] rounded-full" />
+
+          {openSearch && <OpenSearchSection openSearch={openSearch} setOpenSearch={setOpenSearch} />}  
 
           <DarkMode />
 
