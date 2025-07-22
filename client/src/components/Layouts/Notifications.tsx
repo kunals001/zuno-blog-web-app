@@ -4,14 +4,16 @@ import React from "react";
 const Notifications = ({
   openNotif,
   setOpenNotif,
+  dropdownRef
 }: {
   openNotif: boolean;
   setOpenNotif: React.Dispatch<React.SetStateAction<boolean>>;
+  dropdownRef: React.RefObject<HTMLDivElement | null>;
 }) => {
   return (
     <>
        {openNotif && (
-        <div className="md:w-[15vw] w-full md:h-[20vw] h-screen bg-zinc-300 md:dark:bg-zinc-700 dark:bg-zinc-800 md:rounded-xl absolute md:top-[4vw] md:right-[10vw] top-0 right-0 z-80 md:p-[1vw] p-[1vh]">
+        <div ref={dropdownRef} className="md:w-[15vw] w-full md:h-[20vw] h-screen bg-zinc-300 md:dark:bg-zinc-700 dark:bg-zinc-800 md:rounded-xl absolute md:top-[4vw] md:right-[10vw] top-0 right-0 z-80 md:p-[1vw] p-[1vh]">
             <div className="md:hidden flex items-center gap-[3vh]">
                 <IconArrowNarrowLeft
                 stroke={1}
