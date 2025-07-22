@@ -5,6 +5,7 @@ import { IconLoader } from "@tabler/icons-react";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { clearVerifyError, verifyEmail } from "@/redux/slices/userSlice";
 import { useRouter } from "next/navigation";
+import { Redirect } from "@/components/Secure/Redirect";
 
 const ErrorToast = dynamic(() => import("@/components/Layouts/ErrorLayout"), {
   ssr: false,
@@ -38,7 +39,7 @@ const Verify = () => {
   };
 
   return (
-    <div>
+    <Redirect>
       {typeof verifyError === "string" && (
         <ErrorToast
           message={verifyError}
@@ -53,7 +54,7 @@ const Verify = () => {
         handelVerify={handelVerify}
         verifyLoading={verifyLoding}
       />
-    </div>
+    </Redirect>
   );
 };
 

@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { loginUser } from "@/redux/slices/userSlice";
 import { useRouter } from "next/navigation";
 import { clearLoginError } from "@/redux/slices/userSlice";
+import { Redirect } from "@/components/Secure/Redirect";
 
 const ErrorToast = dynamic(() => import("@/components/Layouts/ErrorLayout"), {
   ssr: false,
@@ -40,7 +41,7 @@ const Login = () => {
   };
 
   return (
-    <div>
+    <Redirect>
       {typeof loginError === "string" && (
         <ErrorToast
           message={loginError}
@@ -57,7 +58,7 @@ const Login = () => {
         handelLogin={handelLogin}
         loginLoading={loginLoading}
       />
-    </div>
+    </Redirect>
   );
 };
 

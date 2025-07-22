@@ -7,6 +7,7 @@ import {
   clearForgotPasswordError,
   forgotPassword,
 } from "@/redux/slices/userSlice";
+import { Redirect } from "@/components/Secure/Redirect";
 
 const ErrorToast = dynamic(() => import("@/components/Layouts/ErrorLayout"), {
   ssr: false,
@@ -52,7 +53,7 @@ const ForgotPage = () => {
   };
 
   return (
-    <div>
+    <Redirect>
       {typeof forgotPasswordError === "string" && (
         <ErrorToast
           message={forgotPasswordError}
@@ -71,7 +72,7 @@ const ForgotPage = () => {
       ) : (
         <ResetForm />
       )}
-    </div>
+    </Redirect>
   );
 };
 

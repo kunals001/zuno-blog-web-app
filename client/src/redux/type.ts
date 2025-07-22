@@ -21,7 +21,7 @@ export type User = {
   resetpasswordtoken?: string;
   resetpasswordtokenexpire?: string;
   verified: boolean;
-  avatar?: string;
+  profilePic?: string;
   bio: string;
   socialLinks: SocialLink[];
   followers: string[]; 

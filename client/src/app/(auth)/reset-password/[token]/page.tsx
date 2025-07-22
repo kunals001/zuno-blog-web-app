@@ -8,6 +8,7 @@ import {
   resetPassword,
 } from "@/redux/slices/userSlice";
 import { useRouter,useParams } from "next/navigation";
+import { Redirect } from "@/components/Secure/Redirect";
 
 const ErrorToast = dynamic(() => import("@/components/Layouts/ErrorLayout"), {
   ssr: false,
@@ -54,7 +55,7 @@ const ResetPasswordPage = () => {
   };
 
   return (
-    <div>
+    <Redirect>
       {typeof resetPasswordError === "string" && (
         <ErrorToast
           message={resetPasswordError}
@@ -71,7 +72,7 @@ const ResetPasswordPage = () => {
         handelReset={handelLogin}
         resetLoading={resetPasswordLoading}
       />
-    </div>
+    </Redirect>
   );
 };
 

@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { registerUser } from "@/redux/slices/userSlice";
 import { useRouter } from "next/navigation";
 import { clearRegisterError } from "@/redux/slices/userSlice";
+import { Redirect } from "@/components/Secure/Redirect";
 
 const ErrorToast = dynamic(() => import("@/components/Layouts/ErrorLayout"), {
   ssr: false,
@@ -43,7 +44,7 @@ const Signup = () => {
   };
 
   return (
-    <div>
+    <Redirect>
       {typeof registerError === "string" && (
         <ErrorToast
           message={registerError}
@@ -62,7 +63,7 @@ const Signup = () => {
         handelSignup={handelSignup}
         signupLoading={signupLoading}
       />
-    </div>
+    </Redirect>
   );
 };
 

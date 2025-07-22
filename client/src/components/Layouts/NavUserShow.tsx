@@ -14,8 +14,8 @@ const NavUserShow = () => {
       {isUserLoggedIn ? (
         <div className="md:w-[3.5vw] md:h-[3.5vw] h-[6vh] w-[6vh] rounded-full">
           <Image
-            src={user.avatar || ""}
-            alt="user-avatar"
+            src={user.profilePic || ""}
+            alt="user-profile"
             width={100}
             height={100}
             className="object-contain"
