@@ -45,7 +45,7 @@ const NavUserShow = () => {
     },
     {
       name: "Write",
-      path: "/write",
+      path: "/add-story",
       icon: IconWriting,
     },
     {
