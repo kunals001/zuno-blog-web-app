@@ -12,7 +12,7 @@ const NavUserShow = () => {
   return (
     <div aria-label="show user">
       {isUserLoggedIn ? (
-        <div className="md:w-[2.5vw] md:h-[2.5vw] h-[4.7vh] w-[4.7vh] rounded-full overflow-hidden">
+        <div className="md:w-[2.5vw] md:h-[2.5vw] h-[4.7vh] w-[4.7vh] rounded-full overflow-hidden select-none">
           <Image
             src={user.profilePic || ""}
             alt="user-profile"

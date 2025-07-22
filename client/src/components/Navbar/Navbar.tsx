@@ -1,22 +1,10 @@
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import Skeleton from "../Layouts/Skeleton";
-import { IconMenu2, IconSearch } from "@tabler/icons-react";
+import { IconBell, IconMenu2, IconSearch } from "@tabler/icons-react";
 import { useState } from "react";
 
 const NavUserShow = dynamic(() => import("../Layouts/NavUserShow"), {
-  ssr: false,
-  loading: () => (
-    <Skeleton
-      width={"w-[5vh] md:w-[2.5vw]"}
-      height={"h-[5vh] md:h-[2.5vw]"}
-      rounded={"rounded-full"}
-      animation="shimmer"
-    />
-  ),
-});
-
-const DarkMode = dynamic(() => import("@/components/Layouts/DarkMode"), {
   ssr: false,
   loading: () => (
     <Skeleton
@@ -44,13 +32,25 @@ const MobileMenu = dynamic(() => import("../Layouts/MobileMenu"), {
   ssr: false,
 });
 
-const OpenSearchSection = dynamic(() => import("../Layouts/OpenSearchSection"), {
-  ssr: false,
-});
+const OpenSearchSection = dynamic(() => import("../Layouts/OpenSearchSection"),{
+    ssr: false,
+  }
+);
+
+const Notifications = dynamic(() => import("../Layouts/Notifications"),{
+    ssr: false,
+  }
+);
+
+const DarkMode = dynamic(() => import("../Layouts/DarkMode"),{
+    ssr: false,
+  }
+);
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [openSearch, setOpenSearch] = useState(false);
+  const [openNotif, setOpenNotif] = useState(false);
 
   return (
     <nav className="w-full md:h-[4vw] h-[7vh] md:px-[10vw] px-[1vh] flex items-center justify-between bg-zinc-200 dark:bg-zinc-800 border-b-1 border-zinc-400 dark:border-zinc-600 md:border-b-0">
@@ -84,14 +84,33 @@ const Navbar = () => {
           <Navlinks />
         </div>
 
-        {/* Dark mode toggle and mobile menu */}
+        {/* user section */}
 
         <div className="flex items-center md:gap-[.5vw] gap-[1.5vh]">
-          <IconSearch onClick={() => setOpenSearch(!openSearch)} className="md:size-[2.6vw] size-[3vh] text-zinc-700 dark:text-zinc-200 cursor-pointer hover:bg-zinc-300 dark:hover:bg-zinc-700 transition ease-in-out duration-200 md:p-[.5vw] rounded-full" />
+          <div className="flex items-center gap-[1.5vh] md:gap-0">
+            <IconSearch
+              onClick={() => setOpenSearch(!openSearch)}
+              className="md:size-[2.6vw] size-[3.5vh] text-zinc-600 dark:text-zinc-200 cursor-pointer hover:bg-zinc-300 dark:hover:bg-zinc-700 transition ease-in-out duration-200 md:p-[.5vw] rounded-full"
+            />
 
-          {openSearch && <OpenSearchSection openSearch={openSearch} setOpenSearch={setOpenSearch} />}  
+            <IconBell onClick={() => setOpenNotif(!openNotif)} className="md:size-[2.6vw] size-[3.5vh] text-zinc-600 dark:text-zinc-200 cursor-pointer hover:bg-zinc-300 dark:hover:bg-zinc-700 transition ease-in-out duration-200 md:p-[.5vw] rounded-full" />
+          </div>
 
-          <DarkMode />
+          <DarkMode/>
+
+          {openNotif && (
+            <Notifications
+              openNotif={openNotif}
+              setOpenNotif={setOpenNotif}
+            />
+          )}
+
+          {openSearch && (
+            <OpenSearchSection
+              openSearch={openSearch}
+              setOpenSearch={setOpenSearch}
+            />
+          )}
 
           <div className="">
             <NavUserShow />
