@@ -334,12 +334,12 @@ export const userSlice = createSlice({
         state.logoutLoading = false;
         state.user = null;
         state.accessToken = null;
+
+        setToken(null);
       })
       .addCase(logoutUser.rejected, (state, action) => {
         state.logoutLoading = false;
         state.logoutError = action.payload as string;
-
-        setToken(null);
       })
 
       /// ---------------------- GOOGLE LOGIN --------------------------- ///
