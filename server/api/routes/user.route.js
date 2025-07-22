@@ -3,7 +3,8 @@ const router = express.Router();
 
 import {
     registerUser,
-    verifyUser,
+    verifyEmail,
+    googleSignup,
     loginUser,
     logoutUser,
     forgotPassword,
@@ -25,7 +26,8 @@ import {refreshAccessToken} from "../utils/refreshAccessToken.js";
 router.get("/refresh", refreshAccessToken);
 router.get("/check-auth", protectRoute, checkAuth);
 router.post("/register", registerUser);
-router.post("/verify", verifyUser);
+router.post("/verify", verifyEmail);
+router.post("/google-signup", googleSignup);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
 router.post("/forgot-password", forgotPassword);

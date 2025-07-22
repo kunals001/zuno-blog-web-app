@@ -1,19 +1,16 @@
-import bcrypt from "bcryptjs";
 import User from "../models/user.model.js";
 import { sendEmail } from "../utils/sendEmail.js";
 import {
   VERIFICATION_EMAIL_TEMPLATE,
   PASSWORD_RESET_REQUEST_TEMPLATE,
-} from "../config/email.js";
-import { generateTokens } from "../config/generateToken.js";
+} from "../utils/email.js";
+import { generateTokens } from "../utils/generateToken.js";
+import bcrypt from "bcryptjs";
 import crypto from "crypto";
-import {connectedUsers} from "../config/websocket.js"
-
-//// ----------------- AUTH CONTROLLERS ----------------- ////
 
 export const registerUser = async (req, res) => {
   try {
-    const { password, email, name} = req.body;
+    const { password, email, name } = req.body;
 
     if (!password || !email || !name) {
       res
@@ -42,8 +39,8 @@ export const registerUser = async (req, res) => {
       name,
       email,
       password,
-      verifytoken: verifyToken,
-      verifytokenexpire: Date.now() + 1 * 60 * 60 * 1000,
+      verificationToken: verifyToken,
+      verifyTokenExpiry: Date.now() + 1 * 60 * 60 * 1000,
     });
 
     await newUser.save();
@@ -61,13 +58,13 @@ export const registerUser = async (req, res) => {
   }
 };
 
-export const verifyUser = async (req, res) => {
+export const verifyEmail = async (req, res) => {
   try {
     const { code } = req.body;
 
     const user = await User.findOne({
-      verifytoken: code,
-      verifytokenexpire: { $gt: Date.now() },
+      verificationToken: code,
+      verifyTokenExpiry: { $gt: Date.now() },
     }).select("-password");
 
     if (!user) {
@@ -75,9 +72,9 @@ export const verifyUser = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Invalid verification code" });
     }
-    user.verified = true;
-    user.verifytoken = undefined;
-    user.verifytokenexpire = undefined;
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    user.verifyTokenExpiry = undefined;
 
     await user.save();
 
@@ -104,12 +101,75 @@ export const verifyUser = async (req, res) => {
   }
 };
 
+const generateStrongPassword = (name) => {
+  const salt = crypto.randomBytes(4).toString("hex"); // 8 chars
+  const namePart = name.slice(0, 3).toLowerCase();    // first 3 letters
+  const randomNum = Math.floor(100 + Math.random() * 900); // 3-digit number
+
+  return `${namePart}@${salt}${randomNum}`; // final password string
+};
+
+export const googleSignup = async (req, res) => {
+  try {
+    const { name, email, profilePic } = req.body;
+
+    const existUser = await User.findOne({ email });
+
+    if (existUser) {
+      const { accessToken, refreshToken } = generateTokens(existUser._id);
+
+      res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+      return res.status(200).json({
+        accessToken
+      });
+    }
+
+    
+    const rawPassword = generateStrongPassword(name);
+    const hashedPassword = await bcrypt.hash(rawPassword, 10);
+
+    const newUser = await User.create({
+      name,
+      email,
+      profilePic,
+      password: hashedPassword, 
+    });
+
+    newUser.signupSource = "google";
+    newUser.isVerified = true;
+
+    await newUser.save();
+
+    const { accessToken, refreshToken } = generateTokens(newUser._id);
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return res.status(200).json({
+      accessToken
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
 
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email }).select("+password"); // FIXED
+    const user = await User.findOne({ email }).select("+password");
 
     if (!user) {
       return res
@@ -135,19 +195,13 @@ export const loginUser = async (req, res) => {
     });
 
     res.status(200).json({
-      accessToken,
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-      },
+      accessToken
     });
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
-
 
 export const logoutUser = (req, res) => {
   res.clearCookie("refreshToken", {
@@ -178,8 +232,8 @@ export const forgotPassword = async (req, res) => {
 
     const randomToken = crypto.randomBytes(20).toString("hex");
 
-    user.resetpasswordtoken = randomToken;
-    user.resetpasswordtokenexpire = Date.now() + 1 * 60 * 60 * 1000;
+    user.forgotPasswordToken = randomToken;
+    user.forgotPasswordExpiry = Date.now() + 1 * 60 * 60 * 1000;
 
     await user.save();
 
@@ -222,8 +276,8 @@ export const resetPassword = async (req, res) => {
     }
 
     const user = await User.findOne({
-      resetpasswordtoken: token,
-      resetpasswordtokenexpire: { $gt: Date.now() },
+      forgotPasswordToken: token,
+      forgotPasswordExpiry: { $gt: Date.now() },
     }).select("-password");
 
     if (!user) {
@@ -231,8 +285,8 @@ export const resetPassword = async (req, res) => {
     }
 
     user.password = password;
-    user.resetpasswordtoken = undefined;
-    user.resetpasswordtokenexpire = undefined;
+    user.forgotPasswordToken = undefined;
+    user.forgotPasswordExpiry = undefined;
 
     await user.save();
 
@@ -255,6 +309,7 @@ export const checkAuth = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 
 //// ----------------- PROFILE CONTROLLER ------------------- ////

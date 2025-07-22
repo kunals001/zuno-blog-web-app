@@ -1,40 +1,36 @@
 import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema(
   {
+
     name: {
       type: String,
       required: true,
+      trim: true
     },
-
     email: {
       type: String,
       required: true,
       unique: true,
+      lowercase: true
     },
-
     password: {
       type: String,
       required: true,
+      select: false
     },
-
-    isAuthor: {
-      type: Boolean,
-      default: false,
-    },
-
-    verifytoken: String,
-    verifytokenexpire: Date,
-    resetpasswordtoken: String,
-    resetpasswordtokenexpire: Date,
-
-    verified: {
-      type: Boolean,
-      default: false,
-    },
-
-    avatar: {
+    phone: {
       type: String,
+      trim: true
+    },
+    
+    isVerified: { type: Boolean, default: false },
+    verificationToken: String,
+    forgotPasswordToken: String,
+    forgotPasswordExpiry: Date,
+    verifyTokenExpiry: {
+        type: Date
     },
 
     bio: {
@@ -108,9 +104,34 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+
+    profilePic: String,
+    
+    signupSource: {
+      type: String,
+      enum: ["website", "google"],
+      default: "website"
+    },
+
   },
   { timestamps: true }
 );
 
+
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
+  this.password = await bcrypt.hash(this.password, 10);
+});
+
+
+userSchema.methods.comparePassword = function (password) {
+  return bcrypt.compare(password, this.password);
+};
+
+
 const User = mongoose.model("User", userSchema);
+
 export default User;
+
+
+
