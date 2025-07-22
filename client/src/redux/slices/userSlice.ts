@@ -1,37 +1,31 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 import type { User } from "../type";
-import api from "@/lib/axios";
+import api from "@/lib/axiosInstance";
 import { setToken } from "@/lib/tokenService";
 
 axios.defaults.withCredentials = true;
 
-const API_URL = process.env.NEXT_PUBLIC_SERVER_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-type VerifyResponse = {
-  user: User;
-  accessToken: string;
-};
-
-//// ---------------------- SIGNUP USER --------------------------- ////
-
-export const signupUser = createAsyncThunk(
-  "user/signupUser",
+//// ----------------- Register User ----------------- ////
+export const registerUser = createAsyncThunk(
+  "user/registerUser",
   async (
     {
       name,
       email,
       password,
-    }: { name: string; email: string; password: string },
+    }: { name: string; email: string; password: string},
     { rejectWithValue }
   ) => {
     try {
-      const response = await axios.post(`${API_URL}/users/register`, {
+      const res = await axios.post(`${API_URL}/api/users/register`, {
         name,
         email,
         password,
       });
-      return response.data.message;
+      return res.data.message; 
     } catch (error) {
       if (error instanceof AxiosError) {
         return rejectWithValue(error.response?.data.message || "Signup failed");
@@ -40,80 +34,110 @@ export const signupUser = createAsyncThunk(
   }
 );
 
-//// ---------------------- VERIFY USER --------------------------- ////
+//// ----------------- Verify Email ----------------- ////
+type VerifyResponse = {
+  user: User;
+  accessToken: string;
+};
 
-export const verifyUser = createAsyncThunk<VerifyResponse, { code: string }>(
-  "user/verifyUser",
-  async ({ code }, { rejectWithValue }) => {
-    try {
-      const response = await axios.post(`${API_URL}/users/verify`, {
-        code,
-      });
-      return {
-        user: response.data.user,
-        accessToken: response.data.accessToken,
-      };
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        return rejectWithValue(
-          error.response?.data.message || "Verification failed"
-        );
-      }
-      return rejectWithValue("Something went wrong");
-    }
-  }
-);
-
-//// ---------------------- LOGIN USER --------------------------- ////
-
-export const loginUser = createAsyncThunk<
+export const verifyEmail = createAsyncThunk<
   VerifyResponse,
-  { email: string; password: string }
->(
-  "user/loginUser",
-  async (
-    { email, password }: { email: string; password: string },
-    { rejectWithValue }
-  ) => {
-    try {
-      const response = await axios.post(`${API_URL}/users/login`, {
-        email,
-        password,
-      });
-      return {
-        user: response.data.user,
-        accessToken: response.data.accessToken,
-      };
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        return rejectWithValue(
-          error.response?.data.message || "Verification failed"
-        );
-      }
-      return rejectWithValue("Something went wrong");
-    }
-  }
-);
-
-/// ------------------------ LOGOUT USER --------------------------- ////
-
-export const logoutUser = createAsyncThunk("user/logoutUser", async () => {
+  { code: string },
+  { rejectValue: string }
+>("user/verifyEmail", async ({ code }, { rejectWithValue }) => {
   try {
-    await axios.post(`${API_URL}/users/logout`);
+    const res = await axios.post(`${API_URL}/api/users/verify`, { code });
+    return {
+      user: res.data.user,
+      accessToken: res.data.accessToken,
+    };
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      return error.response?.data.message;
+      return rejectWithValue(
+        error.response?.data.message || "Verification failed"
+      );
     }
+    return rejectWithValue("Something went wrong");
+  }
+});
+
+//// ----------------- Google Signup ----------------- ////
+
+type UserInfo = {
+  name: string;
+  email: string;
+  profilePic: string;
+};
+
+export const googleSignup = createAsyncThunk<
+  VerifyResponse,
+  UserInfo,
+  { rejectValue: string }
+>("user/googleSignup", async (userInfo, { rejectWithValue }) => {
+  try {
+    const res = await axios.post(`${API_URL}/api/users/google-signup`, userInfo);
+    return {
+      user: res.data.user,
+      accessToken: res.data.accessToken,
+    };
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      return rejectWithValue(
+        error.response?.data.message || "Verification failed"
+      );
+    }
+    return rejectWithValue("Something went wrong");
+  }
+});
+
+//// ----------------- Login User ----------------- ////
+export const loginUser = createAsyncThunk<
+  VerifyResponse,
+  { email: string; password: string },
+  { rejectValue: string }
+>("user/loginUser", async ({ email, password }, { rejectWithValue }) => {
+  try {
+    const res = await axios.post(`${API_URL}/api/users/login`, {
+      email,
+      password,
+    });
+    return {
+      user: res.data.user,
+      accessToken: res.data.accessToken,
+    };
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      return rejectWithValue(
+        error.response?.data.message || "Verification failed"
+      );
+    }
+    return rejectWithValue("Something went wrong");
+  }
+});
+
+//// ----------------- Logout User ----------------- ////
+
+export const logoutUser = createAsyncThunk<
+  string, 
+  void,   
+  { rejectValue: string } 
+>("user/logoutUser", async (_, { rejectWithValue }) => {
+  try {
+    const res = await axios.post(`${API_URL}/api/users/logout`);
+    return res.data.message;
+  } catch (error) {
+    const err = error as AxiosError<{ message?: string }>;
+    return rejectWithValue(err.response?.data?.message || "Logout failed");
   }
 });
 
 //// ----------------- Forgot Password ----------------- ////
 
 export const forgotPassword = createAsyncThunk(
-  "auth/forgotPassword",
+  "user/forgotPassword",
   async ({ email }: { email: string }, { rejectWithValue }) => {
     try {
-      const res = await axios.post(`${API_URL}/users/forgot-password`, {
+      const res = await axios.post(`${API_URL}/api/users/forgot-password`, {
         email,
       });
       return res.data.message;
@@ -131,15 +155,18 @@ export const forgotPassword = createAsyncThunk(
 //// ----------------- Reset Password ----------------- ////
 
 export const resetPassword = createAsyncThunk(
-  "auth/resetPassword",
+  "user/resetPassword",
   async (
     { token, password }: { token: string; password: string },
     { rejectWithValue }
   ) => {
     try {
-      const res = await axios.post(`${API_URL}/users/reset-password/${token}`, {
-        password,
-      });
+      const res = await axios.post(
+        `${API_URL}/api/users/reset-password/${token}`,
+        {
+          password,
+        }
+      );
       return res.data.message;
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -155,10 +182,10 @@ export const resetPassword = createAsyncThunk(
 //// ----------------- Check Auth ----------------- ////
 
 export const checkAuth = createAsyncThunk(
-  "auth/checkAuth",
+  "user/checkAuth",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await api.get("/users/check-auth");
+      const res = await api.get("/api/users/check-auth");
       return res.data.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -179,6 +206,7 @@ interface AuthState {
   forgotPasswordLoading: boolean;
   resetPasswordLoading: boolean;
   logoutLoading: boolean;
+  googleLoading: boolean;
 
   registerError: string | null;
   verifyError: string | null;
@@ -186,6 +214,7 @@ interface AuthState {
   forgotPasswordError: string | null;
   resetPasswordError: string | null;
   logoutError: string | null;
+  googleError: string | null;
 
   isAuthenticated: boolean;
   isCheckingAuth: boolean;
@@ -200,6 +229,7 @@ const initialState: AuthState = {
   forgotPasswordLoading: false,
   resetPasswordLoading: false,
   logoutLoading: false,
+  googleLoading: false,
 
   registerError: null,
   verifyError: null,
@@ -207,6 +237,7 @@ const initialState: AuthState = {
   forgotPasswordError: null,
   resetPasswordError: null,
   logoutError: null,
+  googleError: null,
 
   isAuthenticated: false,
   isCheckingAuth: true,
@@ -238,36 +269,39 @@ export const userSlice = createSlice({
     clearLogoutError: (state) => {
       state.logoutError = null;
     },
+    clearGoogleError: (state) => {
+      state.googleError = null;
+    },
   },
   extraReducers: (builder) => {
     builder
       /// ---------------------- SIGNUP USER --------------------------- ///
-      .addCase(signupUser.pending, (state) => {
+      .addCase(registerUser.pending, (state) => {
         state.signupLoading = true;
         state.registerError = null;
       })
-      .addCase(signupUser.fulfilled, (state) => {
+      .addCase(registerUser.fulfilled, (state) => {
         state.signupLoading = false;
       })
-      .addCase(signupUser.rejected, (state, action) => {
+      .addCase(registerUser.rejected, (state, action) => {
         state.signupLoading = false;
         state.registerError = action.payload as string;
       })
 
       /// ---------------------- VERIFY USER --------------------------- ///
 
-      .addCase(verifyUser.pending, (state) => {
+      .addCase(verifyEmail.pending, (state) => {
         state.verifyLoding = true;
         state.verifyError = null;
       })
-      .addCase(verifyUser.fulfilled, (state, action) => {
+      .addCase(verifyEmail.fulfilled, (state, action) => {
         state.verifyLoding = false;
         state.user = action.payload.user;
         state.accessToken = action.payload.accessToken;
 
         setToken(action.payload.accessToken);
       })
-      .addCase(verifyUser.rejected, (state, action) => {
+      .addCase(verifyEmail.rejected, (state, action) => {
         state.verifyLoding = false;
         state.verifyError = action.payload as string;
       })
@@ -306,6 +340,24 @@ export const userSlice = createSlice({
         state.logoutError = action.payload as string;
 
         setToken(null);
+      })
+
+      /// ---------------------- GOOGLE LOGIN --------------------------- ///
+
+      .addCase(googleSignup.pending, (state) => {
+        state.googleLoading = true;
+        state.googleError = null;
+      })
+      .addCase(googleSignup.fulfilled, (state, action) => {
+        state.googleLoading = false;
+        state.user = action.payload.user;
+        state.accessToken = action.payload.accessToken;
+
+        setToken(action.payload.accessToken);
+      })
+      .addCase(googleSignup.rejected, (state, action) => {
+        state.googleLoading = false;
+        state.googleError = action.payload as string;
       })
 
       /// ---------------------- FORGOT PASSWORD --------------------------- ///
@@ -361,5 +413,6 @@ export const {
   clearForgotPasswordError,
   clearResetPasswordError,
   clearLogoutError,
+  clearGoogleError
 } = userSlice.actions;
 export default userSlice.reducer;

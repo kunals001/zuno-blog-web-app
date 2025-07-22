@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import dynamic from "next/dynamic";
 import { IconLoader } from "@tabler/icons-react";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { signupUser } from "@/redux/slices/userSlice";
+import { registerUser } from "@/redux/slices/userSlice";
 import { useRouter } from "next/navigation";
 import { clearRegisterError } from "@/redux/slices/userSlice";
 
@@ -35,7 +35,7 @@ const Signup = () => {
     e.preventDefault();
 
     try {
-      await dispatch(signupUser({ name, email, password })).unwrap();
+      await dispatch(registerUser({ name, email, password })).unwrap();
       if (!registerError) {
         router.push("/verify-account");
       }

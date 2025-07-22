@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import dynamic from "next/dynamic";
 import { IconLoader } from "@tabler/icons-react";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { clearVerifyError, verifyUser } from "@/redux/slices/userSlice";
+import { clearVerifyError, verifyEmail } from "@/redux/slices/userSlice";
 import { useRouter } from "next/navigation";
 
 const ErrorToast = dynamic(() => import("@/components/Layouts/ErrorLayout"), {
@@ -30,7 +30,7 @@ const Verify = () => {
     e.preventDefault();
 
     try {
-      await dispatch(verifyUser({code})).unwrap();
+      await dispatch(verifyEmail({code})).unwrap();
       if (!verifyError) {
         router.push("/");
       }

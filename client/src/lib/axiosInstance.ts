@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig, AxiosError, InternalAxiosRequestConfig } fro
 import { getToken, setToken } from "./tokenService"; 
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_SERVER_URL,
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
   withCredentials: true,
 });
 
@@ -60,7 +60,7 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const res = await api.get("/users/refresh");
+        const res = await api.get("/api/auth/refresh");
         const newAccessToken = (res.data as { accessToken: string }).accessToken;
 
         setToken(newAccessToken);
