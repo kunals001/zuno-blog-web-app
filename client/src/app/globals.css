@@ -174,5 +174,17 @@ input:not(:checked) ~ .moon {
    }
  }
 
+ul {
+  list-style-type: disc;
+  margin-left: 1.5rem;
+}
 
+ol {
+  list-style-type: decimal;
+  margin-left: 1.5rem;
+}
+
+li {
+  margin-bottom: 0.25rem;
+}
 
