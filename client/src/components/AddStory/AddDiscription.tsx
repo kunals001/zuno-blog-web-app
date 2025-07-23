@@ -23,7 +23,7 @@ const AddDescription: React.FC<Props> = ({ description, setDescription }) => {
           placeholder:text-zinc-400 dark:placeholder:text-zinc-500
           outline-none
           p-4
-          text-[1rem] md:text-[1.1vw]
+          text-[1rem] md:text-[1vw]
           transition resize-none overflow-y-scroll md:h-[12vw] h-[20vh] scrollbar-hide
         "
       />

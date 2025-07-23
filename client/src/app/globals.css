@@ -4,6 +4,7 @@
 
 @theme{
   --font-prime: "Barlow", sans-serif;
+  --color-prime: #0ABAB5;
 }
 
 body {
@@ -157,3 +158,21 @@ input:not(:checked) ~ .moon {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;                /* Chrome, Safari, Opera */
 }
+
+
+ .animate-wave {
+   animation: wave-fade 0.4s ease-in-out;
+ }
+ @keyframes wave-fade {
+   from {
+     opacity: 0;
+     transform: scaleY(0.9);
+   }
+   to {
+     opacity: 1;
+     transform: scaleY(1);
+   }
+ }
+
+
+

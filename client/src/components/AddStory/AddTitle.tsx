@@ -21,7 +21,7 @@ const AddTitle: React.FC<Props> = ({ Title, setTitle }) => {
           text-[3vh] md:text-[2.2vw]
           outline-none
           border-none
-          caret-[#6366f1] caret-w-[3vw]
+          caret-prime caret-w-[3vw]
           peer font-prime
         '
       />
@@ -31,7 +31,7 @@ const AddTitle: React.FC<Props> = ({ Title, setTitle }) => {
         left-0 bottom-0
         h-[2px]
         w-0
-        bg-[#6366f1]
+        bg-prime
         transition-all
         duration-300
         peer-focus:w-full

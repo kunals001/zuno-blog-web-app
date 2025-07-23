@@ -17,6 +17,10 @@ const TagInput = dynamic(() => import("./AddTagesAndKeyword"), {
   ssr: false,
 });
 
+const AddContent = dynamic(() => import("../Layouts/StoryEditor"), {
+  ssr: false,
+});
+
 const Scoring = dynamic(() => import("./Scoring"), {
   ssr: false,
 });
@@ -27,6 +31,7 @@ const CombineAll = () => {
   const [description, setDescription] = useState<string>("");
   const [tags, setTags] = useState<string[]>([]);
   const [keywords, setKeywords] = useState<string[]>([]);
+  const [content, setContent] = useState<string>("");
 
   return (
     <div className="md:px-[10vw] px-[1vh] md:py-[1vw] py-[1vh] mt-[2vh] w-full ">
@@ -44,6 +49,7 @@ const CombineAll = () => {
             setItems={setKeywords}
             placeholder="Add keywords..."
           />
+          <AddContent content={content} setContent={setContent} />
         </div>
 
         <div className="w-full md:w-[20vw] flex items-center flex-col md:sticky">

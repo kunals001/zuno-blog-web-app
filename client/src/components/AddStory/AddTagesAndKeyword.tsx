@@ -60,7 +60,7 @@ const TagInput: React.FC<Props> = ({ items, setItems, placeholder }) => {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder || 'Add tag...'}
-            className="flex-1 min-w-[80px] max-w-[150px] border-none bg-transparent outline-none text-sm text-zinc-800 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
+            className="flex-1 min-w-[80px] max-w-[150px] border-none bg-transparent outline-none text-[1.6vh] md:text-[.9vw] text-zinc-800 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
           />
         )}
       </div>
