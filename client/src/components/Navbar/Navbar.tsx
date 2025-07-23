@@ -63,7 +63,7 @@ const Navbar = () => {
   });
 
   return (
-    <nav className="w-full md:h-[4vw] h-[7vh] md:px-[10vw] px-[1vh] flex items-center justify-between bg-zinc-200 dark:bg-zinc-800 border-b-1 border-zinc-400 dark:border-zinc-600 md:border-b-0">
+    <nav className="w-full md:h-[4vw] h-[7vh] md:px-[10vw] px-[1vh] flex items-center justify-between bg-zinc-200 dark:bg-zinc-800 border-b-1 border-zinc-400 dark:border-zinc-600 md:border-b-0 sticky top-0 z-[100]">
       <div className="w-full h-[100%] flex items-center justify-between md:border-b-2 border-zinc-400 dark:border-zinc-600">
         {/* navbar logo*/}
 

@@ -18,11 +18,11 @@ const AddTitle: React.FC<Props> = ({ Title, setTitle }) => {
           bg-transparent
           text-zinc-700 dark:text-zinc-200
           placeholder:text-zinc-500 dark:placeholder:text-zinc-400
-          text-[3vh] md:text-[2.5vw]
+          text-[3vh] md:text-[2.2vw]
           outline-none
           border-none
           caret-[#6366f1] caret-w-[3vw]
-          peer
+          peer font-prime
         '
       />
       {/* Animated bottom border */}

@@ -401,6 +401,7 @@ export const userSlice = createSlice({
       .addCase(checkAuth.rejected, (state) => {
         state.isCheckingAuth = false;
         state.isAuthenticated = false;
+        state.user = null;
       });
   },
 });

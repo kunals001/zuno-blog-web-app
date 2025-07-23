@@ -2,7 +2,7 @@ import React from 'react'
 
 const Scoring = () => {
   return (
-    <div>Scoring</div>
+    <div className='bg-amber-300'>Scoring</div>
   )
 }
 
