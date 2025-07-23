@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import Post from "../models/post.model.js";
 import slugify from "slugify";
 import { connectedUsers } from "../config/websocket.js";
+import {processPostImages} from "../utils/processPostImages.js"
 
 export const createPost = async (req, res) => {
   try {
@@ -12,15 +13,13 @@ export const createPost = async (req, res) => {
       tags,
       category,
       keywords,
-      coverImage,
+      coverImage, // base64
       status,
       isFeatured,
     } = req.body;
 
     if (!title || !description || !content) {
-      return res
-        .status(400)
-        .json({ message: "Title, description, and content are required." });
+      return res.status(400).json({ message: "Title, description, and content are required." });
     }
 
     const userId = req.user._id;
@@ -39,19 +38,22 @@ export const createPost = async (req, res) => {
       });
     }
 
-    const words = content.trim().split(/\s+/).length;
+    // ✅ PROCESS images
+    const { coverImageURL, updatedContent } = await processPostImages(coverImage, content);
+
+    const words = updatedContent.trim().split(/\s+/).length;
     const estimatedReadTime = Math.ceil(words / 200);
 
     const newPost = await Post.create({
       author: userId,
       title,
       description,
-      content,
+      content: updatedContent,
       slug,
       tags,
       category,
       keywords,
-      coverImage,
+      coverImage: coverImageURL,
       status: status || "Published",
       isFeatured: isFeatured || false,
       readTime: estimatedReadTime,
@@ -59,7 +61,7 @@ export const createPost = async (req, res) => {
 
     await User.findByIdAndUpdate(userId, { $push: { myposts: newPost._id } });
 
-    // ✅ Send real-time notification to followers
+    // ✅ Real-time notification
     const notificationData = {
       type: "NEW_POST",
       payload: {
