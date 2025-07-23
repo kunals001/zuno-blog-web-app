@@ -147,8 +147,6 @@ input:not(:checked) ~ .moon {
   }
 }
 
-.popup-animate {
-  animation: popup 0.3s ease-out forwards;
-}
+
 
 
