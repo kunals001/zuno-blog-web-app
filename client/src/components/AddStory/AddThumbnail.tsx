@@ -43,7 +43,7 @@ const AddThumbnail: React.FC<Props> = ({ coverImg, setCoverImg }) => {
     <div className="w-full mt-[3vh]">
       {/* Desktop */}
       <div
-        className={`relative hidden md:flex overflow-hidden transition-all duration-500 ease-in-out cursor-pointer border-3 border-dashed border-indigo-300 rounded-xl bg-zinc-200 hover:bg-indigo-50 ${
+        className={`relative hidden md:flex overflow-hidden transition-all duration-500 ease-in-out cursor-pointer border-3 border-dashed border-indigo-300 rounded-xl bg-zinc-200 dark:bg-zinc-700 hover:bg-indigo-50 dark:hover:bg-zinc-600 ${
           coverImg ? "h-[28vw] p-1" : "h-[10vw] items-center justify-center"
         }`}
         onClick={handleClick}
@@ -73,7 +73,7 @@ const AddThumbnail: React.FC<Props> = ({ coverImg, setCoverImg }) => {
 
       {/* Mobile */}
       <div
-        className={`relative md:hidden overflow-hidden transition-all duration-500 ease-in-out cursor-pointer border-2 border-dashed border-indigo-300 rounded-xl bg-indigo-50 hover:bg-indigo-100 ${
+        className={`relative md:hidden overflow-hidden transition-all duration-500 ease-in-out cursor-pointer border-2 border-dashed border-indigo-300 rounded-xl bg-zinc-200 dark:bg-zinc-700 ${
           coverImg ? "h-auto p-1" : "h-[15vh] flex items-center justify-center"
         }`}
         onClick={handleClick}
