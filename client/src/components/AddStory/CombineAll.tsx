@@ -33,6 +33,8 @@ const CombineAll = () => {
   const [keywords, setKeywords] = useState<string[]>([]);
   const [content, setContent] = useState<string>("");
 
+  console.log(content);
+
   return (
     <div className="md:px-[10vw] px-[1vh] md:py-[1vw] py-[1vh] mt-[2vh] w-full ">
       <form className="flex md:flex-row flex-col items-center justify-between ">

@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { IconBold, IconItalic, IconList, IconPhoto } from "@tabler/icons-react";
+import {
+  IconBold,
+  IconItalic,
+  IconLink,
+  IconList,
+  IconPhoto,
+} from "@tabler/icons-react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   FORMAT_TEXT_COMMAND,
@@ -12,11 +18,15 @@ import {
   COMMAND_PRIORITY_LOW,
   $createParagraphNode,
 } from "lexical";
+
 import {
   INSERT_UNORDERED_LIST_COMMAND,
   REMOVE_LIST_COMMAND,
   $isListNode,
 } from "@lexical/list";
+
+import { TOGGLE_LINK_COMMAND, $isLinkNode } from "@lexical/link";
+
 import { $createHeadingNode, HeadingTagType } from "@lexical/rich-text";
 import { $createImageNode } from "@/nodes/ImageNode";
 
@@ -28,6 +38,8 @@ const Toolbar = () => {
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
   const [isList, setIsList] = useState(false);
+  const [showLinkInput, setShowLinkInput] = useState(false);
+  const [linkUrl, setLinkUrl] = useState("");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -123,66 +135,113 @@ const Toolbar = () => {
   const selectedClass = "bg-zinc-300 dark:bg-zinc-600";
 
   return (
-    <div className="sticky md:top-[6vw] top-[9vh] left-0 w-full md:px-[1vw] md:py-[.5vw] px-[1vh] py-[.4vh] bg-transparent z-20 rounded-xl backdrop-blur-md border border-zinc-300 dark:border-zinc-700 flex gap-2 overflow-x-scroll scrollbar-hide">
-      <button
-        type="button"
-        onClick={() => handleFormat("bold")}
-        title="Bold"
-        className={`${baseClass} ${isBold ? selectedClass : ""}`}
-      >
-        <IconBold className="w-5 h-5" />
-      </button>
-      <button
-        type="button"
-        onClick={() => handleFormat("italic")}
-        title="Italic"
-        className={`${baseClass} ${isItalic ? selectedClass : ""}`}
-      >
-        <IconItalic className="w-5 h-5" />
-      </button>
-      <button
-        type="button"
-        onClick={handleList}
-        title="Bullet List"
-        className={`${baseClass} ${isList ? selectedClass : ""}`}
-      >
-        <IconList className="w-5 h-5" />
-      </button>
-      <button
-        type="button"
-        onClick={handleImageClick}
-        title="Insert Image"
-        className={baseClass}
-      >
-        <IconPhoto className="w-5 h-5" />
-      </button>
-      <input
-        type="file"
-        accept="image/*"
-        ref={fileInputRef}
-        onChange={handleImageChange}
-        className="hidden"
-      />
-      {headingTypes.map((tag) => (
+    <>
+      <div className="sticky md:top-[6vw] top-[9vh] left-0 w-full md:px-[1vw] md:py-[.5vw] px-[1vh] py-[.4vh] bg-transparent z-20 rounded-xl backdrop-blur-md border border-zinc-300 dark:border-zinc-700 flex gap-2 overflow-x-scroll scrollbar-hide">
         <button
-          key={tag}
           type="button"
-          onClick={() => handleHeading(tag)}
-          title={`Heading ${tag.toUpperCase()}`}
+          onClick={() => handleFormat("bold")}
+          title="Bold"
+          className={`${baseClass} ${isBold ? selectedClass : ""}`}
+        >
+          <IconBold className="w-5 h-5" />
+        </button>
+        <button
+          type="button"
+          onClick={() => handleFormat("italic")}
+          title="Italic"
+          className={`${baseClass} ${isItalic ? selectedClass : ""}`}
+        >
+          <IconItalic className="w-5 h-5" />
+        </button>
+        <button
+          type="button"
+          onClick={handleList}
+          title="Bullet List"
+          className={`${baseClass} ${isList ? selectedClass : ""}`}
+        >
+          <IconList className="w-5 h-5" />
+        </button>
+        <button
+          type="button"
+          onClick={() => setShowLinkInput(true)}
+          title="Insert Link"
           className={baseClass}
         >
-          {tag.toUpperCase()}
+          <IconLink className="w-5 h-5" />
         </button>
-      ))}
-      <button
-        type="button"
-        onClick={handleParagraph}
-        title="Paragraph"
-        className={baseClass}
-      >
-        P
-      </button>
-    </div>
+
+        <button
+          type="button"
+          onClick={handleImageClick}
+          title="Insert Image"
+          className={baseClass}
+        >
+          <IconPhoto className="w-5 h-5" />
+        </button>
+        <input
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          onChange={handleImageChange}
+          className="hidden"
+        />
+        {headingTypes.map((tag) => (
+          <button
+            key={tag}
+            type="button"
+            onClick={() => handleHeading(tag)}
+            title={`Heading ${tag.toUpperCase()}`}
+            className={baseClass}
+          >
+            {tag.toUpperCase()}
+          </button>
+        ))}
+        <button
+          type="button"
+          onClick={handleParagraph}
+          title="Paragraph"
+          className={baseClass}
+        >
+          P
+        </button>
+      </div>
+
+      {showLinkInput && (
+        <div className="fixed inset-0 z-[999] bg-black/30 backdrop-blur-sm flex items-center justify-center px-4">
+          <div className="bg-white dark:bg-zinc-800 p-4 rounded-xl shadow-2xl w-full max-w-md flex flex-col gap-4">
+            <h2 className="text-lg font-semibold text-zinc-800 dark:text-zinc-200">
+              Enter URL
+            </h2>
+            <input
+              type="text"
+              value={linkUrl}
+              onChange={(e) => setLinkUrl(e.target.value)}
+              className="w-full px-4 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-prime"
+              placeholder="https://example.com/image.jpg"
+            />
+
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setShowLinkInput(false)}
+                className="px-4 py-2 rounded-lg bg-zinc-200 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-600 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  editor.dispatchCommand(TOGGLE_LINK_COMMAND, linkUrl);
+                  setShowLinkInput(false);
+                  setLinkUrl("");
+                }}
+                className="px-4 py-2 rounded-lg bg-prime text-zinc-200 hover:bg-prime/80 transition"
+              >
+                Insert
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

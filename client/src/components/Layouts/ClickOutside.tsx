@@ -23,7 +23,7 @@ export const useClickOutside = ({
         if (ignoreRef.current?.contains(target)) return;
       }
 
-      onOutsideClick(event); // otherwise, run callback
+      onOutsideClick(event); 
     };
 
     document.addEventListener("mousedown", handleClick);
