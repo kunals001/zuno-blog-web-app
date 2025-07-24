@@ -1,34 +1,44 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { IconTrash } from "@tabler/icons-react";
 import Image from "next/image";
 
 interface Props {
-  coverImg: string | null;
-  setCoverImg: (url: string | null) => void;
+  coverImg: File | null;
+  setCoverImg: (file: File | null) => void;
 }
 
 const AddThumbnail: React.FC<Props> = ({ coverImg, setCoverImg }) => {
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleImage = (file: File | undefined) => {
-    if (file && file.type.startsWith("image/")) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setCoverImg(reader.result as string);
+  useEffect(() => {
+    if (coverImg) {
+      const url = URL.createObjectURL(coverImg);
+      setPreviewUrl(url);
+
+      return () => {
+        URL.revokeObjectURL(url); // cleanup
       };
-      reader.readAsDataURL(file);
+    } else {
+      setPreviewUrl(null);
+    }
+  }, [coverImg]);
+
+  const handleFile = (file?: File) => {
+    if (file && file.type.startsWith("image/")) {
+      setCoverImg(file); // ✅ store the File
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    handleImage(file);
+    handleFile(file);
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     const file = e.dataTransfer.files?.[0];
-    handleImage(file);
+    handleFile(file);
   };
 
   const handleClick = () => {
@@ -45,20 +55,20 @@ const AddThumbnail: React.FC<Props> = ({ coverImg, setCoverImg }) => {
       {/* Desktop */}
       <div
         className={`relative hidden md:flex overflow-hidden transition-all duration-500 ease-in-out cursor-pointer border-3 border-dashed border-prime rounded-xl bg-zinc-200 dark:bg-zinc-700 hover:bg-indigo-50 dark:hover:bg-zinc-600 ${
-          coverImg ? "h-[28vw] p-1" : "h-[10vw] items-center justify-center"
+          previewUrl ? "h-[28vw] p-1" : "h-[10vw] items-center justify-center"
         }`}
         onClick={handleClick}
         onDrop={handleDrop}
         onDragOver={(e) => e.preventDefault()}
       >
-        {coverImg ? (
+        {previewUrl ? (
           <>
             <Image
               width={1200}
               height={720}
               loading="eager"
               priority
-              src={coverImg}
+              src={previewUrl}
               alt="Thumbnail"
               className="w-full max-h-[28vw] object-contain rounded-lg"
             />
@@ -79,20 +89,20 @@ const AddThumbnail: React.FC<Props> = ({ coverImg, setCoverImg }) => {
       {/* Mobile */}
       <div
         className={`relative md:hidden overflow-hidden transition-all duration-500 ease-in-out cursor-pointer border-2 border-dashed border-prime rounded-xl bg-zinc-200 dark:bg-zinc-700 ${
-          coverImg ? "h-auto p-1" : "h-[15vh] flex items-center justify-center"
+          previewUrl ? "h-auto p-1" : "h-[15vh] flex items-center justify-center"
         }`}
         onClick={handleClick}
         onDrop={handleDrop}
         onDragOver={(e) => e.preventDefault()}
       >
-        {coverImg ? (
+        {previewUrl ? (
           <>
             <Image
               width={1200}
               height={720}
               loading="eager"
               priority
-              src={coverImg}
+              src={previewUrl}
               alt="Thumbnail"
               className={`w-full max-h-[27vh] object-contain rounded-lg`}
             />

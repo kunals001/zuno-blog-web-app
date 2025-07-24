@@ -2,7 +2,7 @@ import User from "../models/user.model.js";
 import Post from "../models/post.model.js";
 import slugify from "slugify";
 import { connectedUsers } from "../config/websocket.js";
-import {processPostImages} from "../utils/processPostImages.js"
+import { processPostImages } from "../utils/processPostImages.js";
 
 export const createPost = async (req, res) => {
   try {
@@ -13,33 +13,36 @@ export const createPost = async (req, res) => {
       tags,
       category,
       keywords,
-      coverImage, // base64
+      coverImage,
       status,
-      isFeatured,
     } = req.body;
 
     if (!title || !description || !content) {
-      return res.status(400).json({ message: "Title, description, and content are required." });
+      return res
+        .status(400)
+        .json({ message: "Title, description, and content are required." });
     }
 
-    const userId = req.user._id;
+    const userId = req.user;
 
     const user = await User.findById(userId).populate("followers", "_id");
     if (!user) {
       return res.status(404).json({ message: "User not found." });
     }
 
-    const slug = slugify(title, { lower: true, strict: true });
+    let baseSlug = slugify(title, { lower: true, strict: true });
+    let slug = baseSlug;
+    let count = 1;
 
-    const existingPost = await Post.findOne({ slug });
-    if (existingPost) {
-      return res.status(409).json({
-        message: "A post with this title already exists.",
-      });
+    // Keep incrementing slug until a unique one is found
+    while (await Post.findOne({ slug })) {
+      slug = `${baseSlug}-${count++}`;
     }
 
-    // ✅ PROCESS images
-    const { coverImageURL, updatedContent } = await processPostImages(coverImage, content);
+    const { coverImageURL, updatedContent } = await processPostImages(
+      coverImage,
+      content
+    );
 
     const words = updatedContent.trim().split(/\s+/).length;
     const estimatedReadTime = Math.ceil(words / 200);
@@ -55,7 +58,6 @@ export const createPost = async (req, res) => {
       keywords,
       coverImage: coverImageURL,
       status: status || "Published",
-      isFeatured: isFeatured || false,
       readTime: estimatedReadTime,
     });
 
@@ -73,7 +75,7 @@ export const createPost = async (req, res) => {
       },
     };
 
-    user.followers.forEach(follower => {
+    user.followers.forEach((follower) => {
       const followerId = follower._id.toString();
       const ws = connectedUsers.get(followerId);
       if (ws && ws.readyState === 1) {
@@ -142,15 +144,15 @@ export const deletePost = async (req, res) => {
     const { postId } = req.params;
     const userId = req.user._id;
 
-    
-
     const post = await Post.findById(postId);
     if (!post) {
       return res.status(404).json({ message: "Post not found" });
     }
 
     if (post.author.toString() !== userId) {
-      return res.status(403).json({ message: "You are not authorized to delete this post" });
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to delete this post" });
     }
 
     await Post.findByIdAndDelete(postId);
@@ -164,7 +166,6 @@ export const deletePost = async (req, res) => {
       message: "Post deleted successfully",
       deleted: true,
     });
-
   } catch (error) {
     console.error("Delete Post Error:", error);
     res.status(500).json({ message: "Internal Server Error" });
@@ -202,7 +203,9 @@ export const updatePost = async (req, res) => {
     }
 
     if (post.author.toString() !== userId) {
-      return res.status(403).json({ message: "You are not authorized to update this post" });
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to update this post" });
     }
 
     // Update only allowed fields (slug will remain unchanged)
@@ -231,10 +234,8 @@ export const updatePost = async (req, res) => {
       updated: true,
       post,
     });
-
   } catch (error) {
     console.error("Update Post Error:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
-

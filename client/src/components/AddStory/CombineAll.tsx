@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { createPost } from "@/redux/slices/postSlice";
 
 const AddThumbnail = dynamic(() => import("./AddThumbnail"), {
   ssr: false,
@@ -27,20 +30,48 @@ const Scoring = dynamic(() => import("./Scoring"), {
 
 const CombineAll = () => {
   const [Title, setTitle] = useState<string | null>(null);
-  const [coverImg, setCoverImg] = useState<string | null>(null);
+  const [coverImage, setCoverImgage] = useState<File | null>(null);
   const [description, setDescription] = useState<string>("");
   const [tags, setTags] = useState<string[]>([]);
   const [keywords, setKeywords] = useState<string[]>([]);
   const [content, setContent] = useState<string>("");
 
-  console.log(content);
+  const dispatch = useAppDispatch();
+
+  const handelAddPost = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!Title || !coverImage || !content) {
+      alert("Title, Cover Image, and Content are required!");
+      return;
+    }
+
+    const postData = {
+      title: Title,
+      description,
+      tags,
+      keywords,
+      content,
+      coverImage, // Already a File now
+    };
+
+    try {
+      await dispatch(createPost(postData)).unwrap();
+    } catch (err) {
+      console.log(err);
+      alert("Something went wrong!");
+    }
+  };
 
   return (
     <div className="md:px-[10vw] px-[1vh] md:py-[1vw] py-[1vh] mt-[2vh] w-full ">
-      <form className="flex md:flex-row flex-col items-center justify-between ">
+      <form
+        onSubmit={handelAddPost}
+        className="flex md:flex-row flex-col items-center justify-between "
+      >
         <div className="w-full md:w-[58vw]">
           <AddTitle Title={Title} setTitle={setTitle} />
-          <AddThumbnail coverImg={coverImg} setCoverImg={setCoverImg} />
+          <AddThumbnail coverImg={coverImage} setCoverImg={setCoverImgage} />
           <AddDiscription
             description={description}
             setDescription={setDescription}

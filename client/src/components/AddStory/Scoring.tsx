@@ -2,7 +2,9 @@ import React from 'react'
 
 const Scoring = () => {
   return (
-    <div className='bg-amber-300'>Scoring</div>
+    <div>
+      <button type='submit' className='bg-[#0ABAB5] text-zinc-50 text-[2vh] md:text-[1vw] hover:bg-[#0ABAB5] transition ease-in-out duration-200 cursor-pointer p-2 rounded-lg'>Publish</button>
+    </div>
   )
 }
 

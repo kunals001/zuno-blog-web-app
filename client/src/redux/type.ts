@@ -41,18 +41,18 @@ export type User = {
 
 export type Post = {
   _id: string;
-  author: string; // User ID
+  author: string; 
   title: string;
   description: string;
   keywords: string[];
   slug: string;
   content: string;
-  coverImage?: string;
+  coverImage?: string | null;
   tags: string[];
   status: string;
   category: string;
-  likes: string[];      // User IDs
-  comments: string[];   // Comment IDs
+  likes: string[];     
+  comments: string[];  
   isDraft: boolean;
   readTime: number;
   views: number;
