@@ -29,7 +29,7 @@ const Scoring = dynamic(() => import("./Scoring"), {
 });
 
 const CombineAll = () => {
-  const [Title, setTitle] = useState<string | null>(null);
+  const [title, setTitle] = useState<string | null>(null);
   const [coverImage, setCoverImgage] = useState<File | null>(null);
   const [description, setDescription] = useState<string>("");
   const [tags, setTags] = useState<string[]>([]);
@@ -41,25 +41,25 @@ const CombineAll = () => {
   const handelAddPost = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!Title || !coverImage || !content) {
+    if (!title || !coverImage || !content) {
       alert("Title, Cover Image, and Content are required!");
       return;
     }
 
     const postData = {
-      title: Title,
+      title,
       description,
       tags,
       keywords,
       content,
-      coverImage, // Already a File now
+      coverImage,
     };
 
+    console.log(postData);
     try {
       await dispatch(createPost(postData)).unwrap();
     } catch (err) {
       console.log(err);
-      alert("Something went wrong!");
     }
   };
 
@@ -70,7 +70,7 @@ const CombineAll = () => {
         className="flex md:flex-row flex-col items-center justify-between "
       >
         <div className="w-full md:w-[58vw]">
-          <AddTitle Title={Title} setTitle={setTitle} />
+          <AddTitle Title={title} setTitle={setTitle} />
           <AddThumbnail coverImg={coverImage} setCoverImg={setCoverImgage} />
           <AddDiscription
             description={description}

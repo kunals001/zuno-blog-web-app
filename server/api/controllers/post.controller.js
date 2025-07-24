@@ -6,16 +6,10 @@ import { processPostImages } from "../utils/processPostImages.js";
 
 export const createPost = async (req, res) => {
   try {
-    const {
-      title,
-      description,
-      content,
-      tags,
-      category,
-      keywords,
-      coverImage,
-      status,
-    } = req.body;
+    const { title, description, tags, category, keywords, status } = req.body;
+
+    const content = req.body.content;
+    const coverImage = req.file;
 
     if (!title || !description || !content) {
       return res
@@ -63,7 +57,6 @@ export const createPost = async (req, res) => {
 
     await User.findByIdAndUpdate(userId, { $push: { myposts: newPost._id } });
 
-    // ✅ Real-time notification
     const notificationData = {
       type: "NEW_POST",
       payload: {
