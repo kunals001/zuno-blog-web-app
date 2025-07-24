@@ -1,4 +1,4 @@
-import React, { useState, useRef, InputHTMLAttributes } from "react";
+import React, { useState, useRef} from "react";
 import {
   IconLogout,
   IconSettings,

@@ -11,7 +11,7 @@ export const Redirect = ({ children }: { children: React.ReactNode }) => {
     if (user || isAuthenticated) {
       router.push("/");
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, router, user]);
 
   return <>{!isAuthenticated && children}</>;
 };

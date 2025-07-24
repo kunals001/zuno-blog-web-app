@@ -8,6 +8,9 @@ import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { ListNode, ListItemNode } from "@lexical/list";
+import { ImageNode } from "@/nodes/ImageNode";
+
+import { HeadingNode } from '@lexical/rich-text';
 import { $getRoot } from 'lexical';
 import dynamic from 'next/dynamic';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
@@ -21,19 +24,21 @@ interface Props {
   setContent: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const StoryEditor: React.FC<Props> = ({ content, setContent }) => {
+const StoryEditor: React.FC<Props> = ({setContent }) => {
   const initialConfig = {
     namespace: 'StoryEditor',
     theme: {
       paragraph: 'text-base leading-relaxed',
     },
-    onError: (error: any) => {
-      console.error('Lexical Error:', error);
+    onError: (error: unknown) => {
+      console.log('Lexical Error:', error);
     },
 
     nodes: [
     ListNode,
     ListItemNode,
+    HeadingNode,
+    ImageNode,
     // ... baaki nodes jaise TextNode, HeadingNode, ParagraphNode, etc.
   ],
   };

@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
 import { IconTrash } from "@tabler/icons-react";
+import Image from "next/image";
 
 interface Props {
   coverImg: string | null;
@@ -52,7 +53,11 @@ const AddThumbnail: React.FC<Props> = ({ coverImg, setCoverImg }) => {
       >
         {coverImg ? (
           <>
-            <img
+            <Image
+              width={1200}
+              height={720}
+              loading="eager"
+              priority
               src={coverImg}
               alt="Thumbnail"
               className="w-full max-h-[28vw] object-contain rounded-lg"
@@ -82,7 +87,11 @@ const AddThumbnail: React.FC<Props> = ({ coverImg, setCoverImg }) => {
       >
         {coverImg ? (
           <>
-            <img
+            <Image
+              width={1200}
+              height={720}
+              loading="eager"
+              priority
               src={coverImg}
               alt="Thumbnail"
               className={`w-full max-h-[27vh] object-contain rounded-lg`}
