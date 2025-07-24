@@ -11,6 +11,8 @@ import { ListNode, ListItemNode } from "@lexical/list";
 import { ImageNode } from "@/nodes/ImageNode";
 import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
 import { LinkNode } from "@lexical/link";
+import { CodeNode } from "@lexical/code";
+import { VideoNode } from "@/nodes/VideoNode";
 
 
 import { HeadingNode } from '@lexical/rich-text';
@@ -42,7 +44,9 @@ const StoryEditor: React.FC<Props> = ({setContent }) => {
     ListItemNode,
     HeadingNode,
     ImageNode,
-    LinkNode
+    LinkNode,
+    CodeNode,
+    VideoNode
   ],
   };
 

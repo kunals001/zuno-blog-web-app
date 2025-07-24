@@ -212,6 +212,59 @@ input:not(:checked) ~ .moon {
   font-weight: 400;
 }
 
+.head a{
+  color: #0ABAB5;
+  font-weight: 600;
+}
 
 
+.head code {
+  background-color: #1e1e1e;
+  color: #d4d4d4;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.875rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  display: block;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
 
+/* Simulate syntax highlighting (minimal) */
+.head code .token.comment,
+.head code .token.prolog,
+.head code .token.doctype,
+.head code .token.cdata {
+  color: #6a9955;
+  font-style: italic;
+}
+
+.head code .token.keyword {
+  color: #569cd6;
+}
+
+.head code .token.string {
+  color: #ce9178;
+}
+
+.head code .token.function {
+  color: #dcdcaa;
+}
+
+.head code .token.number {
+  color: #b5cea8;
+}
+
+.head code .token.operator {
+  color: #d4d4d4;
+}
+
+/* Optional: Better scrollbar on overflow */
+.head code::-webkit-scrollbar {
+  height: 8px;
+}
+.head code::-webkit-scrollbar-thumb {
+  background-color: #555;
+  border-radius: 4px;
+}

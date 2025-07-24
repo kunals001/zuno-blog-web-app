@@ -7,6 +7,7 @@ import {
   IconLink,
   IconList,
   IconPhoto,
+  IconBrandYoutube,
 } from "@tabler/icons-react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
@@ -25,10 +26,14 @@ import {
   $isListNode,
 } from "@lexical/list";
 
-import { TOGGLE_LINK_COMMAND, $isLinkNode } from "@lexical/link";
+import { IconCode } from "@tabler/icons-react";
+import { $createCodeNode } from "@lexical/code";
+
+import { TOGGLE_LINK_COMMAND } from "@lexical/link";
 
 import { $createHeadingNode, HeadingTagType } from "@lexical/rich-text";
 import { $createImageNode } from "@/nodes/ImageNode";
+import { $createVideoNode } from "@/nodes/VideoNode";
 
 const headingTypes: HeadingTagType[] = ["h2", "h3", "h4", "h5", "h6"];
 
@@ -40,6 +45,8 @@ const Toolbar = () => {
   const [isList, setIsList] = useState(false);
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
+  const [showVideoInput, setShowVideoInput] = useState(false);
+  const [videoUrl, setVideoUrl] = useState("");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -119,6 +126,17 @@ const Toolbar = () => {
     });
   };
 
+  const handleCodeBlock = () => {
+    editor.update(() => {
+      const selection = $getSelection();
+      if ($isRangeSelection(selection)) {
+        const codeNode = $createCodeNode();
+        selection.insertParagraph();
+        selection.insertNodes([codeNode]);
+      }
+    });
+  };
+
   const handleParagraph = () => {
     editor.update(() => {
       const selection = $getSelection();
@@ -129,6 +147,14 @@ const Toolbar = () => {
       }
     });
   };
+
+  function convertYouTubeToEmbed(url: string): string | null {
+    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/);
+    if (match && match[1]) {
+      return `https://www.youtube.com/embed/${match[1]}`;
+    }
+    return null;
+  }
 
   const baseClass =
     "p-2 rounded-md transition-colors duration-200 hover:bg-zinc-300 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200";
@@ -172,11 +198,29 @@ const Toolbar = () => {
 
         <button
           type="button"
+          onClick={handleCodeBlock}
+          title="Code Block"
+          className={baseClass}
+        >
+          <IconCode className="w-5 h-5" />
+        </button>
+
+        <button
+          type="button"
           onClick={handleImageClick}
           title="Insert Image"
           className={baseClass}
         >
           <IconPhoto className="w-5 h-5" />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setShowVideoInput(true)}
+          title="Insert YouTube Video"
+          className={baseClass}
+        >
+          <IconBrandYoutube className="w-5 h-5" />
         </button>
         <input
           type="file"
@@ -232,6 +276,48 @@ const Toolbar = () => {
                   editor.dispatchCommand(TOGGLE_LINK_COMMAND, linkUrl);
                   setShowLinkInput(false);
                   setLinkUrl("");
+                }}
+                className="px-4 py-2 rounded-lg bg-prime text-zinc-200 hover:bg-prime/80 transition"
+              >
+                Insert
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showVideoInput && (
+        <div className="fixed inset-0 z-[999] bg-black/30 backdrop-blur-sm flex items-center justify-center px-4">
+          <div className="bg-white dark:bg-zinc-800 p-4 rounded-xl shadow-2xl w-full max-w-md flex flex-col gap-4">
+            <h2 className="text-lg font-semibold text-zinc-800 dark:text-zinc-200">
+              Enter YouTube URL
+            </h2>
+            <input
+              type="text"
+              value={videoUrl}
+              onChange={(e) => setVideoUrl(e.target.value)}
+              className="w-full px-4 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-prime"
+              placeholder="https://www.youtube.com/watch?v=abcd1234"
+            />
+
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setShowVideoInput(false)}
+                className="px-4 py-2 rounded-lg bg-zinc-200 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-600 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  const embedURL = convertYouTubeToEmbed(videoUrl);
+                  if (embedURL) {
+                    editor.update(() => {
+                      const videoNode = $createVideoNode(embedURL);
+                      $getSelection()?.insertNodes([videoNode]);
+                    });
+                  }
+                  setShowVideoInput(false);
+                  setVideoUrl("");
                 }}
                 className="px-4 py-2 rounded-lg bg-prime text-zinc-200 hover:bg-prime/80 transition"
               >
