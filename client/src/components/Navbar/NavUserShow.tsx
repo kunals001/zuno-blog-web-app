@@ -8,7 +8,7 @@ import {
 } from "@tabler/icons-react";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { logoutUser } from "@/redux/slices/userSlice";
-import { useClickOutside } from "./ClickOutside";
+import { useClickOutside } from "../Layouts/ClickOutside";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -40,7 +40,7 @@ const NavUserShow = () => {
   }[] = [
     {
       name: "Profile",
-      path: "/profile",
+      path: "/profile/?tab=user-profile",
       icon: IconUserStar,
     },
     {
@@ -50,7 +50,7 @@ const NavUserShow = () => {
     },
     {
       name: "Settings",
-      path: "/settings",
+      path: "/profile/?tab=settings",
       icon: IconSettings,
     },
   ];

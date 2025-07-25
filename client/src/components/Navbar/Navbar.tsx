@@ -5,7 +5,7 @@ import { IconBell, IconMenu2, IconSearch } from "@tabler/icons-react";
 import { useRef, useState } from "react";
 import { useClickOutside } from "../Layouts/ClickOutside";
 
-const NavUserShow = dynamic(() => import("../Layouts/NavUserShow"), {
+const NavUserShow = dynamic(() => import("./NavUserShow"), {
   ssr: false,
   loading: () => (
     <Skeleton
@@ -17,7 +17,7 @@ const NavUserShow = dynamic(() => import("../Layouts/NavUserShow"), {
   ),
 });
 
-const Navlinks = dynamic(() => import("../Layouts/Navlinks"), {
+const Navlinks = dynamic(() => import("./Navlinks"), {
   ssr: false,
   loading: () => (
     <Skeleton
@@ -29,18 +29,18 @@ const Navlinks = dynamic(() => import("../Layouts/Navlinks"), {
   ),
 });
 
-const MobileMenu = dynamic(() => import("../Layouts/MobileMenu"), {
+const MobileMenu = dynamic(() => import("./MobileMenu"), {
   ssr: false,
 });
 
 const OpenSearchSection = dynamic(
-  () => import("../Layouts/OpenSearchSection"),
+  () => import("./OpenSearchSection"),
   {
     ssr: false,
   }
 );
 
-const Notifications = dynamic(() => import("../Layouts/Notifications"), {
+const Notifications = dynamic(() => import("./Notifications"), {
   ssr: false,
 });
 

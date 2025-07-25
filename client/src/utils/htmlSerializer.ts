@@ -4,8 +4,6 @@ import {
   $isElementNode,
   $isTextNode,
   LexicalNode,
-  ElementNode,
-  TextNode,
 } from 'lexical';
 import { $isHeadingNode } from '@lexical/rich-text';
 import { $isListNode, $isListItemNode } from '@lexical/list';

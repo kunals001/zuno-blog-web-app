@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { useAppDispatch } from "@/redux/hooks";
 import { createPost } from "@/redux/slices/postSlice";
 
 const AddThumbnail = dynamic(() => import("./AddThumbnail"), {
