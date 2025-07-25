@@ -28,6 +28,14 @@ export class ImageNode extends DecoratorNode<React.ReactElement> {
     this.__altText = altText;
   }
 
+  getSrc(): string {
+    return this.__src;
+  }
+
+  getAltText(): string {
+    return this.__altText;
+  }
+
   createDOM(): HTMLElement {
     return document.createElement("div");
   }

@@ -7,9 +7,8 @@ import { processPostImages } from "../utils/processPostImages.js";
 export const createPost = async (req, res) => {
   try {
     const { title, description, tags, category, keywords, status } = req.body;
-
     const content = req.body.content;
-    const coverImage = req.file;
+    const coverImage = req.file; 
 
     if (!title || !description || !content) {
       return res
@@ -18,7 +17,6 @@ export const createPost = async (req, res) => {
     }
 
     const userId = req.user;
-
     const user = await User.findById(userId).populate("followers", "_id");
     if (!user) {
       return res.status(404).json({ message: "User not found." });
@@ -28,13 +26,13 @@ export const createPost = async (req, res) => {
     let slug = baseSlug;
     let count = 1;
 
-    // Keep incrementing slug until a unique one is found
     while (await Post.findOne({ slug })) {
       slug = `${baseSlug}-${count++}`;
     }
 
+    // Pass file object directly, not base64
     const { coverImageURL, updatedContent } = await processPostImages(
-      coverImage,
+      coverImage, // file object or null
       content
     );
 

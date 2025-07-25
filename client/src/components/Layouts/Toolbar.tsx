@@ -8,6 +8,7 @@ import {
   IconList,
   IconPhoto,
   IconBrandYoutube,
+  IconCode,
 } from "@tabler/icons-react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
@@ -26,11 +27,8 @@ import {
   $isListNode,
 } from "@lexical/list";
 
-import { IconCode } from "@tabler/icons-react";
 import { $createCodeNode } from "@lexical/code";
-
 import { TOGGLE_LINK_COMMAND } from "@lexical/link";
-
 import { $createHeadingNode, HeadingTagType } from "@lexical/rich-text";
 import { $createImageNode } from "@/nodes/ImageNode";
 import { $createVideoNode } from "@/nodes/VideoNode";
@@ -50,9 +48,7 @@ const Toolbar = () => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleImageClick = () => {
-    fileInputRef.current?.click();
-  };
+  const handleImageClick = () => fileInputRef.current?.click();
 
   const insertImage = (file: File) => {
     const reader = new FileReader();
@@ -82,7 +78,6 @@ const Toolbar = () => {
           const anchorNode = selection.anchor.getNode();
           const parent = anchorNode.getParent();
           const node = parent?.getType?.() === "list" ? parent : anchorNode;
-
           setIsList($isListNode(node));
         }
       });
@@ -104,29 +99,26 @@ const Toolbar = () => {
     };
   }, [editor]);
 
-  const handleFormat = (format: TextFormatType) => {
+  const handleFormat = (format: TextFormatType) =>
     editor.dispatchCommand(FORMAT_TEXT_COMMAND, format);
-  };
 
-  const handleList = () => {
+  const handleList = () =>
     editor.dispatchCommand(
       isList ? REMOVE_LIST_COMMAND : INSERT_UNORDERED_LIST_COMMAND,
       undefined
     );
-  };
 
-  const handleHeading = (tag: HeadingTagType) => {
+  const handleHeading = (tag: HeadingTagType) =>
     editor.update(() => {
       const selection = $getSelection();
       if ($isRangeSelection(selection)) {
         const headingNode = $createHeadingNode(tag);
-        selection.insertParagraph(); // separate
+        selection.insertParagraph();
         selection.insertNodes([headingNode]);
       }
     });
-  };
 
-  const handleCodeBlock = () => {
+  const handleCodeBlock = () =>
     editor.update(() => {
       const selection = $getSelection();
       if ($isRangeSelection(selection)) {
@@ -135,9 +127,8 @@ const Toolbar = () => {
         selection.insertNodes([codeNode]);
       }
     });
-  };
 
-  const handleParagraph = () => {
+  const handleParagraph = () =>
     editor.update(() => {
       const selection = $getSelection();
       if ($isRangeSelection(selection)) {
@@ -146,15 +137,43 @@ const Toolbar = () => {
         selection.insertNodes([paragraphNode]);
       }
     });
-  };
 
-  function convertYouTubeToEmbed(url: string): string | null {
-    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/);
-    if (match && match[1]) {
-      return `https://www.youtube.com/embed/${match[1]}`;
+  const convertYouTubeToEmbed = (url: string): string | null => {
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+      /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/,
+      /youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/,
+    ];
+
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match && match[1]) {
+        return `https://www.youtube.com/embed/${match[1]}?enablejsapi=1&origin=${window.location.origin}`;
+      }
     }
     return null;
-  }
+  };
+
+  const handleVideoInsert = () => {
+    const embedURL = convertYouTubeToEmbed(videoUrl);
+    if (!embedURL) {
+      alert(
+        "Please enter a valid YouTube URL\nSupported formats:\n- https://www.youtube.com/watch?v=VIDEO_ID\n- https://youtu.be/VIDEO_ID\n- https://www.youtube.com/shorts/VIDEO_ID"
+      );
+      return;
+    }
+
+    editor.update(() => {
+      const videoNode = $createVideoNode(embedURL);
+      const selection = $getSelection();
+      if ($isRangeSelection(selection)) {
+        selection.insertNodes([videoNode]);
+      }
+    });
+
+    setShowVideoInput(false);
+    setVideoUrl("");
+  };
 
   const baseClass =
     "p-2 rounded-md transition-colors duration-200 hover:bg-zinc-300 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200";
@@ -162,7 +181,7 @@ const Toolbar = () => {
 
   return (
     <>
-      <div className="sticky md:top-[6vw] top-[9vh] left-0 w-full md:px-[1vw] md:py-[.5vw] px-[1vh] py-[.4vh] bg-transparent z-20 rounded-xl backdrop-blur-md border border-zinc-300 dark:border-zinc-700 flex gap-2 overflow-x-scroll scrollbar-hide">
+      <div className="sticky md:top-[6vw] top-[9vh] left-0 w-full md:px-[1vw] md:py-[.5vw] px-[1vh] py-[.4vh] bg-transparent z-20 rounded-xl backdrop-blur-md border border-zinc-300 dark:border-zinc-700 flex gap-2 overflow-x-auto scrollbar-hide">
         <button
           type="button"
           onClick={() => handleFormat("bold")}
@@ -171,6 +190,7 @@ const Toolbar = () => {
         >
           <IconBold className="w-5 h-5" />
         </button>
+
         <button
           type="button"
           onClick={() => handleFormat("italic")}
@@ -179,6 +199,7 @@ const Toolbar = () => {
         >
           <IconItalic className="w-5 h-5" />
         </button>
+
         <button
           type="button"
           onClick={handleList}
@@ -187,6 +208,7 @@ const Toolbar = () => {
         >
           <IconList className="w-5 h-5" />
         </button>
+
         <button
           type="button"
           onClick={() => setShowLinkInput(true)}
@@ -222,6 +244,7 @@ const Toolbar = () => {
         >
           <IconBrandYoutube className="w-5 h-5" />
         </button>
+
         <input
           type="file"
           accept="image/*"
@@ -229,6 +252,7 @@ const Toolbar = () => {
           onChange={handleImageChange}
           className="hidden"
         />
+
         {headingTypes.map((tag) => (
           <button
             key={tag}
@@ -240,6 +264,7 @@ const Toolbar = () => {
             {tag.toUpperCase()}
           </button>
         ))}
+
         <button
           type="button"
           onClick={handleParagraph}
@@ -261,9 +286,8 @@ const Toolbar = () => {
               value={linkUrl}
               onChange={(e) => setLinkUrl(e.target.value)}
               className="w-full px-4 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-prime"
-              placeholder="https://example.com/image.jpg"
+              placeholder="https://example.com"
             />
-
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowLinkInput(false)}
@@ -299,7 +323,9 @@ const Toolbar = () => {
               className="w-full px-4 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-prime"
               placeholder="https://www.youtube.com/watch?v=abcd1234"
             />
-
+            <div className="text-xs text-zinc-500">
+              Supported: YouTube watch, youtu.be, YouTube shorts
+            </div>
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowVideoInput(false)}
@@ -308,17 +334,7 @@ const Toolbar = () => {
                 Cancel
               </button>
               <button
-                onClick={() => {
-                  const embedURL = convertYouTubeToEmbed(videoUrl);
-                  if (embedURL) {
-                    editor.update(() => {
-                      const videoNode = $createVideoNode(embedURL);
-                      $getSelection()?.insertNodes([videoNode]);
-                    });
-                  }
-                  setShowVideoInput(false);
-                  setVideoUrl("");
-                }}
+                onClick={handleVideoInsert}
                 className="px-4 py-2 rounded-lg bg-prime text-zinc-200 hover:bg-prime/80 transition"
               >
                 Insert

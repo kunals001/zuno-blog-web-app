@@ -13,10 +13,8 @@ import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
 import { LinkNode } from "@lexical/link";
 import { CodeNode } from "@lexical/code";
 import { VideoNode } from "@/nodes/VideoNode";
-
-
 import { HeadingNode } from '@lexical/rich-text';
-import { $getRoot } from 'lexical';
+import { $generateHTMLFromNodes } from '@/utils/htmlSerializer';
 import dynamic from 'next/dynamic';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 
@@ -29,25 +27,38 @@ interface Props {
   setContent: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const StoryEditor: React.FC<Props> = ({setContent }) => {
+const StoryEditor: React.FC<Props> = ({ setContent }) => {
   const initialConfig = {
     namespace: 'StoryEditor',
     theme: {
       paragraph: 'text-base leading-relaxed',
+      heading: {
+        h2: 'text-xl font-bold mt-4 mb-2',
+        h3: 'text-lg font-bold mt-3 mb-2',
+        h4: 'text-base font-bold mt-2 mb-1',
+        h5: 'text-sm font-bold mt-2 mb-1',
+        h6: 'text-xs font-bold mt-1 mb-1',
+      },
+      list: {
+        ul: 'list-disc ml-4 my-2',
+        ol: 'list-decimal ml-4 my-2',
+        listitem: 'mb-1',
+      },
+      link: 'text-blue-500 underline hover:text-blue-700',
+      code: 'bg-gray-100 dark:bg-gray-800 p-2 rounded font-mono text-sm my-2 block',
     },
     onError: (error: unknown) => {
       console.log('Lexical Error:', error);
     },
-
     nodes: [
-    ListNode,
-    ListItemNode,
-    HeadingNode,
-    ImageNode,
-    LinkNode,
-    CodeNode,
-    VideoNode
-  ],
+      ListNode,
+      ListItemNode,
+      HeadingNode,
+      ImageNode,
+      LinkNode,
+      CodeNode,
+      VideoNode
+    ],
   };
 
   return (
@@ -69,8 +80,10 @@ const StoryEditor: React.FC<Props> = ({setContent }) => {
         <OnChangePlugin
           onChange={(editorState) => {
             editorState.read(() => {
-              const text = $getRoot().getTextContent();
-              setContent(text);
+              // Custom HTML generator use karo
+              const htmlString = $generateHTMLFromNodes();
+              console.log('Generated HTML:', htmlString); // Debug ke liye
+              setContent(htmlString);
             });
           }}
         />

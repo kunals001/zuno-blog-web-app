@@ -23,6 +23,10 @@ export class VideoNode extends DecoratorNode<React.ReactElement> {
     this.__videoUrl = videoUrl;
   }
 
+  // ➕ ADD THIS LINE
+  getVideoUrl(): string { return this.__videoUrl; }
+
+
   createDOM(): HTMLElement {
     return document.createElement("div");
   }
@@ -36,9 +40,16 @@ export class VideoNode extends DecoratorNode<React.ReactElement> {
       <div className="my-4 rounded-lg overflow-hidden">
         <iframe
           src={this.__videoUrl}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          title="YouTube Video"
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
+          referrerPolicy="strict-origin-when-cross-origin"
           className="w-full h-[25vh] md:h-[25vw] rounded-lg"
+          style={{
+            border: 'none',
+            minHeight: '315px'
+          }}
         />
       </div>
     );
