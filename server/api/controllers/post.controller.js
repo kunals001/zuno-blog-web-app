@@ -30,9 +30,9 @@ export const createPost = async (req, res) => {
       slug = `${baseSlug}-${count++}`;
     }
 
-    // Pass file object directly, not base64
+    
     const { coverImageURL, updatedContent } = await processPostImages(
-      coverImage, // file object or null
+      coverImage,
       content
     );
 

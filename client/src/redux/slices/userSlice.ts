@@ -3,6 +3,7 @@ import axios, { AxiosError } from "axios";
 import type { User } from "../type";
 import api from "@/lib/axiosInstance";
 import { setToken } from "@/lib/tokenService";
+import { getToken } from "../../lib/tokenService";
 
 axios.defaults.withCredentials = true;
 
@@ -179,6 +180,45 @@ export const resetPassword = createAsyncThunk(
   }
 );
 
+/// ----------------- Update User ----------------- ////
+
+interface UpdateUserPayload {
+  name?: string;
+  bio?: string;
+  socialLinks?: string;
+  profilePic?: File | null;
+}
+
+export const updateUser = createAsyncThunk(
+  "user/updateUser",
+  async (user: UpdateUserPayload, { rejectWithValue }) => {
+    try {
+      const token = getToken();
+      const formData = new FormData();
+      if (user.name) formData.append("name", user.name);
+      if (user.bio) formData.append("bio", user.bio);
+      if (user.socialLinks) formData.append("socialLinks", user.socialLinks);
+      if (user.profilePic) formData.append("profilePic", user.profilePic);
+
+      const res = await axios.put(`${API_URL}/api/users/update-user`, formData, {
+        headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+      });
+
+      return res.data.user;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(
+          error.response?.data.message || "Update failed"
+        );
+      }
+      return rejectWithValue("Something went wrong");
+    }
+  }
+);
+
 //// ----------------- Check Auth ----------------- ////
 
 export const checkAuth = createAsyncThunk(
@@ -208,6 +248,8 @@ interface AuthState {
   logoutLoading: boolean;
   googleLoading: boolean;
 
+  updateUserLoading: boolean;
+
   registerError: string | null;
   verifyError: string | null;
   loginError: string | null;
@@ -215,6 +257,8 @@ interface AuthState {
   resetPasswordError: string | null;
   logoutError: string | null;
   googleError: string | null;
+
+  updateUserError: string | null;
 
   isAuthenticated: boolean;
   isCheckingAuth: boolean;
@@ -231,6 +275,8 @@ const initialState: AuthState = {
   logoutLoading: false,
   googleLoading: false,
 
+  updateUserLoading: false,
+
   registerError: null,
   verifyError: null,
   loginError: null,
@@ -238,6 +284,8 @@ const initialState: AuthState = {
   resetPasswordError: null,
   logoutError: null,
   googleError: null,
+
+  updateUserError: null,
 
   isAuthenticated: false,
   isCheckingAuth: true,
@@ -386,6 +434,22 @@ export const userSlice = createSlice({
       .addCase(resetPassword.rejected, (state, action) => {
         state.resetPasswordLoading = false;
         state.resetPasswordError = action.payload as string;
+      })
+
+
+      /// ---------------------- UPDATE USER --------------------------- ///
+
+      .addCase(updateUser.pending, (state) => {
+        state.updateUserLoading = true;
+        state.updateUserError = null;
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.updateUserLoading = false;
+        state.user = action.payload;
+      })
+      .addCase(updateUser.rejected, (state, action) => {
+        state.updateUserLoading = false;
+        state.updateUserError = action.payload as string;
       })
 
       // ---------------------- CHECK AUTH --------------------------- ///

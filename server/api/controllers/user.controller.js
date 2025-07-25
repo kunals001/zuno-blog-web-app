@@ -7,6 +7,7 @@ import {
 import { generateTokens } from "../utils/generateToken.js";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
+import { processPostImages } from "../utils/processPostImages.js";
 
 export const registerUser = async (req, res) => {
   try {
@@ -334,8 +335,10 @@ export const checkAuth = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    const userId = req.user._id;
-    const { name, bio, avatar, socialLinks } = req.body;
+    const userId = req.user;
+    const { name, bio, socialLinks } = req.body;
+
+    const profilePic = req.file
 
     const user = await User.findById(userId);
     if (!user) {
@@ -344,9 +347,11 @@ export const updateProfile = async (req, res) => {
         .json({ success: false, message: "User not found" });
     }
 
+    const {profilePicUrl} = await processPostImages(profilePic)
+
     if (name !== undefined) user.name = name;
     if (bio !== undefined) user.bio = bio;
-    if (avatar !== undefined) user.avatar = avatar;
+    if (profilePic !== undefined) user.profilePic = profilePicUrl;
     if (socialLinks !== undefined) user.socialLinks = socialLinks;
 
     await user.save();
@@ -357,7 +362,7 @@ export const updateProfile = async (req, res) => {
       user: {
         name: user.name,
         bio: user.bio,
-        avatar: user.avatar,
+        profilePic: user.profilePic,
         socialLinks: user.socialLinks,
         email: user.email,
         _id: user._id,
@@ -372,7 +377,7 @@ export const updateProfile = async (req, res) => {
 export const sendFollowRequest = async (req, res) => {
   try {
     const targetUser = await User.findById(req.params.id);
-    const currentUser = await User.findById(req.user.id);
+    const currentUser = await User.findById(req.user);
 
     if (!targetUser || !currentUser)
       return res.status(404).json({ message: "User not found" });
@@ -381,11 +386,11 @@ export const sendFollowRequest = async (req, res) => {
       return res.status(400).json({ message: "Already following this user" });
     }
 
-    if (targetUser.followRequests.includes(currentUser._id)) {
+    if (targetUser.followRequests.includes(currentUser)) {
       return res.status(400).json({ message: "Follow request already sent" });
     }
 
-    targetUser.followRequests.push(currentUser._id);
+    targetUser.followRequests.push(currentUser);
     await targetUser.save();
 
     // 👇 Realtime notification
