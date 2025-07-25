@@ -35,6 +35,35 @@ import { $createVideoNode } from "@/nodes/VideoNode";
 
 const headingTypes: HeadingTagType[] = ["h2", "h3", "h4", "h5", "h6"];
 
+// Image compression utility function
+const compressImage = (file: File, maxWidth: number = 800, quality: number = 0.7): Promise<string> => {
+  return new Promise((resolve) => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    
+    img.onload = () => {
+      // Calculate new dimensions
+      let { width, height } = img;
+      if (width > maxWidth) {
+        height = (height * maxWidth) / width;
+        width = maxWidth;
+      }
+      
+      // Set canvas size
+      canvas.width = width;
+      canvas.height = height;
+      
+      // Draw and compress
+      ctx?.drawImage(img, 0, 0, width, height);
+      const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+      resolve(compressedBase64);
+    };
+    
+    img.src = URL.createObjectURL(file);
+  });
+};
+
 const Toolbar = () => {
   const [editor] = useLexicalComposerContext();
 
@@ -45,26 +74,57 @@ const Toolbar = () => {
   const [linkUrl, setLinkUrl] = useState("");
   const [showVideoInput, setShowVideoInput] = useState(false);
   const [videoUrl, setVideoUrl] = useState("");
+  const [isImageUploading, setIsImageUploading] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageClick = () => fileInputRef.current?.click();
 
-  const insertImage = (file: File) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const src = reader.result as string;
+  const insertImage = async (file: File) => {
+    try {
+      setIsImageUploading(true);
+      
+      // Check file size (limit to 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image size should be less than 5MB');
+        return;
+      }
+      
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select a valid image file');
+        return;
+      }
+
+      // Compress image
+      const compressedBase64 = await compressImage(file, 800, 0.7);
+      
       editor.update(() => {
-        const imageNode = $createImageNode({ src, altText: "Image" });
+        const imageNode = $createImageNode({ 
+          src: compressedBase64, 
+          altText: file.name || "Uploaded Image" 
+        });
         $getSelection()?.insertNodes([imageNode]);
       });
-    };
-    reader.readAsDataURL(file);
+
+      console.log(`Image compressed: ${file.size} bytes → ${Math.round(compressedBase64.length * 0.75)} bytes`);
+      
+    } catch (error) {
+      console.error('Error processing image:', error);
+      alert('Error uploading image. Please try again.');
+    } finally {
+      setIsImageUploading(false);
+    }
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) insertImage(file);
+    if (file) {
+      insertImage(file);
+    }
+    
+    // Reset input so same file can be selected again
+    e.target.value = '';
   };
 
   useEffect(() => {
@@ -138,21 +198,20 @@ const Toolbar = () => {
       }
     });
 
-  const convertYouTubeToEmbed = (url: string): string | null => {
+  function convertYouTubeToEmbed(url: string): string | null {
     const patterns = [
       /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/,
       /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/,
       /youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/,
     ];
-
-    for (const pattern of patterns) {
-      const match = url.match(pattern);
-      if (match && match[1]) {
-        return `https://www.youtube.com/embed/${match[1]}?enablejsapi=1&origin=${window.location.origin}`;
+    for (const p of patterns) {
+      const m = url.match(p);
+      if (m && m[1]) {
+        return `https://www.youtube.com/embed/${m[1]}?enablejsapi=1&origin=${window.location.origin}`;
       }
     }
     return null;
-  };
+  }
 
   const handleVideoInsert = () => {
     const embedURL = convertYouTubeToEmbed(videoUrl);
@@ -176,7 +235,7 @@ const Toolbar = () => {
   };
 
   const baseClass =
-    "p-2 rounded-md transition-colors duration-200 hover:bg-zinc-300 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200";
+    "p-2 rounded-md transition-colors duration-200 hover:bg-zinc-300 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed";
   const selectedClass = "bg-zinc-300 dark:bg-zinc-600";
 
   return (
@@ -230,10 +289,15 @@ const Toolbar = () => {
         <button
           type="button"
           onClick={handleImageClick}
-          title="Insert Image"
+          title={isImageUploading ? "Uploading..." : "Insert Image"}
+          disabled={isImageUploading}
           className={baseClass}
         >
-          <IconPhoto className="w-5 h-5" />
+          {isImageUploading ? (
+            <div className="w-5 h-5 border-2 border-zinc-600 border-t-transparent rounded-full animate-spin"></div>
+          ) : (
+            <IconPhoto className="w-5 h-5" />
+          )}
         </button>
 
         <button
@@ -290,18 +354,24 @@ const Toolbar = () => {
             />
             <div className="flex justify-end gap-2">
               <button
-                onClick={() => setShowLinkInput(false)}
+                onClick={() => {
+                  setShowLinkInput(false);
+                  setLinkUrl("");
+                }}
                 className="px-4 py-2 rounded-lg bg-zinc-200 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-600 transition"
               >
                 Cancel
               </button>
               <button
                 onClick={() => {
-                  editor.dispatchCommand(TOGGLE_LINK_COMMAND, linkUrl);
+                  if (linkUrl.trim()) {
+                    editor.dispatchCommand(TOGGLE_LINK_COMMAND, linkUrl);
+                  }
                   setShowLinkInput(false);
                   setLinkUrl("");
                 }}
-                className="px-4 py-2 rounded-lg bg-prime text-zinc-200 hover:bg-prime/80 transition"
+                disabled={!linkUrl.trim()}
+                className="px-4 py-2 rounded-lg bg-prime text-zinc-200 hover:bg-prime/80 transition disabled:opacity-50"
               >
                 Insert
               </button>
@@ -328,14 +398,18 @@ const Toolbar = () => {
             </div>
             <div className="flex justify-end gap-2">
               <button
-                onClick={() => setShowVideoInput(false)}
+                onClick={() => {
+                  setShowVideoInput(false);
+                  setVideoUrl("");
+                }}
                 className="px-4 py-2 rounded-lg bg-zinc-200 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-600 transition"
               >
                 Cancel
               </button>
               <button
                 onClick={handleVideoInsert}
-                className="px-4 py-2 rounded-lg bg-prime text-zinc-200 hover:bg-prime/80 transition"
+                disabled={!videoUrl.trim()}
+                className="px-4 py-2 rounded-lg bg-prime text-zinc-200 hover:bg-prime/80 transition disabled:opacity-50"
               >
                 Insert
               </button>
