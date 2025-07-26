@@ -1,11 +1,66 @@
-import React from 'react'
+import { IconChevronDown } from "@tabler/icons-react";
+import React from "react";
 
-const Scoring = () => {
-  return (
-    <div>
-      <button type='submit' className='bg-[#0ABAB5] text-zinc-50 text-[2vh] md:text-[1vw] hover:bg-[#0ABAB5] transition ease-in-out duration-200 cursor-pointer p-2 rounded-lg'>Publish</button>
-    </div>
-  )
+const categories = [
+  'Technology',
+  'Health',
+  'Travel',
+  'Education',
+  'Food',
+  'Lifestyle',
+  'Finance',
+  'Business',
+  'Entertainment',
+  'Sports',
+];
+
+interface ScoringProps {
+  category: string;
+  setCategory: React.Dispatch<React.SetStateAction<string>>;
+  setStatus: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export default Scoring
+const Scoring = ({ category, setCategory, setStatus }: ScoringProps) => {
+  return (
+    <div className="mx:px-[1vw] px-[0vh] flex flex-col md:py-[1vw] py-[2vh] md:fixed w-full md:w-[20vw]">
+      <div className="w-full relative">
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="text-zinc-700 dark:text-zinc-200 text-[1.8vh] md:text-[1vw] md:px-[1vw] md:py-[.3vw] px-[2vh] py-[.8vh] rounded-xl bg-transparent border-2 border-zinc-300 dark:border-zinc-600 outline-none w-full cursor-pointer appearance-none"
+        >
+          <option className="text-zinc-700 bg-zinc-200 dark:bg-zinc-700 dark:text-zinc-200" value="">Select a category</option>
+          {categories.map((cat) => (
+            <option
+              className="text-zinc-700 bg-zinc-200 dark:bg-zinc-700 dark:text-zinc-200"
+              key={cat}
+              value={cat}
+            >
+              {cat}
+            </option>
+          ))}
+        </select>
+
+        <IconChevronDown className="absolute top-[50%] right-[2vh] translate-y-[-50%] text-zinc-700 dark:text-zinc-200" />
+      </div>
+
+      <div className="w-full mt-2 flex flex-col gap-2">
+        <button
+          onClick={() => setStatus("Draft")}
+          className="w-full text-zinc-200 text-[2vh] md:text-[1.2vw] md:px-[1vw] md:py-[.3vw] px-[2vh] py-[.8vh] rounded-xl bg-prime hover:bg-prime/80 cursor-pointer transition-all duration-500 ease-in-out"
+        >
+          Draft
+        </button>
+
+        <button
+          onClick={() => setStatus("Published")}
+          className="w-full text-zinc-200 text-[2vh] md:text-[1.2vw] md:px-[1vw] md:py-[.3vw] px-[2vh] py-[.8vh] rounded-xl bg-indigo-500 hover:bg-indigo-600 cursor-pointer transition-all duration-500 ease-in-out"
+        >
+          Publish
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default Scoring;

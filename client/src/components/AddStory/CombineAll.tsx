@@ -3,6 +3,8 @@ import dynamic from "next/dynamic";
 import { useAppDispatch } from "@/redux/hooks";
 import { createPost } from "@/redux/slices/postSlice";
 
+import ErrorToast from "../Layouts/ErrorLayout";
+
 const AddThumbnail = dynamic(() => import("./AddThumbnail"), {
   ssr: false,
 });
@@ -31,6 +33,8 @@ const CombineAll = () => {
   const [title, setTitle] = useState<string | null>(null);
   const [coverImage, setCoverImgage] = useState<File | null>(null);
   const [description, setDescription] = useState<string>("");
+  const [category, setCategory] = useState<string>("");
+  const [status, setStatus] = useState<string>("");
   const [tags, setTags] = useState<string[]>([]);
   const [keywords, setKeywords] = useState<string[]>([]);
   const [content, setContent] = useState<string>("");
@@ -40,8 +44,8 @@ const CombineAll = () => {
   const handelAddPost = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!title || !coverImage || !content) {
-      alert("Title, Cover Image, and Content are required!");
+    if (!title || !coverImage || !content || !category) {
+      <ErrorToast message="All fields are required" />;
       return;
     }
 
@@ -49,6 +53,8 @@ const CombineAll = () => {
       title,
       description,
       tags,
+      category,
+      status,
       keywords,
       content,
       coverImage,
@@ -57,6 +63,7 @@ const CombineAll = () => {
     console.log(postData);
     try {
       await dispatch(createPost(postData)).unwrap();
+      window.location.reload();
     } catch (err) {
       console.log(err);
     }
@@ -66,7 +73,7 @@ const CombineAll = () => {
     <div className="md:px-[10vw] px-[1vh] md:py-[1vw] py-[1vh] mt-[2vh] w-full ">
       <form
         onSubmit={handelAddPost}
-        className="flex md:flex-row flex-col items-center justify-between "
+        className="flex md:flex-row flex-col justify-between "
       >
         <div className="w-full md:w-[58vw]">
           <AddTitle Title={title} setTitle={setTitle} />
@@ -84,8 +91,8 @@ const CombineAll = () => {
           <AddContent content={content} setContent={setContent} />
         </div>
 
-        <div className="w-full md:w-[20vw] flex items-center flex-col md:sticky">
-          <Scoring />
+        <div className="w-full md:w-[20vw] flex flex-col gap-[1vh] md:pt-[3.5vw]">
+          <Scoring category={category} setCategory={setCategory} setStatus={setStatus}/>
         </div>
       </form>
     </div>

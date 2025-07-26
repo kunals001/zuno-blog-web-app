@@ -39,19 +39,38 @@ export const createPost = async (req, res) => {
     const words = updatedContent.trim().split(/\s+/).length;
     const estimatedReadTime = Math.ceil(words / 200);
 
-    const newPost = await Post.create({
-      author: userId,
-      title,
-      description,
-      content: updatedContent,
-      slug,
-      tags,
-      category,
-      keywords,
-      coverImage: coverImageURL,
-      status: status || "Published",
-      readTime: estimatedReadTime,
-    });
+    if(status === "Published"){
+      await Post.create({
+        author: userId,
+        title,
+        description,
+        content: updatedContent,
+        slug,
+        tags,
+        category,
+        keywords,
+        coverImage: coverImageURL,
+        status: "Published",
+        readTime: estimatedReadTime,
+      });
+    }else{
+      await Post.create({
+        author: userId,
+        title,
+        description,
+        content: updatedContent,
+        slug,
+        tags,
+        category,
+        keywords,
+        coverImage: coverImageURL,
+        status: "Draft",
+        isDraft: true,
+        readTime: estimatedReadTime,
+      });
+    }
+
+
 
     await User.findByIdAndUpdate(userId, { $push: { myposts: newPost._id } });
 
