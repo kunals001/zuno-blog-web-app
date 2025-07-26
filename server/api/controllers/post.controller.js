@@ -8,7 +8,7 @@ export const createPost = async (req, res) => {
   try {
     const { title, description, tags, category, keywords, status } = req.body;
     const content = req.body.content;
-    const coverImage = req.file; 
+    const coverImage = req.file;
 
     if (!title || !description || !content) {
       return res
@@ -30,7 +30,6 @@ export const createPost = async (req, res) => {
       slug = `${baseSlug}-${count++}`;
     }
 
-    
     const { coverImageURL, updatedContent } = await processPostImages(
       coverImage,
       content
@@ -39,8 +38,10 @@ export const createPost = async (req, res) => {
     const words = updatedContent.trim().split(/\s+/).length;
     const estimatedReadTime = Math.ceil(words / 200);
 
-    if(status === "Published"){
-      await Post.create({
+    let newPost;
+
+    if (status === "Published") {
+      newPost = await Post.create({
         author: userId,
         title,
         description,
@@ -53,8 +54,8 @@ export const createPost = async (req, res) => {
         status: "Published",
         readTime: estimatedReadTime,
       });
-    }else{
-      await Post.create({
+    } else {
+      newPost = await Post.create({
         author: userId,
         title,
         description,
@@ -69,8 +70,6 @@ export const createPost = async (req, res) => {
         readTime: estimatedReadTime,
       });
     }
-
-
 
     await User.findByIdAndUpdate(userId, { $push: { myposts: newPost._id } });
 

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import dynamic from "next/dynamic";
 import { useAppDispatch } from "@/redux/hooks";
 import { createPost } from "@/redux/slices/postSlice";
+import { useRouter } from "next/navigation";
 
 import ErrorToast from "../Layouts/ErrorLayout";
 
@@ -41,6 +42,8 @@ const CombineAll = () => {
 
   const dispatch = useAppDispatch();
 
+  const router = useRouter();
+
   const handelAddPost = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -63,7 +66,7 @@ const CombineAll = () => {
     console.log(postData);
     try {
       await dispatch(createPost(postData)).unwrap();
-      window.location.reload();
+      router.push("/profile/?tab=user-profile");
     } catch (err) {
       console.log(err);
     }
