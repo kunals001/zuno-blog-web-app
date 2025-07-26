@@ -12,13 +12,12 @@ const UserFriends = dynamic(() => import("./UserFriends"), {
 
 
 interface UploadPicProps {
-  profilePic: File | null;
   setProfilePic: (file: File | null) => void;
 }
 
 const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/avif"];
 
-const UploadPic: React.FC<UploadPicProps> = ({ profilePic, setProfilePic }) => {
+const UploadPic: React.FC<UploadPicProps> = ({ setProfilePic }) => {
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
