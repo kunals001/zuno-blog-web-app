@@ -21,7 +21,7 @@ const Navlinks = dynamic(() => import("./Navlinks"), {
   ssr: false,
   loading: () => (
     <Skeleton
-      width={"w-[15vw]"}
+      width={"w-[30vw]"}
       height={"h-[3.5vw]"}
       rounded={"rounded-lg"}
       animation="shimmer"

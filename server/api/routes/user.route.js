@@ -1,4 +1,7 @@
 import express from "express";
+import multer from "multer";
+
+const upload = multer();
 const router = express.Router();
 
 import {
@@ -35,7 +38,7 @@ router.post("/reset-password/:token", resetPassword);
 
 //// ---------------------- PROFILE ROUTES --------------------------- ////
 
-router.post("/update-profile",protectRoute,updateProfile);
+router.post("/update-profile",protectRoute,upload.single("profilePic"),updateProfile);
 router.post('/:id/follow-request', protectRoute, sendFollowRequest);
 router.post('/:id/accept-follow', protectRoute, acceptFollowRequest);
 router.post('/:id/unfollow', protectRoute, unfollowUser);

@@ -1,5 +1,15 @@
 import React, { useRef, useState, useEffect } from "react";
 import ErrorToast from "../Layouts/ErrorLayout";
+import Skeleton from "../Layouts/Skeleton";
+import dynamic from "next/dynamic";
+import { IconCamera, IconTrash } from "@tabler/icons-react";
+import { useAppSelector } from "@/redux/hooks";
+
+const UserFriends = dynamic(() => import("./UserFriends"), {
+  ssr: false, loading: () => <Skeleton width={"w-full md:w-[25vw]"} height={"h-[10vh] md:h-[5vw]"} animation="shimmer" rounded='rounded-xl' />,
+});
+
+
 
 interface UploadPicProps {
   profilePic: File | null;
@@ -13,7 +23,7 @@ const UploadPic: React.FC<UploadPicProps> = ({ profilePic, setProfilePic }) => {
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-
+  const user = useAppSelector((state) => state.user.user);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -48,35 +58,54 @@ const UploadPic: React.FC<UploadPicProps> = ({ profilePic, setProfilePic }) => {
     };
   }, [preview]);
 
+  const openFilePicker = () => {
+    fileInputRef.current?.click();
+  };
+
   return (
-    <div className="space-y-2">
+    <div className="flex flex-col md:flex-row gap-2 w-full md:items-start items-center">
+      {/* Hidden file input */}
       <input
         type="file"
         accept="image/*"
         onChange={handleFileChange}
         ref={fileInputRef}
-        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
-          file:rounded-full file:border-0 file:text-sm file:font-semibold
-          file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+        className="hidden"
       />
 
-      {error && <ErrorToast message={error} />}
+      {/* Profile Picture with Camera Icon */}
+      <div className="relative md:w-[6vw] md:h-[6vw] w-[10vh] h-[10vh]">
+        <img
+          src={preview || user?.profilePic}
+          alt="Profile preview"
+          className="w-full h-full object-cover rounded-full border-2 border-prime shadow"
+        />
 
-      {preview && (
-        <div className="relative w-32 h-32 mt-2">
-          <img
-            src={preview}
-            alt="Profile preview"
-            className="w-full h-full object-cover rounded-full border"
-          />
+        <button
+          type="button"
+          onClick={openFilePicker}
+          className="absolute bottom-1 right-1 bg-prime  p-1 rounded-full shadow cursor-pointer"
+        >
+          <IconCamera className="md:size-[2vw] size-[2.3vh] text-white" />
+        </button>
+
+        {preview && (
           <button
             onClick={handleRemove}
-            className="absolute top-0 right-0 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-zinc-200 text-red-300 dark:bg-zinc-600 text-xs px-1 py-0.5 rounded-full"
+            title="Remove"
           >
-            ✕
+            <IconTrash className="md:size-[1.5vw] size-[2vh]" />
           </button>
-        </div>
-      )}
+        )}
+      </div>
+
+
+      <div className="flex items-center justify-center w-full md:w-[25vw]">
+        <UserFriends />
+      </div>
+
+      {error && <ErrorToast message={error} />}
     </div>
   );
 };
