@@ -59,7 +59,7 @@ const NavUserShow = () => {
     <div aria-label="show user">
       {isUserLoggedIn ? (
         <div className="md:w-[2.5vw] md:h-[2.5vw] h-[4.7vh] w-[4.7vh]  select-none cursor-pointer ">
-          <div ref={profileRef} className="">
+          <div ref={profileRef} className="md:block hidden">
             <Image
               onClick={() => setOpenPanel(!openPanel)}
               src={user.profilePic || ""}
@@ -69,6 +69,17 @@ const NavUserShow = () => {
               className="object-contain rounded-full"
             />
           </div>
+
+          <Link href="/profile/?tab=user-profile" className="md:hidden">
+            <Image
+              onClick={() => setOpenPanel(!openPanel)}
+              src={user.profilePic || ""}
+              alt="user-profile"
+              width={100}
+              height={100}
+              className="object-contain rounded-full"
+            />
+          </Link>
 
           <div
             ref={panelRef}

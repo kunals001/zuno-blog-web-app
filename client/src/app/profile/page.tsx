@@ -25,7 +25,7 @@ const Profile = () => {
     <div className='min-h-screen w-full bg-zinc-200 dark:bg-zinc-800 flex flex-col items-center'>
       <Navbar />
       <div className='md:px-[10vw] px-[1vh] md:py-[1vw] py-[1vh] flex md:flex-row flex-col-reverse w-full'>
-        <div className="">
+        <div className="md:block hidden">
           <ProfileSidebar />
         </div>
 
