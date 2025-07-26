@@ -8,6 +8,8 @@ import GoogleSignup from "@/firebase/GoogleSignup";
 type InputType = {
   name: string;
   setName: React.Dispatch<React.SetStateAction<string>>;
+  username: string;
+  setUsername: React.Dispatch<React.SetStateAction<string>>;
   email: string;
   setEmail: React.Dispatch<React.SetStateAction<string>>;
   password: string;
@@ -19,6 +21,8 @@ type InputType = {
 const SignupForm: React.FC<InputType> = ({
   name,
   setName,
+  username,
+  setUsername,
   email,
   setEmail,
   password,
@@ -42,6 +46,13 @@ const SignupForm: React.FC<InputType> = ({
           </p>
           <Input
             label="Full Name"
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+
+          <Input
+            label="User Name"
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}

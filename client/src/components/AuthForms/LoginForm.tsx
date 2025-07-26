@@ -8,8 +8,8 @@ import GoogleSignup from "@/firebase/GoogleSignup";
 
 
 type InputType = {
-  email: string;
-  setEmail: React.Dispatch<React.SetStateAction<string>>;
+  identifier: string;
+  setIdentifier: React.Dispatch<React.SetStateAction<string>>;
   password: string;
   setPassword: React.Dispatch<React.SetStateAction<string>>;
   handelLogin: (e: React.FormEvent<HTMLFormElement>) => void;
@@ -17,8 +17,8 @@ type InputType = {
 };
 
 const LoginForm: React.FC<InputType> = ({
-  email,
-  setEmail,
+  identifier,
+  setIdentifier,
   password,
   setPassword,
   handelLogin,
@@ -36,10 +36,10 @@ const LoginForm: React.FC<InputType> = ({
           </h1>
 
           <Input
-            label="Email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            label="Email or Username"
+            type="text"
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
           />
           <Input
             label="Password"

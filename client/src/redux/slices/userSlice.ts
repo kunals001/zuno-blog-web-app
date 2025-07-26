@@ -17,7 +17,8 @@ export const registerUser = createAsyncThunk(
       name,
       email,
       password,
-    }: { name: string; email: string; password: string},
+      username
+    }: { name: string; email: string; password: string, username: string },
     { rejectWithValue }
   ) => {
     try {
@@ -25,6 +26,7 @@ export const registerUser = createAsyncThunk(
         name,
         email,
         password,
+        username
       });
       return res.data.message; 
     } catch (error) {
@@ -94,12 +96,12 @@ export const googleSignup = createAsyncThunk<
 //// ----------------- Login User ----------------- ////
 export const loginUser = createAsyncThunk<
   VerifyResponse,
-  { email: string; password: string },
+  { identifier: string; password: string },
   { rejectValue: string }
->("user/loginUser", async ({ email, password }, { rejectWithValue }) => {
+>("user/loginUser", async ({ identifier, password }, { rejectWithValue }) => {
   try {
     const res = await axios.post(`${API_URL}/api/users/login`, {
-      email,
+      identifier,
       password,
     });
     return {

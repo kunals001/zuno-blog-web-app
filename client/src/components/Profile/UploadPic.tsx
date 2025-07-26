@@ -10,6 +10,7 @@ import {
 } from "@tabler/icons-react";
 import { useAppSelector } from "@/redux/hooks";
 import Link from "next/link";
+import Image from "next/image";
 
 const UserFriends = dynamic(() => import("./UserFriends"), {
   ssr: false,
@@ -86,8 +87,10 @@ const UploadPic: React.FC<UploadPicProps> = ({ setProfilePic }) => {
 
       {/* Profile Picture with Camera Icon */}
       <div className="relative md:w-[6vw] md:h-[6vw] w-[10vh] h-[10vh]">
-        <img
-          src={preview || user?.profilePic}
+        <Image
+          width={100}
+          height={100}
+          src={preview ?? user?.profilePic ?? ""}
           alt="Profile preview"
           className="w-full h-full object-cover rounded-full border-2 border-prime shadow"
         />

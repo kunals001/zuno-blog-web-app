@@ -29,6 +29,7 @@ const Signup = () => {
   );
 
   const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -36,7 +37,7 @@ const Signup = () => {
     e.preventDefault();
 
     try {
-      await dispatch(registerUser({ name, email, password })).unwrap();
+      await dispatch(registerUser({ name, email, password ,username})).unwrap();
       if (!registerError) {
         router.push("/verify-account");
       }
@@ -54,6 +55,8 @@ const Signup = () => {
       )}
 
       <SignupForm
+        username={username}
+        setUsername={setUsername}
         name={name}
         setName={setName}
         email={email}

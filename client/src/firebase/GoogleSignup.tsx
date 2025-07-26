@@ -53,6 +53,8 @@ const GoogleSignup = () => {
 
       <button
         onClick={handleClick}
+        disabled={googleLoading}
+        type="button"
         className="w-full py-[.7vh] px-2 md:px-2 text-zinc-700 font-[500] rounded-lg text-lg md:text-xl flex items-center gap-[1vh] md:gap-[.5vw] justify-center tracking-tight bg-zinc-100"
       >
         {" "}

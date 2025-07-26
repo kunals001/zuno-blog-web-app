@@ -11,53 +11,78 @@ import { processPostImages } from "../utils/processPostImages.js";
 
 export const registerUser = async (req, res) => {
   try {
-    const { password, email, name } = req.body;
+    const { password, email, name, username } = req.body;
 
-    if (!password || !email || !name) {
-      res
-        .status(401)
+    // 1. Basic required fields check
+    if (!password || !email || !name || !username) {
+      return res
+        .status(400)
         .json({ success: false, message: "All fields are required" });
     }
 
+    // 2. Password length check
     if (password.length < 6) {
-      res
-        .status(401)
+      return res
+        .status(400)
         .json({
           success: false,
-          message: "Password must be at leadt 6 characters",
+          message: "Password must be at least 6 characters",
         });
     }
 
-    const existUser = await User.findOne({ email });
-
-    if (existUser) {
-      res.status(401).json({ success: false, message: "User already exist" });
+    // 3. Username format validation (only alphanumeric)
+    const usernameRegex = /^[a-zA-Z0-9]+$/;
+    if (!usernameRegex.test(username)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Username must be alphanumeric" });
     }
 
+    // 4. Check if username already exists
+    const usernameExist = await User.findOne({ username });
+    if (usernameExist) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Username already exists" });
+    }
+
+    // 5. Check if email already exists
+    const existUser = await User.findOne({ email });
+    if (existUser) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User with this email already exists" });
+    }
+
+    // 6. Create verification token
     const verifyToken = Math.floor(100000 + Math.random() * 900000).toString();
 
+    // 7. Create new user
     const newUser = await User.create({
       name,
       email,
       password,
+      username,
       verificationToken: verifyToken,
-      verifyTokenExpiry: Date.now() + 1 * 60 * 60 * 1000,
+      verifyTokenExpiry: Date.now() + 1 * 60 * 60 * 1000, // 1 hour expiry
     });
 
-    await newUser.save();
-
+    // 8. Send verification email
     await sendEmail(
       newUser.email,
       "Verify your email",
       VERIFICATION_EMAIL_TEMPLATE.replace("{verificationCode}", verifyToken)
     );
 
+    // 9. Respond
     res.status(201).json({ success: true, message: "Verify your email" });
+
   } catch (error) {
-    console.log(error);
+    console.error("Register error:", error);
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
+
 
 export const verifyEmail = async (req, res) => {
   try {
@@ -110,6 +135,25 @@ const generateStrongPassword = (name) => {
   return `${namePart}@${salt}${randomNum}`; // final password string
 };
 
+const generateUniqueUsername = async (name) => {
+  const baseUsername = name.replace(/\s+/g, "").toLowerCase();
+
+  let username;
+  let isTaken = true;
+
+  while (isTaken) {
+    const randomSuffix = crypto.randomBytes(2).toString("hex"); // 4-digit hex
+    username = `${baseUsername}_${randomSuffix}`;
+
+    const existing = await User.findOne({ username });
+    if (!existing) {
+      isTaken = false;
+    }
+  }
+
+  return username;
+};
+
 export const googleSignup = async (req, res) => {
   try {
     const { name, email, profilePic } = req.body;
@@ -120,11 +164,11 @@ export const googleSignup = async (req, res) => {
       const { accessToken, refreshToken } = generateTokens(existUser._id);
 
       res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
 
       return res.status(200).json({
         accessToken,
@@ -133,25 +177,25 @@ export const googleSignup = async (req, res) => {
           name: existUser.name,
           email: existUser.email,
           profilePic: existUser.profilePic,
+          username: existUser.username,
         },
       });
     }
 
-    
     const rawPassword = generateStrongPassword(name);
     const hashedPassword = await bcrypt.hash(rawPassword, 10);
+
+    const username = await generateUniqueUsername(name); 
 
     const newUser = await User.create({
       name,
       email,
       profilePic,
-      password: hashedPassword, 
+      password: hashedPassword,
+      username,
+      signupSource: "google",
+      isVerified: true,
     });
-
-    newUser.signupSource = "google";
-    newUser.isVerified = true;
-
-    await newUser.save();
 
     const { accessToken, refreshToken } = generateTokens(newUser._id);
 
@@ -169,7 +213,7 @@ export const googleSignup = async (req, res) => {
         name: newUser.name,
         email: newUser.email,
         profilePic: newUser.profilePic,
-        // password: rawPassword, // (optional) send only if needed on frontend
+        username: newUser.username,
       },
     });
 
@@ -181,9 +225,20 @@ export const googleSignup = async (req, res) => {
 
 export const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { identifier, password } = req.body;
 
-    const user = await User.findOne({ email }).select("+password");
+    if (!identifier || !password) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Both fields are required" });
+    }
+
+    // Check if identifier is an email
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
+
+    const user = await User.findOne(
+      isEmail ? { email: identifier } : { username: identifier }
+    ).select("+password");
 
     if (!user) {
       return res
@@ -192,7 +247,6 @@ export const loginUser = async (req, res) => {
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
-
     if (!isMatch) {
       return res
         .status(401)
@@ -213,14 +267,18 @@ export const loginUser = async (req, res) => {
       user: {
         _id: user._id,
         name: user.name,
+        username: user.username,
         email: user.email,
+        profilePic: user.profilePic,
       },
     });
+
   } catch (error) {
-    console.log(error);
+    console.error("Login error:", error);
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
+
 
 export const logoutUser = (req, res) => {
   res.clearCookie("refreshToken", {

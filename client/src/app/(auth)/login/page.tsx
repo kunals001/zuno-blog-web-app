@@ -26,14 +26,14 @@ const Login = () => {
   const router = useRouter();
   const { loginLoading, loginError } = useAppSelector((state) => state.user);
 
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
 
   const handelLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
-      await dispatch(loginUser({ email, password })).unwrap();
+      await dispatch(loginUser({ identifier, password })).unwrap();
       if (!loginError) {
         router.push("/");
       }
@@ -51,8 +51,8 @@ const Login = () => {
       )}
 
       <LoginForm
-        email={email}
-        setEmail={setEmail}
+        identifier={identifier}
+        setIdentifier={setIdentifier}
         password={password}
         setPassword={setPassword}
         handelLogin={handelLogin}
