@@ -7,7 +7,7 @@ import {
 import { generateTokens } from "../utils/generateToken.js";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
-import { processPostImages } from "../utils/processPostImages.js";
+import { processProfileImage } from "../utils/processProfileImage.js";
 
 export const registerUser = async (req, res) => {
   try {
@@ -393,7 +393,7 @@ export const checkAuth = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    console.log("Update profile request received");
+    console.log("=== UPDATE PROFILE START ===");
     console.log("req.body:", req.body);
     console.log("req.file:", req.file);
     
@@ -401,12 +401,16 @@ export const updateProfile = async (req, res) => {
     const { name, bio, socialLinks, username, password } = req.body;
     const profilePic = req.file;
 
+    // User find करें
+    console.log("Finding user with ID:", userId);
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
+    
+    console.log("Current user profilePic:", user.profilePic);
 
-    // Unique username check
+    // Username update check
     if (username && username !== user.username) {
       const existingUser = await User.findOne({ username });
       if (existingUser) {
@@ -418,63 +422,100 @@ export const updateProfile = async (req, res) => {
       user.username = username;
     }
 
-    // Profile pic update - ONLY if file exists
+    // Profile pic update - सिर्फ file exist करने पर
     if (profilePic) {
-      console.log("Processing profile pic:", profilePic);
+      console.log("=== PROFILE PIC UPDATE START ===");
+      console.log("File details:", {
+        fieldname: profilePic.fieldname,
+        originalname: profilePic.originalname,
+        mimetype: profilePic.mimetype,
+        size: profilePic.size,
+        buffer: profilePic.buffer ? `Buffer exists (${profilePic.buffer.length} bytes)` : "No buffer"
+      });
+      
       try {
-        const { profilePicUrl } = await processPostImages(profilePic);
-        console.log("Profile pic processed, URL:", profilePicUrl);
-        user.profilePic = profilePicUrl;
+        // नया function use करें
+        const result = await processProfileImage(profilePic);
+        console.log("processProfileImage result:", result);
+        
+        if (result && result.profilePicUrl) {
+          user.profilePic = result.profilePicUrl;
+          console.log("New profilePic URL set:", user.profilePic);
+        } else {
+          console.error("No profilePicUrl in result:", result);
+          return res.status(500).json({ 
+            success: false, 
+            message: "Failed to get profile picture URL" 
+          });
+        }
       } catch (imageError) {
         console.error("Image processing error:", imageError);
         return res.status(500).json({ 
           success: false, 
-          message: "Failed to process profile picture" 
+          message: "Failed to process profile picture: " + imageError.message 
         });
       }
+      console.log("=== PROFILE PIC UPDATE END ===");
     } else {
-      console.log("No profile pic uploaded, skipping image processing");
+      console.log("No profile pic file uploaded, skipping image processing");
     }
 
-    // Update other fields
-    if (name !== undefined) user.name = name;
-    if (bio !== undefined) user.bio = bio;
+    // Other fields update
+    if (name !== undefined) {
+      user.name = name;
+      console.log("Name updated to:", name);
+    }
+    
+    if (bio !== undefined) {
+      user.bio = bio;
+      console.log("Bio updated to:", bio);
+    }
+    
     if (socialLinks !== undefined) {
       try {
-        // Parse socialLinks if it's a string
         user.socialLinks = typeof socialLinks === 'string' ? JSON.parse(socialLinks) : socialLinks;
+        console.log("Social links updated to:", user.socialLinks);
       } catch (parseError) {
         console.error("Error parsing socialLinks:", parseError);
         user.socialLinks = socialLinks; // Use as is if parsing fails
       }
     }
 
-    // Password update (with hash)
+    // Password update
     if (password !== undefined && password.trim() !== "") {
       const salt = await bcrypt.genSalt(10);
       user.password = await bcrypt.hash(password, salt);
+      console.log("Password updated");
     }
 
-    await user.save();
-    console.log("User saved successfully with profilePic:", user.profilePic);
+    // Save user
+    console.log("About to save user with profilePic:", user.profilePic);
+    const savedUser = await user.save();
+    console.log("User saved successfully!");
+    console.log("Final saved profilePic:", savedUser.profilePic);
+    console.log("=== UPDATE PROFILE END ===");
 
+    // Response
     res.status(200).json({
       success: true,
       message: "Profile updated successfully",
       user: {
-        _id: user._id,
-        name: user.name,
-        bio: user.bio,
-        username: user.username,
-        profilePic: user.profilePic,
-        socialLinks: user.socialLinks,
-        email: user.email,
-        isVerified: user.isVerified,
+        _id: savedUser._id,
+        name: savedUser.name,
+        bio: savedUser.bio,
+        username: savedUser.username,
+        profilePic: savedUser.profilePic, // यहां saved user से लें
+        socialLinks: savedUser.socialLinks,
+        email: savedUser.email,
+        isVerified: savedUser.isVerified,
       },
     });
   } catch (error) {
     console.error("Update profile error:", error);
-    res.status(500).json({ success: false, message: "Server Error" });
+    res.status(500).json({ 
+      success: false, 
+      message: "Server Error: " + error.message 
+    });
   }
 };
 

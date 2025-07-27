@@ -5,6 +5,7 @@ import { CheckUser } from "@/components/Secure/Checkauth";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
+
 const barlow = Barlow({
   variable: "--font-barlow",
   subsets: ["latin"],

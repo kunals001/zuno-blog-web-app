@@ -23,5 +23,5 @@ export const uploadToS3 = async (buffer, mimetype) => {
     })
   );
 
-  return `${CLOUDFRONT_URL}/${key}`;
+  return `https://${CLOUDFRONT_URL}/${key}`;
 };

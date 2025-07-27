@@ -55,33 +55,32 @@ const NavUserShow = () => {
     },
   ];
 
-  const defaultPic = "https://d2ntopquj72nb1.cloudfront.net/posts/352a25c1-cd73-4f07-8814-faf97213bf3e.avif"
 
   return (
     <div aria-label="show user">
       {isUserLoggedIn ? (
-        <div className="md:w-[2.5vw] md:h-[2.5vw] h-[4.7vh] w-[4.7vh]  select-none cursor-pointer ">
-          <div ref={profileRef} className="md:block hidden">
+        <div className="h-12 w-12 select-none cursor-pointer border-2 border-prime rounded-full">
+          <div ref={profileRef} className="md:block hidden w-full h-full">
             <Image
               onClick={() => setOpenPanel(!openPanel)}
-              src={user?.profilePic || defaultPic}
+              src={`${user?.profilePic}` || "/user.webp"}
               alt="user-profile"
-              width={100}
-              height={100}
+              width={40}
+              height={40}
               loading="lazy"
-              className="object-contain rounded-full"
+              className="object-cover rounded-full w-full h-full"
             />
           </div>
 
-          <Link href="/profile/?tab=user-profile" className="md:hidden">
+          <Link href="/profile/?tab=user-profile" className="md:hidden w-full h-full block">
             <Image
               onClick={() => setOpenPanel(!openPanel)}
-              src={user?.profilePic || defaultPic}
+              src={`${user?.profilePic}` || "/user.webp"}
               alt="user-profile"
-              width={100}
-              height={100}
+              width={40}
+              height={40}
               loading="lazy"
-              className="object-contain rounded-full"
+              className="object-cover rounded-full w-full h-full"
             />
           </Link>
 
