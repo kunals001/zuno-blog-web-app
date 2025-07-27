@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { IconLoader } from "@tabler/icons-react";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
@@ -8,10 +8,7 @@ import {
   forgotPassword,
 } from "@/redux/slices/userSlice";
 import { Redirect } from "@/components/Secure/Redirect";
-
-const ErrorToast = dynamic(() => import("@/components/Layouts/ErrorLayout"), {
-  ssr: false,
-});
+import {toast} from "react-hot-toast";
 
 const ForgotForm = dynamic(() => import("@/components/AuthForms/ForgotForm"), {
   ssr: false,
@@ -49,19 +46,22 @@ const ForgotPage = () => {
     try {
       await dispatch(forgotPassword({ email })).unwrap();
       setSubmit(false);
-    } catch (error) {console.log(error)}
+    } catch (error) {
+      console.log(error);
+    }
   };
+
+  useEffect(() => {
+    if (typeof forgotPasswordError === "string") {
+      toast.error(forgotPasswordError, {
+        duration: 4000,
+      });
+      dispatch(clearForgotPasswordError()); // clear after showing
+    }
+  }, [forgotPasswordError, dispatch]);
 
   return (
     <Redirect>
-      {typeof forgotPasswordError === "string" && (
-        <ErrorToast
-          message={forgotPasswordError}
-          duration={4000}
-          onClose={() => dispatch(clearForgotPasswordError())}
-        />
-      )}
-
       {submit ? (
         <ForgotForm
           email={email}

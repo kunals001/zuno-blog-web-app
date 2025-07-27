@@ -1,7 +1,6 @@
 "use client";
 import Skeleton from "@/components/Layouts/Skeleton";
 import dynamic from "next/dynamic";
-import { Redirect } from "@/components/Secure/Redirect";
 import { useSearchParams } from "next/navigation";
 
 const Navbar = dynamic(() => import("@/components/Navbar/Navbar"), {
@@ -23,7 +22,7 @@ const ProfileSidebar = dynamic(
     loading: () => (
       <Skeleton
         width={"w-full md:w-[14vw]"}
-        height={"h-[20vh] md:h-[calc(100vh-6vw)]"}
+        height={"h-[20vh] md:h-[80vh]"}
         animation="shimmer"
         rounded="rounded-xl"
       />
@@ -39,6 +38,7 @@ const ProfilePage = dynamic(() => import("@/components/Profile/ProfilePage"), {
       height={"h-[20vh] md:h-[90vw]"}
       animation="shimmer"
       rounded="rounded-xl"
+      className="md:ml-2"
     />
   ),
 });

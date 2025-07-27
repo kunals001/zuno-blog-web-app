@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Barlow, Poppins } from "next/font/google";
 import ReduxProvider from "@/redux/provider";
 import { CheckUser } from "@/components/Secure/Checkauth";
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
 const barlow = Barlow({
@@ -37,7 +38,10 @@ export default function RootLayout({
         cz-shortcut-listen="true"
       >
         <ReduxProvider>
-          <CheckUser>{children}</CheckUser>
+          <CheckUser>
+            {children}
+            <Toaster position="top-center" />
+          </CheckUser>
         </ReduxProvider>
       </body>
     </html>

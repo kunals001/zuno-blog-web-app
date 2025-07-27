@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
 import Skeleton from "../Layouts/Skeleton";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { updateUser } from "@/redux/slices/userSlice";
 
 const UploadPic = dynamic(() => import("./UploadPic"), {
   ssr: false,
@@ -32,6 +34,7 @@ const ProfilePage = () => {
   const [profilePic, setProfilePic] = useState<File | null>(null);
   const [bio, setBio] = useState<string | null>(null);
   const [socialLinks, setSocialLinks] = useState<string[] | null>(null);
+
 
   return (
     <div className="md:px-[9vw] md:py-[1vw] w-full">

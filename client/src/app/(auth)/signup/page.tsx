@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { IconLoader } from "@tabler/icons-react";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
@@ -7,10 +7,7 @@ import { registerUser } from "@/redux/slices/userSlice";
 import { useRouter } from "next/navigation";
 import { clearRegisterError } from "@/redux/slices/userSlice";
 import { Redirect } from "@/components/Secure/Redirect";
-
-const ErrorToast = dynamic(() => import("@/components/Layouts/ErrorLayout"), {
-  ssr: false,
-});
+import { toast } from "react-hot-toast";
 
 const SignupForm = dynamic(() => import("@/components/AuthForms/SignupForm"), {
   ssr: false,
@@ -44,15 +41,17 @@ const Signup = () => {
     } catch (error) {console.log(error)}
   };
 
+  useEffect(() => {
+    if (typeof registerError === "string") {
+      toast.error(registerError, {
+        duration: 4000,
+      });
+      dispatch(clearRegisterError()); // clear after showing
+    }
+  }, [registerError, dispatch]);
+
   return (
     <Redirect>
-      {typeof registerError === "string" && (
-        <ErrorToast
-          message={registerError}
-          duration={4000}
-          onClose={() => dispatch(clearRegisterError())}
-        />
-      )}
 
       <SignupForm
         username={username}

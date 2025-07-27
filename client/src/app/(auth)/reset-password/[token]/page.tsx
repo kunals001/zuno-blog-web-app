@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { IconLoader } from "@tabler/icons-react";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
@@ -9,10 +9,7 @@ import {
 } from "@/redux/slices/userSlice";
 import { useRouter,useParams } from "next/navigation";
 import { Redirect } from "@/components/Secure/Redirect";
-
-const ErrorToast = dynamic(() => import("@/components/Layouts/ErrorLayout"), {
-  ssr: false,
-});
+import {toast} from "react-hot-toast";
 
 const ResetPasswordForm = dynamic(
   () => import("@/components/AuthForms/ResetPasswordForm"),
@@ -54,15 +51,17 @@ const ResetPasswordPage = () => {
     } catch (error) {console.log(error)}
   };
 
+  useEffect(() => {
+    if (typeof resetPasswordError === "string") {
+      toast.error(resetPasswordError, {
+        duration: 4000,
+      });
+      dispatch(clearResetPasswordError()); // clear after showing
+    }
+  }, [resetPasswordError, dispatch]);
+
   return (
     <Redirect>
-      {typeof resetPasswordError === "string" && (
-        <ErrorToast
-          message={resetPasswordError}
-          duration={4000}
-          onClose={() => dispatch(clearResetPasswordError())}
-        />
-      )}
 
       <ResetPasswordForm
         password={password}

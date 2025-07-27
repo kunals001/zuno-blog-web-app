@@ -394,23 +394,41 @@ export const checkAuth = async (req, res) => {
 export const updateProfile = async (req, res) => {
   try {
     const userId = req.user;
-    const { name, bio, socialLinks } = req.body;
-
-    const profilePic = req.file
+    const { name, bio, socialLinks, username, password } = req.body;
+    const profilePic = req.file;
 
     const user = await User.findById(userId);
     if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
+      return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    const {profilePicUrl} = await processPostImages(profilePic)
+    // Unique username check
+    if (username && username !== user.username) {
+      const existingUser = await User.findOne({ username });
+      if (existingUser) {
+        return res.status(400).json({
+          success: false,
+          message: "Username already taken",
+        });
+      }
+      user.username = username;
+    }
+
+    // Profile pic update
+    if (profilePic) {
+      const { profilePicUrl } = await processPostImages(profilePic);
+      user.profilePic = profilePicUrl;
+    }
 
     if (name !== undefined) user.name = name;
     if (bio !== undefined) user.bio = bio;
-    if (profilePic !== undefined) user.profilePic = profilePicUrl;
     if (socialLinks !== undefined) user.socialLinks = socialLinks;
+
+    // Password update (with hash)
+    if (password !== undefined && password.trim() !== "") {
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(password, salt);
+    }
 
     await user.save();
 
@@ -418,12 +436,13 @@ export const updateProfile = async (req, res) => {
       success: true,
       message: "Profile updated successfully",
       user: {
+        _id: user._id,
         name: user.name,
         bio: user.bio,
+        username: user.username,
         profilePic: user.profilePic,
         socialLinks: user.socialLinks,
         email: user.email,
-        _id: user._id,
       },
     });
   } catch (error) {

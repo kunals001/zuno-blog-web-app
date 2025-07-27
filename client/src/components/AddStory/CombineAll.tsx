@@ -3,8 +3,7 @@ import dynamic from "next/dynamic";
 import { useAppDispatch } from "@/redux/hooks";
 import { createPost } from "@/redux/slices/postSlice";
 import { useRouter } from "next/navigation";
-
-import ErrorToast from "../Layouts/ErrorLayout";
+import {toast} from "react-hot-toast"
 
 const AddThumbnail = dynamic(() => import("./AddThumbnail"), {
   ssr: false,
@@ -48,8 +47,7 @@ const CombineAll = () => {
     e.preventDefault();
 
     if (!title || !coverImage || !content || !category) {
-      <ErrorToast message="All fields are required" />;
-      return;
+      return toast.error("All fields are required");
     }
 
     const postData = {

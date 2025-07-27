@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { IconLoader } from "@tabler/icons-react";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
@@ -7,10 +7,8 @@ import { loginUser } from "@/redux/slices/userSlice";
 import { useRouter } from "next/navigation";
 import { clearLoginError } from "@/redux/slices/userSlice";
 import { Redirect } from "@/components/Secure/Redirect";
+import {toast} from "react-hot-toast";
 
-const ErrorToast = dynamic(() => import("@/components/Layouts/ErrorLayout"), {
-  ssr: false,
-});
 
 const LoginForm = dynamic(() => import("@/components/AuthForms/LoginForm"), {
   ssr: false,
@@ -40,16 +38,17 @@ const Login = () => {
     } catch (error) {console.log(error)}
   };
 
+    useEffect(() => {
+    if (typeof loginError === "string") {
+      toast.error(loginError, {
+        duration: 4000,
+      });
+      dispatch(clearLoginError()); 
+    }
+  }, [loginError, dispatch]);
+
   return (
     <Redirect>
-      {typeof loginError === "string" && (
-        <ErrorToast
-          message={loginError}
-          duration={4000}
-          onClose={() => dispatch(clearLoginError())}
-        />
-      )}
-
       <LoginForm
         identifier={identifier}
         setIdentifier={setIdentifier}

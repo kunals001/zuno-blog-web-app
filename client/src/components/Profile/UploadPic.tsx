@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect } from "react";
-import ErrorToast from "../Layouts/ErrorLayout";
 import Skeleton from "../Layouts/Skeleton";
 import dynamic from "next/dynamic";
 import {
@@ -11,6 +10,7 @@ import {
 import { useAppSelector } from "@/redux/hooks";
 import Link from "next/link";
 import Image from "next/image";
+import { toast } from "react-hot-toast";
 
 const UserFriends = dynamic(() => import("./UserFriends"), {
   ssr: false,
@@ -74,6 +74,14 @@ const UploadPic: React.FC<UploadPicProps> = ({ setProfilePic }) => {
     fileInputRef.current?.click();
   };
 
+  useEffect(() =>{
+    if(error){
+      toast.error(error, {
+        duration: 3000
+      })
+    }
+  })
+
   return (
     <div className="flex flex-col md:flex-row gap-2 w-full md:items-start items-center relative">
       {/* Hidden file input */}
@@ -127,7 +135,6 @@ const UploadPic: React.FC<UploadPicProps> = ({ setProfilePic }) => {
         <UserFriends />
       </div>
 
-      {error && <ErrorToast message={error} />}
     </div>
   );
 };

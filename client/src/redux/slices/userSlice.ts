@@ -183,43 +183,55 @@ export const resetPassword = createAsyncThunk(
 );
 
 /// ----------------- Update User ----------------- ////
-
 interface UpdateUserPayload {
   name?: string;
   bio?: string;
   socialLinks?: string;
   profilePic?: File | null;
+  username?: string;
+  password?: string;
 }
 
-export const updateUser = createAsyncThunk(
+export const updateUser = createAsyncThunk<
+  any,
+  UpdateUserPayload,
+  { rejectValue: string }
+>(
   "user/updateUser",
-  async (user: UpdateUserPayload, { rejectWithValue }) => {
+  async (user, { rejectWithValue }) => {
     try {
       const token = getToken();
       const formData = new FormData();
-      if (user.name) formData.append("name", user.name);
-      if (user.bio) formData.append("bio", user.bio);
-      if (user.socialLinks) formData.append("socialLinks", user.socialLinks);
-      if (user.profilePic) formData.append("profilePic", user.profilePic);
+
+      // Dynamically append only non-empty fields
+      Object.entries(user).forEach(([key, value]) => {
+        if (
+          value !== undefined &&
+          value !== null &&
+          value !== "" &&
+          !(value instanceof File && value.size === 0)
+        ) {
+          formData.append(key, value);
+        }
+      });
 
       const res = await axios.put(`${API_URL}/api/users/update-user`, formData, {
         headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
-      },
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
       });
 
       return res.data.user;
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        return rejectWithValue(
-          error.response?.data.message || "Update failed"
-        );
+        return rejectWithValue(error.response?.data.message || "Update failed");
       }
       return rejectWithValue("Something went wrong");
     }
   }
 );
+
 
 //// ----------------- Check Auth ----------------- ////
 
