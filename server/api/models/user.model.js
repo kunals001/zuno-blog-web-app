@@ -106,7 +106,7 @@ const userSchema = new mongoose.Schema(
 
     profilePic:{
       type: String,
-      default: ""
+      default: "https://d2ntopquj72nb1.cloudfront.net/posts/352a25c1-cd73-4f07-8814-faf97213bf3e.avif"
     },
     
     signupSource: {

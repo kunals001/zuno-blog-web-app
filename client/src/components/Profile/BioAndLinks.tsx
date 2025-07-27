@@ -57,7 +57,7 @@ const BioAndLinks = ({ setBio, setSocialLinks }: Props) => {
           placeholder="Write a short bio..."
           readOnly={!editingBio}
           maxLength={160}
-          className="w-[80vw] md:w-[20vw] outline-none md:p-[0vw] p-[1vh] rounded-lg bg-transparent scrollbar-hide text-[1.5vh] md:text-[1vw] text-zinc-700 dark:text-zinc-200 resize-none "
+          className="w-[80vw] md:w-[20vw] outline-none md:p-[0vw] p-[1vh] rounded-lg bg-transparent scrollbar-hide text-[1.5vh] md:text-[1vw] text-zinc-700 dark:text-zinc-200 resize-none placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
         />
         <div
           onClick={() => setEditingBio(true)}
@@ -71,19 +71,33 @@ const BioAndLinks = ({ setBio, setSocialLinks }: Props) => {
       <div className="w-full relative mt-2 bg-zinc-300 dark:bg-zinc-700 p-[1vh] md:p-[1vw] rounded-lg">
         <div className="flex flex-wrap gap-2 text-[1.5vh] md:text-[1vw] text-zinc-700 dark:text-zinc-200">
           {links.length > 0 ? (
-            links.map((link, i) => (
-              <a
-                key={i}
-                href={link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition md:py-1 py-[1.2vh]"
-              >
-                {new URL(link).hostname.replace("www.", "")}
-              </a>
-            ))
+            links.map((link, i) => {
+              let hostname = link;
+              try {
+                const urlObj = new URL(
+                  link.startsWith("http") ? link : "https://" + link
+                );
+                hostname = urlObj.hostname.replace("www.", "");
+              } catch {
+                hostname = link;
+              }
+
+              return (
+                <a
+                  key={i}
+                  href={link.startsWith("http") ? link : "https://" + link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition md:py-1 py-[1.2vh]"
+                >
+                  {hostname}
+                </a>
+              );
+            })
           ) : (
-            <span className="text-zinc-500 md:py-2 py-[1.2vh]">Add social links...</span>
+            <p className="text-zinc-400 dark:text-zinc-500 md:py-2 py-[1.2vh]">
+              Add social links...
+            </p>
           )}
         </div>
 

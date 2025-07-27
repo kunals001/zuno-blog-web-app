@@ -393,6 +393,10 @@ export const checkAuth = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
+    console.log("Update profile request received");
+    console.log("req.body:", req.body);
+    console.log("req.file:", req.file);
+    
     const userId = req.user;
     const { name, bio, socialLinks, username, password } = req.body;
     const profilePic = req.file;
@@ -414,15 +418,36 @@ export const updateProfile = async (req, res) => {
       user.username = username;
     }
 
-    // Profile pic update
+    // Profile pic update - ONLY if file exists
     if (profilePic) {
-      const { profilePicUrl } = await processPostImages(profilePic);
-      user.profilePic = profilePicUrl;
+      console.log("Processing profile pic:", profilePic);
+      try {
+        const { profilePicUrl } = await processPostImages(profilePic);
+        console.log("Profile pic processed, URL:", profilePicUrl);
+        user.profilePic = profilePicUrl;
+      } catch (imageError) {
+        console.error("Image processing error:", imageError);
+        return res.status(500).json({ 
+          success: false, 
+          message: "Failed to process profile picture" 
+        });
+      }
+    } else {
+      console.log("No profile pic uploaded, skipping image processing");
     }
 
+    // Update other fields
     if (name !== undefined) user.name = name;
     if (bio !== undefined) user.bio = bio;
-    if (socialLinks !== undefined) user.socialLinks = socialLinks;
+    if (socialLinks !== undefined) {
+      try {
+        // Parse socialLinks if it's a string
+        user.socialLinks = typeof socialLinks === 'string' ? JSON.parse(socialLinks) : socialLinks;
+      } catch (parseError) {
+        console.error("Error parsing socialLinks:", parseError);
+        user.socialLinks = socialLinks; // Use as is if parsing fails
+      }
+    }
 
     // Password update (with hash)
     if (password !== undefined && password.trim() !== "") {
@@ -431,6 +456,7 @@ export const updateProfile = async (req, res) => {
     }
 
     await user.save();
+    console.log("User saved successfully with profilePic:", user.profilePic);
 
     res.status(200).json({
       success: true,
@@ -443,6 +469,7 @@ export const updateProfile = async (req, res) => {
         profilePic: user.profilePic,
         socialLinks: user.socialLinks,
         email: user.email,
+        isVerified: user.isVerified,
       },
     });
   } catch (error) {

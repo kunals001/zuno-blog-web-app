@@ -45,7 +45,6 @@ const ProfilePage = () => {
 
   const [updateSuccess, setUpdateSuccess] = useState(false);
 
-
   const [initialBio, setInitialBio] = useState<string | null>(
     user?.bio || null
   );
@@ -66,13 +65,23 @@ const ProfilePage = () => {
     JSON.stringify(socialLinks) !== JSON.stringify(initialLinks);
 
   const handleUpdateProfile = async () => {
+    console.log("Profile pic being uploaded:", profilePic); // Debug log
+
     const payload: {
       profilePic?: File | null;
       bio?: string;
       socialLinks?: string;
     } = {};
 
-    if (profilePic) payload.profilePic = profilePic;
+    if (profilePic) {
+      console.log("Profile pic details:", {
+        name: profilePic.name,
+        size: profilePic.size,
+        type: profilePic.type,
+      });
+      payload.profilePic = profilePic;
+    }
+
     if (bio !== initialBio) payload.bio = bio ?? "";
     if (
       socialLinks &&
@@ -81,14 +90,22 @@ const ProfilePage = () => {
       payload.socialLinks = JSON.stringify(socialLinks);
     }
 
-    const updatedUser = await dispatch(updateUser(payload)).unwrap();
-    setProfilePic(null);
-    setInitialBio(updatedUser.bio || null);
-    setBio(updatedUser.bio || null);
-    setInitialLinks(updatedUser.socialLinks || null);
-    setSocialLinks(updatedUser.socialLinks || null);
+    console.log("Payload being sent:", payload); // Debug log
 
-    setUpdateSuccess(true);
+    try {
+      const updatedUser = await dispatch(updateUser(payload)).unwrap();
+      console.log("Updated user received:", updatedUser); // Debug log
+
+      setProfilePic(null);
+      setInitialBio(updatedUser.bio || null);
+      setBio(updatedUser.bio || null);
+      setInitialLinks(updatedUser.socialLinks || null);
+      setSocialLinks(updatedUser.socialLinks || null);
+
+      setUpdateSuccess(true);
+    } catch (error) {
+      console.error("Update failed:", error);
+    }
   };
 
   useEffect(() => {

@@ -82,6 +82,8 @@ const UploadPic: React.FC<UploadPicProps> = ({ setProfilePic }) => {
     }
   })
 
+  const defaultPic = "https://d2ntopquj72nb1.cloudfront.net/posts/352a25c1-cd73-4f07-8814-faf97213bf3e.avif"
+
   return (
     <div className="flex flex-col md:flex-row gap-2 w-full md:items-start items-center relative">
       {/* Hidden file input */}
@@ -98,7 +100,7 @@ const UploadPic: React.FC<UploadPicProps> = ({ setProfilePic }) => {
         <Image
           width={100}
           height={100}
-          src={preview ?? user?.profilePic ?? ""}
+          src={preview ?? user?.profilePic ?? defaultPic}
           priority
           loading="eager"
           alt="Profile preview"

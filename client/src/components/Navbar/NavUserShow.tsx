@@ -55,6 +55,8 @@ const NavUserShow = () => {
     },
   ];
 
+  const defaultPic = "https://d2ntopquj72nb1.cloudfront.net/posts/352a25c1-cd73-4f07-8814-faf97213bf3e.avif"
+
   return (
     <div aria-label="show user">
       {isUserLoggedIn ? (
@@ -62,10 +64,11 @@ const NavUserShow = () => {
           <div ref={profileRef} className="md:block hidden">
             <Image
               onClick={() => setOpenPanel(!openPanel)}
-              src={user.profilePic || ""}
+              src={user?.profilePic || defaultPic}
               alt="user-profile"
               width={100}
               height={100}
+              loading="lazy"
               className="object-contain rounded-full"
             />
           </div>
@@ -73,10 +76,11 @@ const NavUserShow = () => {
           <Link href="/profile/?tab=user-profile" className="md:hidden">
             <Image
               onClick={() => setOpenPanel(!openPanel)}
-              src={user.profilePic || ""}
+              src={user?.profilePic || defaultPic}
               alt="user-profile"
               width={100}
               height={100}
+              loading="lazy"
               className="object-contain rounded-full"
             />
           </Link>

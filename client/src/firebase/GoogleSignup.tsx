@@ -3,9 +3,10 @@ import { app } from "./firebase";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { clearGoogleError, googleSignup } from "@/redux/slices/userSlice";
-import ErrorToast from "@/components/Layouts/ErrorLayout";
 import Image from "next/image";
 import { IconLoader } from "@tabler/icons-react";
+import { useEffect } from "react";
+import { toast } from "react-hot-toast";
 
 const GoogleSignup = () => {
   const auth = getAuth(app);
@@ -41,15 +42,17 @@ const GoogleSignup = () => {
     }
   };
 
+  useEffect(() => {
+    if (googleError) {
+      toast.error(googleError, {
+        duration: 4000,
+      })
+      dispatch(clearGoogleError());
+    }
+  })
+
   return (
     <div className="google-signup w-full">
-      {googleError && (
-        <ErrorToast
-          message={googleError}
-          duration={5000}
-          onClose={() => dispatch(clearGoogleError())}
-        />
-      )}
 
       <button
         onClick={handleClick}

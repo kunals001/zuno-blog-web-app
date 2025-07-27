@@ -192,16 +192,20 @@ interface UpdateUserPayload {
   password?: string;
 }
 
-export const updateUser = createAsyncThunk<
-  any,
-  UpdateUserPayload,
-  { rejectValue: string }
->(
+interface UpdateUserResponse {
+  success: boolean;
+  message: string;
+  user: User;
+}
+
+export const updateUser = createAsyncThunk<User,UpdateUserPayload,{ rejectValue: string }>(
   "user/updateUser",
   async (user, { rejectWithValue }) => {
     try {
       const token = getToken();
       const formData = new FormData();
+
+      console.log("Creating FormData with:", user); 
 
       // Dynamically append only non-empty fields
       Object.entries(user).forEach(([key, value]) => {
@@ -212,18 +216,31 @@ export const updateUser = createAsyncThunk<
           !(value instanceof File && value.size === 0)
         ) {
           formData.append(key, value);
+          console.log(`Appended ${key}:`, value); // Debug log
         }
       });
 
-      const res = await axios.put(`${API_URL}/api/users/update-profile`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      // Log FormData contents
+      console.log("FormData contents:");
+      for (let pair of formData.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+      }
 
+      const res = await axios.put<UpdateUserResponse>(
+        `${API_URL}/api/users/update-profile`, 
+        formData, 
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      console.log("Server response:", res.data); // Debug log
       return res.data.user;
     } catch (error) {
+      console.error("updateUser error:", error);
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data.message || "Update failed");
       }

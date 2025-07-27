@@ -35,7 +35,7 @@ const ProfilePage = dynamic(() => import("@/components/Profile/ProfilePage"), {
   loading: () => (
     <Skeleton
       width={"w-full md:w-[64vw]"}
-      height={"h-[20vh] md:h-[90vw]"}
+      height={"h-[20vh] md:h-[80vh]"}
       animation="shimmer"
       rounded="rounded-xl"
       className="md:ml-2"

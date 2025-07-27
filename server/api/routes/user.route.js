@@ -23,7 +23,6 @@ import {
 import {protectRoute} from "../middleware/protectRoute.js";
 import {refreshAccessToken} from "../utils/refreshAccessToken.js";
 
-
 //// ---------------------- AUTH ROUTES --------------------------- ////
 
 router.get("/refresh", refreshAccessToken);
