@@ -38,7 +38,7 @@ router.post("/reset-password/:token", resetPassword);
 
 //// ---------------------- PROFILE ROUTES --------------------------- ////
 
-router.post("/update-profile",protectRoute,upload.single("profilePic"),updateProfile);
+router.put("/update-profile",protectRoute,upload.single("profilePic"),updateProfile);
 router.post('/:id/follow-request', protectRoute, sendFollowRequest);
 router.post('/:id/accept-follow', protectRoute, acceptFollowRequest);
 router.post('/:id/unfollow', protectRoute, unfollowUser);

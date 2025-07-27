@@ -99,6 +99,8 @@ const UploadPic: React.FC<UploadPicProps> = ({ setProfilePic }) => {
           width={100}
           height={100}
           src={preview ?? user?.profilePic ?? ""}
+          priority
+          loading="eager"
           alt="Profile preview"
           className="w-full h-full object-cover rounded-full border-2 border-prime shadow"
         />

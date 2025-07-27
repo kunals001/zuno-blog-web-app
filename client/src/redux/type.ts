@@ -1,9 +1,5 @@
 
-/// ---------------------- User ---------------------- ////
-export type SocialLink = {
-  label: string;
-  url?: string;
-};
+/// ---------------------- User ---------------------- ///
 
 export type PostView = {
   post: string; 
@@ -24,7 +20,7 @@ export type User = {
   isVerified: boolean;
   profilePic?: string;
   bio: string;
-  socialLinks: SocialLink[];
+  socialLinks: string[];
   followers: string[]; 
   following: string[]; 
   followRequests: string[]; 

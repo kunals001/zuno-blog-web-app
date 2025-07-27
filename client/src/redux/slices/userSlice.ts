@@ -215,7 +215,7 @@ export const updateUser = createAsyncThunk<
         }
       });
 
-      const res = await axios.put(`${API_URL}/api/users/update-user`, formData, {
+      const res = await axios.put(`${API_URL}/api/users/update-profile`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
@@ -333,6 +333,9 @@ export const userSlice = createSlice({
     },
     clearGoogleError: (state) => {
       state.googleError = null;
+    },
+    clearUpdateUserError: (state) => {
+      state.updateUserError = null;
     },
   },
   extraReducers: (builder) => {
@@ -492,6 +495,7 @@ export const {
   clearForgotPasswordError,
   clearResetPasswordError,
   clearLogoutError,
-  clearGoogleError
+  clearGoogleError,
+  clearUpdateUserError
 } = userSlice.actions;
 export default userSlice.reducer;

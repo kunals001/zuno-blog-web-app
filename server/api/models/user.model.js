@@ -41,9 +41,8 @@ const userSchema = new mongoose.Schema(
     socialLinks: {
       type: [
         {
-          label: { type: String, default: "" }, 
-          url: { type: String},
-        },
+          type: String,
+        }
       ],
     },
 
