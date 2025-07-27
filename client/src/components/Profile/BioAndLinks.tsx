@@ -49,7 +49,7 @@ const BioAndLinks = ({ setBio, setSocialLinks }: Props) => {
   return (
     <div className="w-full mt-2">
       {/* BIO */}
-      <div className="w-full relative bg-zinc-300 p-[1vh] md:p-[1vw] rounded-lg">
+      <div className="w-full relative bg-zinc-300 dark:bg-zinc-700 p-[1vh] md:p-[1vw] rounded-lg">
         <textarea
           ref={bioRef}
           value={bioInput}
@@ -68,13 +68,25 @@ const BioAndLinks = ({ setBio, setSocialLinks }: Props) => {
       </div>
 
       {/* LINKS */}
-      <div className="w-full relative mt-2 bg-zinc-300 p-[1vh] md:p-[1vw] rounded-lg">
-        <input
-          readOnly
-          value={links.join(", ")}
-          placeholder="Add social links..."
-          className="w-[80vw] md:w-[20vw] outline-none md:p-[.3vw] p-[1vh] rounded-lg bg-transparent scrollbar-hide text-[1.5vh] md:text-[1vw] text-zinc-700 dark:text-zinc-200"
-        />
+      <div className="w-full relative mt-2 bg-zinc-300 dark:bg-zinc-700 p-[1vh] md:p-[1vw] rounded-lg">
+        <div className="flex flex-wrap gap-2 text-[1.5vh] md:text-[1vw] text-zinc-700 dark:text-zinc-200">
+          {links.length > 0 ? (
+            links.map((link, i) => (
+              <a
+                key={i}
+                href={link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition md:py-1 py-[1.2vh]"
+              >
+                {new URL(link).hostname.replace("www.", "")}
+              </a>
+            ))
+          ) : (
+            <span className="text-zinc-500 md:py-2 py-[1.2vh]">Add social links...</span>
+          )}
+        </div>
+
         <div
           onClick={() => setEditingLinks(true)}
           className="absolute top-[40%] right-[1vh] translate-y-[-50%]"
@@ -83,19 +95,22 @@ const BioAndLinks = ({ setBio, setSocialLinks }: Props) => {
         </div>
 
         {editingLinks && (
-          <div className="fixed inset-0 z-[999] bg-black/60 flex justify-center items-center">
+          <div className="fixed inset-0 z-[999] bg-black/60 flex justify-center items-center scrollbar-hide">
             <div className="bg-white dark:bg-zinc-800 p-6 rounded-xl w-[90vw] md:w-[30vw]">
               <h3 className="text-lg font-bold mb-4 text-zinc-700 dark:text-zinc-200">
                 Edit Social Links
               </h3>
 
-              <div className="flex flex-col gap-2 mb-4 max-h-[40vh] overflow-y-auto">
+              <div className="flex flex-col gap-2 mb-4 max-h-[40vh] overflow-y-auto scrollbar-hide">
                 {links.map((link, index) => (
-                  <div key={index} className="flex items-center justify-between gap-2">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between gap-2"
+                  >
                     <input
                       readOnly
                       value={link}
-                      className="flex-1 p-2 rounded-lg bg-zinc-200 dark:bg-zinc-700 text-sm text-zinc-900 dark:text-zinc-100"
+                      className="flex-1 p-2 rounded-lg bg-zinc-200 dark:bg-zinc-700 text-sm text-zinc-900 scrollbar-hide dark:text-zinc-100"
                     />
                     <IconTrash
                       onClick={() => handleRemoveLink(index)}
