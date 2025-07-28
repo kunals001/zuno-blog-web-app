@@ -11,10 +11,9 @@ const MobileMenu = ({
 }) => {
   const MobileMenu = [
     { name: "Home", path: "/" },
-    { name: "Convert", path: "/convert" },
-    { name: "Merge", path: "/merge" },
-    { name: "Compress", path: "/compress" },
-    { name: "Resize", path: "/resize" },
+    { name: "Tranding", path: "/merge" },
+    { name: "Categories", path: "/compress" },
+    { name: "Popular", path: "/resize" },
   ];
 
   return (

@@ -14,11 +14,6 @@ const ProfileSidebar = () => {
       tab: "user-profile",
     },
     {
-      name: "Messages",
-      url: "/profile/?tab=messages",
-      tab: "messages",
-    },
-    {
       name: "Followers",
       url: "/profile/?tab=followers",
       tab: "followers",

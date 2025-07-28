@@ -1,12 +1,12 @@
 
 /// ---------------------- User ---------------------- ///
 
-export type PostView = {
+export interface PostView {
   post: string; 
   viewedAt: string; 
 };
 
-export type User = {
+export interface User  {
   _id: string;
   username: string;
   name: string;
@@ -36,7 +36,7 @@ export type User = {
 
 /// ------------------------ Post ------------------------ ///
 
-export type Post = {
+export interface Post {
   _id: string;
   author: string; 
   title: string;
@@ -64,7 +64,7 @@ export type Post = {
 
 /// ------------------------ Comment ------------------------ ///
 
-export type Comment = {
+export interface Comment {
   _id: string;
   post: string;             
   author: string;           
@@ -76,5 +76,58 @@ export type Comment = {
   createdAt?: string;
   updatedAt?: string;
 };
+
+
+
+/// ----------------------- SEARCH ----------------------- ///
+
+
+export interface SearchHistory {
+  _id: string;
+  query: string;
+  type: 'user' | 'post';
+  searchedAt: string;
+}
+
+export interface SearchSuggestion {
+  type: 'user' | 'post';
+  id: string;
+  text: string;
+  subtitle: string;
+  image?: string;
+  slug?: string;
+}
+
+export interface SearchResponse<T> {
+  success: boolean;
+  data: {
+    results: T[];
+    pagination: {
+      currentPage: number;
+      totalPages: number;
+      totalUsers?: number;
+      totalPosts?: number;
+      hasNext: boolean;
+      hasPrev: boolean;
+    };
+    filters?: {
+      category?: string;
+      sortBy?: string;
+    };
+  };
+  message: string;
+}
+
+
+export type SearchType = 'user' | 'post';
+
+export interface SearchParams {
+  query: string;
+  type: SearchType;
+  limit?: number;
+  page?: number;
+  category?: string;
+  sortBy?: 'relevance' | 'latest' | 'popular' | 'liked';
+}
 
 

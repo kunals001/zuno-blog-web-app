@@ -1,10 +1,8 @@
+// app/layout.tsx
 import type { Metadata } from "next";
 import { Barlow, Poppins } from "next/font/google";
-import ReduxProvider from "@/redux/provider";
-import { CheckUser } from "@/components/Secure/Checkauth";
-import { Toaster } from "react-hot-toast";
 import "./globals.css";
-
+import LayoutClient from "@/components/Secure/LayoutClient";
 
 const barlow = Barlow({
   variable: "--font-barlow",
@@ -29,21 +27,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
-      <body
-        className={`${barlow.variable} ${poppins.variable} antialiased`}
-        cz-shortcut-listen="true"
+      <body className={`${barlow.variable} ${poppins.variable} antialiased`}
+      cz-shortcut-listen="true"
       >
-        <ReduxProvider>
-          <CheckUser>
-            {children}
-            <Toaster position="top-center" />
-          </CheckUser>
-        </ReduxProvider>
+        <LayoutClient>{children}</LayoutClient>
       </body>
     </html>
   );

@@ -24,11 +24,13 @@ import userRoutes from "./routes/user.route.js";
 import commentRoutes from "./routes/comment.route.js";
 import postRoutes from "./routes/post.route.js";
 import messageRoutes from "./routes/message.route.js";
+import searchRoutes from "./routes/search.route.js";
 
 app.use("/api/users", userRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/searchs", searchRoutes);
 
 
 initWebSocket(server); 

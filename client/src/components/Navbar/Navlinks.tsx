@@ -4,14 +4,13 @@ import React from 'react';
 const Navlinks = () => {
   const Navlinks = [
     { name: 'Home', path: '/' },
-    { name: 'Convert', path: '/convert' },
-    { name: 'Merge', path: '/merge' },
-    { name: 'Compress', path: '/compress' },
-    { name: 'Resize', path: '/resize' },
+    { name: 'Tranding', path: '/merge' },
+    { name: 'Categories', path: '/compress' },
+    { name: 'Popular', path: '/resize' },
   ];
 
   return (
-    <div className="flex items-center gap-[2vw]">
+    <div className="flex items-center gap-[2vw] select-none">
       {Navlinks.map((item, index) => (
         <div
           key={index}
