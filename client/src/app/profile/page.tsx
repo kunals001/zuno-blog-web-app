@@ -56,7 +56,7 @@ const Profile = () => {
             <ProfileSidebar />
           </div>
 
-          <div className="w-full md:h-screen">
+          <div className="w-full min-h-screen">
             {tab === "user-profile" && <ProfilePage />}
           </div>
         </div>

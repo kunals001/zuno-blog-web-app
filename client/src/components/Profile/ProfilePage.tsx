@@ -4,6 +4,7 @@ import Skeleton from "../Layouts/Skeleton";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { clearUpdateUserError, updateUser } from "@/redux/slices/userSlice";
 import { toast } from "react-hot-toast";
+import { IconLoader2 } from "@tabler/icons-react";
 
 const UploadPic = dynamic(() => import("./UploadPic"), {
   ssr: false,
@@ -136,9 +137,16 @@ const ProfilePage = () => {
         {hasChanges && (
           <button
             type="submit"
-            className="mt-4 px-6 py-2 bg-prime  text-white cursor-pointer rounded-xl self-end text-[2vh] md:text-[1vw] transition-all duration-500 ease-in-out hover:bg-prime/80"
+            className="mt-4 px-6 py-2 bg-prime  text-white cursor-pointer rounded-xl self-end text-[2vh] md:text-[1vw] transition-all duration-500 ease-in-out hover:bg-prime/80 flex items-center justify-center"
           >
-            {updateUserLoading ? "Updating..." : "Update Profile"}
+            {updateUserLoading ? (
+              <div className="flex items-center gap-2">
+                <IconLoader2 className="animate-spin" />
+                Updating...
+              </div>
+            ) : (
+              "Update Profile"
+            )}
           </button>
         )}
       </form>

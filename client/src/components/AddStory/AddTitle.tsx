@@ -1,8 +1,8 @@
 import React from 'react'
 
 interface Props {
-  Title: string | null;
-  setTitle: React.Dispatch<React.SetStateAction<string | null>>
+  Title: string;
+  setTitle: React.Dispatch<React.SetStateAction<string>>
 }
 
 const AddTitle: React.FC<Props> = ({ Title, setTitle }) => {
@@ -11,7 +11,7 @@ const AddTitle: React.FC<Props> = ({ Title, setTitle }) => {
       <input
         type="text"
         placeholder='Title Of Your Story'
-        value={Title ?? ''}
+        value={Title}
         onChange={(e) => setTitle(e.target.value)}
         className='
           w-full

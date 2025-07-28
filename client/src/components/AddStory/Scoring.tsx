@@ -47,6 +47,7 @@ const Scoring = ({ category, setCategory, setStatus,createloading }: ScoringProp
 
       <div className="w-full mt-2 flex flex-col gap-2">
         <button
+          type="submit"
           disabled={createloading}
           onClick={() => setStatus("Draft")}
           className="w-full text-zinc-200 text-[2vh] md:text-[1.2vw] md:px-[1vw] md:py-[.3vw] px-[2vh] py-[.8vh] rounded-xl bg-prime hover:bg-prime/80 cursor-pointer transition-all duration-500 ease-in-out"
@@ -55,9 +56,10 @@ const Scoring = ({ category, setCategory, setStatus,createloading }: ScoringProp
         </button>
 
         <button
+          type="submit"
           disabled={createloading}
           onClick={() => setStatus("Published")}
-          className="w-full text-zinc-200 text-[2vh] md:text-[1.2vw] md:px-[1vw] md:py-[.3vw] px-[2vh] py-[.8vh] rounded-xl bg-indigo-500 hover:bg-indigo-600 cursor-pointer transition-all duration-500 ease-in-out"
+          className="w-full text-zinc-200 text-[2vh] md:text-[1.2vw] md:px-[1vw] md:py-[.3vw] px-[2vh] py-[.8vh] rounded-xl bg-indigo-500 hover:bg-indigo-600 cursor-pointer transition-all duration-500 ease-in-out flex items-center justify-center"
         >
           {createloading ? (
             <div className="flex items-center gap-2">

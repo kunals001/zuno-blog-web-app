@@ -5,7 +5,7 @@ import { useAppSelector } from "@/redux/hooks";
 import { clearCreateError } from "@/redux/slices/postSlice";
 import { createPost } from "@/redux/slices/postSlice";
 import { useRouter } from "next/navigation";
-import {toast} from "react-hot-toast"
+import { toast } from "react-hot-toast";
 
 const AddThumbnail = dynamic(() => import("./AddThumbnail"), {
   ssr: false,
@@ -32,7 +32,7 @@ const Scoring = dynamic(() => import("./Scoring"), {
 });
 
 const CombineAll = () => {
-  const [title, setTitle] = useState<string | null>(null);
+  const [title, setTitle] = useState<string>("");
   const [coverImage, setCoverImgage] = useState<File | null>(null);
   const [description, setDescription] = useState<string>("");
   const [altText, setAltText] = useState<string>("");
@@ -43,18 +43,13 @@ const CombineAll = () => {
   const [content, setContent] = useState<string>("");
 
   const dispatch = useAppDispatch();
-
-  const { createError , createloading} = useAppSelector((state) => state.post);
-
+  const { createError, createloading } = useAppSelector((state) => state.post);
   const router = useRouter();
 
   const handelAddPost = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!title || !coverImage || !content || !category) {
-      return null;
-    }
-
+    // No frontend validation - Let backend handle everything
     const postData = {
       title,
       description,
@@ -67,27 +62,28 @@ const CombineAll = () => {
       coverImage,
     };
 
-    console.log(postData);
+    console.log("Sending data to backend:", postData);
+    
     try {
       await dispatch(createPost(postData)).unwrap();
       toast.success("Story created successfully", {
         duration: 2000,
-      })
+      });
       router.push("/profile/?tab=user-profile");
     } catch (err) {
-      console.log(err);
+      console.log("Backend error received:", err);
+      // Error will be automatically handled by useEffect below
     }
   };
-
 
   useEffect(() => {
     if (typeof createError === "string") {
       toast.error(createError, {
         duration: 4000,
       });
-      dispatch(clearCreateError()); 
+      dispatch(clearCreateError());
     }
-  }, [clearCreateError, dispatch]);
+  }, [createError, dispatch]);
 
   return (
     <div className="md:px-[10vw] px-[1vh] md:py-[1vw] py-[1vh] mt-[2vh] w-full ">
@@ -97,7 +93,12 @@ const CombineAll = () => {
       >
         <div className="w-full md:w-[58vw]">
           <AddTitle Title={title} setTitle={setTitle} />
-          <AddThumbnail setAltText={setAltText} coverImg={coverImage} setCoverImg={setCoverImgage} />
+          <AddThumbnail
+            altText={altText}
+            setAltText={setAltText}
+            coverImg={coverImage}
+            setCoverImg={setCoverImgage}
+          />
           <AddDiscription
             description={description}
             setDescription={setDescription}
@@ -112,7 +113,12 @@ const CombineAll = () => {
         </div>
 
         <div className="w-full md:w-[20vw] flex flex-col gap-[1vh] md:pt-[3.5vw]">
-          <Scoring createloading={createloading} category={category} setCategory={setCategory} setStatus={setStatus}/>
+          <Scoring
+            createloading={createloading}
+            category={category}
+            setCategory={setCategory}
+            setStatus={setStatus}
+          />
         </div>
       </form>
     </div>

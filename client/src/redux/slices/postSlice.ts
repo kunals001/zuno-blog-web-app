@@ -17,7 +17,7 @@ export const createPost = createAsyncThunk<
     category?: string;
     keywords?: string[];
     status?: string;
-    coverImage?: File; 
+    coverImage?: File | null; 
   },
   { rejectValue: string }
 >("post/createPost", async (formData, { rejectWithValue }) => {
@@ -29,10 +29,12 @@ export const createPost = createAsyncThunk<
     }
 
     const data = new FormData();
-    data.append("title", formData.title);
-    data.append("description", formData.description);
-    data.append("content", formData.content);
-    data.append("altText", formData.altText);
+    
+    // Always append data - let backend validate
+    data.append("title", formData.title || "");
+    data.append("description", formData.description || "");
+    data.append("content", formData.content || "");
+    data.append("altText", formData.altText || "");
 
     // Arrays ko properly handle karo
     if (formData.tags && formData.tags.length > 0) {
@@ -56,6 +58,8 @@ export const createPost = createAsyncThunk<
       data.append("coverImage", formData.coverImage);
     }
 
+    console.log("Making API request to backend...");
+
     const res = await axios.post(`${API_URL}/api/posts/create-post`, data, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -63,16 +67,24 @@ export const createPost = createAsyncThunk<
       },
     });
 
+    console.log("Backend response:", res.data);
     return res.data.post as Post;
+    
   } catch (err) {
+    console.log("Backend error caught:", err);
+    
     if (axios.isAxiosError(err)) {
-      const errorMessage =
+      // Backend se specific error message
+      const errorMessage = 
         err.response?.data?.message ||
         err.response?.data?.error ||
         err.message ||
         "Something went wrong";
+      
+      console.log("Error message to show:", errorMessage);
       return rejectWithValue(errorMessage);
     }
+    
     return rejectWithValue("Network error occurred");
   }
 });
@@ -101,7 +113,6 @@ const postSlice = createSlice({
       state.success = false;
       state.createdPost = null;
     },
-    // Additional helpful reducer
     clearCreateError(state) {
       state.createError = null;
     },
@@ -112,18 +123,21 @@ const postSlice = createSlice({
         state.createloading = true;
         state.createError = null;
         state.success = false;
+        console.log("Post creation started...");
       })
       .addCase(createPost.fulfilled, (state, action) => {
         state.createloading = false;
         state.success = true;
         state.createdPost = action.payload;
-        state.createError = null; // Clear any previous errors
+        state.createError = null;
+        console.log("Post created successfully");
       })
       .addCase(createPost.rejected, (state, action) => {
         state.createloading = false;
         state.createError = action.payload || "Something went wrong";
         state.success = false;
-        state.createdPost = null; // Clear created post on error
+        state.createdPost = null;
+        console.log("Post creation failed:", action.payload);
       });
   },
 });

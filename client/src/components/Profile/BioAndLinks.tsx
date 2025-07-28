@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useAppSelector } from "@/redux/hooks";
-import { IconPencil, IconTrash, IconPlus } from "@tabler/icons-react";
+import { IconPencil, IconTrash, IconPlus, IconChevronDown, IconChevronUp } from "@tabler/icons-react";
 
 interface Props {
   setBio: React.Dispatch<React.SetStateAction<string | null>>;
@@ -15,6 +15,8 @@ const BioAndLinks = ({ setBio, setSocialLinks }: Props) => {
   const [bioInput, setBioInput] = useState(user?.bio || "");
   const [links, setLinks] = useState<string[]>(user?.socialLinks || []);
   const [newLink, setNewLink] = useState("");
+  const [showFullBio, setShowFullBio] = useState(false);
+  const [needsShowMore, setNeedsShowMore] = useState(false);
 
   const bioRef = useRef<HTMLTextAreaElement>(null);
 
@@ -46,6 +48,67 @@ const BioAndLinks = ({ setBio, setSocialLinks }: Props) => {
     setBio(val);
   };
 
+  const checkIfNeedsShowMore = () => {
+    const el = bioRef.current;
+    if (el && !editingBio) {
+      // Calculate if content exceeds height limits
+      const isMobile = window.innerWidth < 768;
+      const maxHeight = isMobile ? window.innerHeight * 0.15 : window.innerWidth * 0.10;
+      
+      // Temporarily set height to auto to get full content height
+      const originalHeight = el.style.height;
+      el.style.height = "auto";
+      const contentHeight = el.scrollHeight;
+      el.style.height = originalHeight;
+      
+      setNeedsShowMore(contentHeight > maxHeight);
+    }
+  };
+
+  const adjustHeight = () => {
+    const el = bioRef.current;
+    if (el) {
+      if (editingBio) {
+        // When editing, always show full height
+        el.style.height = "auto";
+        el.style.height = el.scrollHeight + "px";
+      } else {
+        // When not editing, check if we need show more
+        const isMobile = window.innerWidth < 768;
+        const maxHeight = isMobile ? window.innerHeight * 0.15 : window.innerWidth * 0.10;
+        
+        if (showFullBio) {
+          el.style.height = "auto";
+          el.style.height = el.scrollHeight + "px";
+        } else {
+          el.style.height = "auto";
+          const contentHeight = el.scrollHeight;
+          if (contentHeight > maxHeight) {
+            el.style.height = maxHeight + "px";
+          } else {
+            el.style.height = el.scrollHeight + "px";
+          }
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    adjustHeight();
+    checkIfNeedsShowMore();
+  }, [bioInput, showFullBio, editingBio]);
+
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      adjustHeight();
+      checkIfNeedsShowMore();
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [bioInput, showFullBio, editingBio]);
+
   return (
     <div className="w-full mt-2">
       {/* BIO */}
@@ -57,11 +120,33 @@ const BioAndLinks = ({ setBio, setSocialLinks }: Props) => {
           placeholder="Write a short bio..."
           readOnly={!editingBio}
           maxLength={160}
-          className="w-[80vw] md:w-[20vw] outline-none md:p-[0vw] p-[1vh] rounded-lg bg-transparent scrollbar-hide text-[1.5vh] md:text-[1vw] text-zinc-700 dark:text-zinc-200 resize-none placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
+          className="w-[90vw] md:w-[30vw] outline-none md:p-[0vw] p-[1vh] rounded-lg bg-transparent scrollbar-hide text-[1.5vh] md:text-[1vw] text-zinc-700 dark:text-zinc-200 resize-none placeholder:text-zinc-400 dark:placeholder:text-zinc-500 transition ease-in-out duration-200 overflow-hidden"
         />
+        
+        {/* Show More/Less Button */}
+        {needsShowMore && !editingBio && (
+          <div className="flex justify-center mt-2">
+            <button
+              type="button"
+              onClick={() => setShowFullBio(!showFullBio)}
+              className="flex items-center gap-1 text-[1.3vh] md:text-[0.8vw] text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition ease-in-out duration-200"
+            >
+              {showFullBio ? (
+                <>
+                  Show Less <IconChevronUp className="w-4 h-4" />
+                </>
+              ) : (
+                <>
+                  Show More <IconChevronDown className="w-4 h-4" />
+                </>
+              )}
+            </button>
+          </div>
+        )}
+
         <div
           onClick={() => setEditingBio(true)}
-          className="absolute top-[30%] right-[1vh] translate-y-[-50%]"
+          className="absolute top-6 md:top-8 right-[1vh] translate-y-[-50%]"
         >
           <IconPencil className="text-zinc-700 dark:text-zinc-200 md:p-[.5vw] md:size-[2.5vw] size-[3.5vh] p-[.5vh] bg-zinc-200 dark:bg-zinc-600 rounded-full hover:bg-prime hover:text-zinc-200 transition ease-in-out duration-200 cursor-pointer" />
         </div>
@@ -103,7 +188,7 @@ const BioAndLinks = ({ setBio, setSocialLinks }: Props) => {
 
         <div
           onClick={() => setEditingLinks(true)}
-          className="absolute top-[40%] right-[1vh] translate-y-[-50%]"
+          className="absolute top-6 md:top-8 right-[1vh] translate-y-[-50%]"
         >
           <IconPencil className="text-zinc-700 dark:text-zinc-200 md:p-[.5vw] md:size-[2.5vw] size-[3.5vh] p-[.5vh] bg-zinc-200 dark:bg-zinc-600 rounded-full hover:bg-prime hover:text-zinc-200 transition ease-in-out duration-200 cursor-pointer" />
         </div>

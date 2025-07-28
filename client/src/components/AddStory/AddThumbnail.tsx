@@ -6,12 +6,14 @@ interface Props {
   coverImg: File | null;
   setCoverImg: (file: File | null) => void;
   setAltText: React.Dispatch<React.SetStateAction<string>>;
+  altText: string;
 }
 
 const AddThumbnail: React.FC<Props> = ({
   coverImg,
   setCoverImg,
   setAltText,
+  altText,
 }) => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [showAltEditor, setShowAltEditor] = useState(false);
@@ -67,23 +69,24 @@ const AltEditorOverlay = (
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-md rounded-2xl bg-zinc-200 dark:bg-zinc-800 p-6 shadow-xl transition-all duration-300"
+        className="relative w-full max-w-md rounded-2xl bg-white dark:bg-zinc-900 p-6 shadow-xl transition-all duration-300"
       >
         <button
           onClick={() => setShowAltEditor(false)}
           className="absolute top-3 right-3 text-zinc-500 hover:text-red-500 transition-colors duration-200"
           aria-label="Close"
         >
-         <IconX className="md:size-[2vw] size-[2.5vh] text-zinc-600 dark:text-zinc-200"/>
+         <IconX className="md:size-[1.5vw] size-[2vh] text-zinc-500 dark:text-zinc-200"/>
         </button>
         <h2 className="text-lg font-semibold mb-4 text-zinc-800 dark:text-zinc-100">
           Add Alt Text
         </h2>
         <input
           type="text"
+          value={altText}
           placeholder="Enter alt text..."
           onChange={(e) => setAltText(e.target.value)}
-          className="w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-zinc-200 dark:bg-zinc-800 px-4 py-2 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-prime"
+          className="w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-4 py-2 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-prime"
         />
       </div>
     </div>
@@ -108,13 +111,14 @@ const AltEditorOverlay = (
 
             {/* Edit icon button */}
             <button
+              type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 setShowAltEditor(true);
               }}
               className="absolute top-2 left-2 bg-white/80 dark:bg-zinc-700/80 backdrop-blur-sm border border-zinc-300 dark:border-zinc-600 rounded-full p-1 hover:scale-105 transition"
             >
-              <IconAlt className="size-[2vw] text-zinc-700 dark:text-zinc-200"/>
+              <IconAlt className="size-[2vw] text-zinc-500 dark:text-zinc-200" />
             </button>
 
             <Image
@@ -127,6 +131,7 @@ const AltEditorOverlay = (
             />
 
             <button
+              type="button"
               onClick={handleRemove}
               className="absolute top-2 right-2 bg-zinc-100 dark:bg-zinc-600 text-red-400 rounded-full shadow-md p-1 hover:bg-red-100"
             >
@@ -157,26 +162,27 @@ const AltEditorOverlay = (
 
             {/* Edit icon button */}
             <button
+              type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 setShowAltEditor(true);
               }}
-              className="absolute top-2 left-2 bg-white/80 dark:bg-zinc-700/80 backdrop-blur-sm border border-zinc-300 dark:border-zinc-500 rounded-full p-1 hover:scale-105 transition"
+              className="absolute top-2 left-2 bg-white/80 dark:bg-zinc-700/80 backdrop-blur-sm border border-zinc-300 dark:border-zinc-600 rounded-full p-1 hover:scale-105 transition"
             >
-              <IconAlt className="size-[3vh] text-zinc-700 dark:text-zinc-200"/>
+              <IconAlt className="size-[3vh] text-zinc-500 dark:text-zinc-200" />
             </button>
 
             <Image
               width={1200}
               height={720}
-              loading="eager"
-              priority
+              loading="lazy"
               src={previewUrl}
               alt="Thumbnail"
               className="w-full max-h-[27vh] object-contain rounded-lg"
             />
 
             <button
+              type="button"
               onClick={handleRemove}
               className="absolute top-2 right-2 bg-zinc-100 dark:bg-zinc-600 text-red-400 rounded-full shadow-md p-1 hover:bg-red-100"
             >
