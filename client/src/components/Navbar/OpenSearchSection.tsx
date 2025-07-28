@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { IconArrowNarrowLeft, IconSearch, IconUser, IconArticle, IconHistory, IconX } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { useSearchSuggestions, useSearchHistory, useSearchMutations } from "@/api/hooks/useSearch";
-import { SearchType } from "@/redux/type";
+import { SearchType, SearchSuggestion } from "@/redux/type";
 import Image from "next/image";
 
 interface OpenSearchSectionProps {
@@ -15,10 +15,10 @@ const OpenSearchSection: React.FC<OpenSearchSectionProps> = ({
   openSearch,
   setOpenSearch,
 }) => {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState<string>("");
   const [selectedType, setSelectedType] = useState<SearchType>("post");
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [showHistory, setShowHistory] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
+  const [showHistory, setShowHistory] = useState<boolean>(false);
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -35,7 +35,7 @@ const OpenSearchSection: React.FC<OpenSearchSectionProps> = ({
   }, [openSearch]);
 
   // Handle search submission
-  const handleSearch = (searchQuery?: string) => {
+  const handleSearch = (searchQuery?: string): void => {
     const finalQuery = searchQuery || query.trim();
     if (!finalQuery) return;
 
@@ -51,7 +51,7 @@ const OpenSearchSection: React.FC<OpenSearchSectionProps> = ({
   };
 
   // Handle suggestion click
-  const handleSuggestionClick = (suggestion: any) => {
+  const handleSuggestionClick = (suggestion: SearchSuggestion): void => {
     if (suggestion.type === 'user') {
       router.push(`/user/${suggestion.text}`);
     } else {
@@ -61,13 +61,13 @@ const OpenSearchSection: React.FC<OpenSearchSectionProps> = ({
   };
 
   // Handle history click
-  const handleHistoryClick = (historyQuery: string) => {
+  const handleHistoryClick = (historyQuery: string): void => {
     setQuery(historyQuery);
     handleSearch(historyQuery);
   };
 
   // Handle input change
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const value = e.target.value;
     setQuery(value);
     
@@ -84,7 +84,7 @@ const OpenSearchSection: React.FC<OpenSearchSectionProps> = ({
   };
 
   // Handle input focus
-  const handleInputFocus = () => {
+  const handleInputFocus = (): void => {
     if (query.length >= 2) {
       setShowSuggestions(true);
     } else {
@@ -93,10 +93,20 @@ const OpenSearchSection: React.FC<OpenSearchSectionProps> = ({
   };
 
   // Handle key press
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
     if (e.key === 'Enter') {
       handleSearch();
     }
+  };
+
+  // Handle clear history item
+  const handleClearHistoryItem = (historyId: string): void => {
+    clearHistoryItem.mutate(historyId);
+  };
+
+  // Handle clear all history
+  const handleClearAllHistory = (): void => {
+    clearAllHistory.mutate();
   };
 
   if (!openSearch) return null;
@@ -167,7 +177,7 @@ const OpenSearchSection: React.FC<OpenSearchSectionProps> = ({
               <h3 className="text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-2">
                 Suggestions
               </h3>
-              {suggestions.map((suggestion) => (
+              {suggestions.map((suggestion: SearchSuggestion) => (
                 <div
                   key={`${suggestion.type}-${suggestion.id}`}
                   onClick={() => handleSuggestionClick(suggestion)}
@@ -207,10 +217,11 @@ const OpenSearchSection: React.FC<OpenSearchSectionProps> = ({
                   Recent Searches
                 </h3>
                 <button
-                  onClick={() => clearAllHistory.mutate()}
+                  onClick={handleClearAllHistory}
                   className="text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+                  disabled={clearAllHistory.isPending}
                 >
-                  Clear All
+                  {clearAllHistory.isPending ? 'Clearing...' : 'Clear All'}
                 </button>
               </div>
               {searchHistory.slice(0, 5).map((history) => (
@@ -231,8 +242,9 @@ const OpenSearchSection: React.FC<OpenSearchSectionProps> = ({
                     </span>
                   </div>
                   <button
-                    onClick={() => clearHistoryItem.mutate(history._id)}
+                    onClick={() => handleClearHistoryItem(history._id)}
                     className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    disabled={clearHistoryItem.isPending}
                   >
                     <IconX size={14} className="text-zinc-500 hover:text-zinc-700" />
                   </button>

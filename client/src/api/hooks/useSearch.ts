@@ -1,17 +1,22 @@
 // hooks/useSearch.ts
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { useDebounce } from 'use-debounce';
 import { searchAPI } from '../search';
 import type {
   SearchParams,
   SearchType,
+  SearchSuggestion,
+  User,
+  Post,
+  SearchHistory,
+  SearchResponse
 } from "@/redux/type";
 
 // Search suggestions hook
 export const useSearchSuggestions = (query: string, type: SearchType) => {
   const [debouncedQuery] = useDebounce(query, 300);
 
-  return useQuery({
+  return useQuery<SearchSuggestion[]>({
     queryKey: ['searchSuggestions', debouncedQuery, type],
     queryFn: () => searchAPI.getSuggestions(debouncedQuery, type),
     enabled: debouncedQuery.length >= 2,
@@ -21,25 +26,27 @@ export const useSearchSuggestions = (query: string, type: SearchType) => {
 
 // Search users hook
 export const useSearchUsers = (params: SearchParams) => {
-  return useQuery({
+  return useQuery<SearchResponse<User>>({
     queryKey: ['searchUsers', params],
     queryFn: () => searchAPI.searchUsers(params),
     enabled: params.query.length > 0,
+    placeholderData: keepPreviousData,
   });
 };
 
 // Search posts hook
 export const useSearchPosts = (params: SearchParams) => {
-  return useQuery({
+  return useQuery<SearchResponse<Post>>({
     queryKey: ['searchPosts', params],
     queryFn: () => searchAPI.searchPosts(params),
     enabled: params.query.length > 0,
+    placeholderData: keepPreviousData,
   });
 };
 
 // Search history hook
 export const useSearchHistory = () => {
-  return useQuery({
+  return useQuery<SearchHistory[]>({
     queryKey: ['searchHistory'],
     queryFn: searchAPI.getSearchHistory,
     staleTime: 5 * 60 * 1000,
@@ -50,14 +57,14 @@ export const useSearchHistory = () => {
 export const useSearchMutations = () => {
   const queryClient = useQueryClient();
 
-  const clearHistoryItem = useMutation({
+  const clearHistoryItem = useMutation<void, Error, string>({
     mutationFn: searchAPI.clearHistoryItem,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['searchHistory'] });
     },
   });
 
-  const clearAllHistory = useMutation({
+  const clearAllHistory = useMutation<void, Error, void>({
     mutationFn: searchAPI.clearAllHistory,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['searchHistory'] });
