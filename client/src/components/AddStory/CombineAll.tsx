@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useAppDispatch } from "@/redux/hooks";
+import { useAppSelector } from "@/redux/hooks";
+import { clearCreateError } from "@/redux/slices/postSlice";
 import { createPost } from "@/redux/slices/postSlice";
 import { useRouter } from "next/navigation";
 import {toast} from "react-hot-toast"
@@ -33,6 +35,7 @@ const CombineAll = () => {
   const [title, setTitle] = useState<string | null>(null);
   const [coverImage, setCoverImgage] = useState<File | null>(null);
   const [description, setDescription] = useState<string>("");
+  const [altText, setAltText] = useState<string>("");
   const [category, setCategory] = useState<string>("");
   const [status, setStatus] = useState<string>("");
   const [tags, setTags] = useState<string[]>([]);
@@ -41,19 +44,22 @@ const CombineAll = () => {
 
   const dispatch = useAppDispatch();
 
+  const { createError , createloading} = useAppSelector((state) => state.post);
+
   const router = useRouter();
 
   const handelAddPost = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!title || !coverImage || !content || !category) {
-      return toast.error("All fields are required");
+      return null;
     }
 
     const postData = {
       title,
       description,
       tags,
+      altText,
       category,
       status,
       keywords,
@@ -64,11 +70,24 @@ const CombineAll = () => {
     console.log(postData);
     try {
       await dispatch(createPost(postData)).unwrap();
+      toast.success("Story created successfully", {
+        duration: 2000,
+      })
       router.push("/profile/?tab=user-profile");
     } catch (err) {
       console.log(err);
     }
   };
+
+
+  useEffect(() => {
+    if (typeof createError === "string") {
+      toast.error(createError, {
+        duration: 4000,
+      });
+      dispatch(clearCreateError()); 
+    }
+  }, [clearCreateError, dispatch]);
 
   return (
     <div className="md:px-[10vw] px-[1vh] md:py-[1vw] py-[1vh] mt-[2vh] w-full ">
@@ -78,7 +97,7 @@ const CombineAll = () => {
       >
         <div className="w-full md:w-[58vw]">
           <AddTitle Title={title} setTitle={setTitle} />
-          <AddThumbnail coverImg={coverImage} setCoverImg={setCoverImgage} />
+          <AddThumbnail setAltText={setAltText} coverImg={coverImage} setCoverImg={setCoverImgage} />
           <AddDiscription
             description={description}
             setDescription={setDescription}
@@ -93,7 +112,7 @@ const CombineAll = () => {
         </div>
 
         <div className="w-full md:w-[20vw] flex flex-col gap-[1vh] md:pt-[3.5vw]">
-          <Scoring category={category} setCategory={setCategory} setStatus={setStatus}/>
+          <Scoring createloading={createloading} category={category} setCategory={setCategory} setStatus={setStatus}/>
         </div>
       </form>
     </div>

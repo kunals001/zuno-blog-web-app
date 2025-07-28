@@ -40,6 +40,7 @@ export type Post = {
   _id: string;
   author: string; 
   title: string;
+  altText: string;
   description: string;
   keywords: string[];
   slug: string;

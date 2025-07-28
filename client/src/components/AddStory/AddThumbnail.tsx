@@ -1,14 +1,20 @@
 import React, { useRef, useState, useEffect } from "react";
-import { IconTrash } from "@tabler/icons-react";
+import { IconAlt, IconTrash, IconX } from "@tabler/icons-react";
 import Image from "next/image";
 
 interface Props {
   coverImg: File | null;
   setCoverImg: (file: File | null) => void;
+  setAltText: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const AddThumbnail: React.FC<Props> = ({ coverImg, setCoverImg }) => {
+const AddThumbnail: React.FC<Props> = ({
+  coverImg,
+  setCoverImg,
+  setAltText,
+}) => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [showAltEditor, setShowAltEditor] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -26,7 +32,7 @@ const AddThumbnail: React.FC<Props> = ({ coverImg, setCoverImg }) => {
 
   const handleFile = (file?: File) => {
     if (file && file.type.startsWith("image/")) {
-      setCoverImg(file); // ✅ store the File
+      setCoverImg(file);
     }
   };
 
@@ -50,6 +56,41 @@ const AddThumbnail: React.FC<Props> = ({ coverImg, setCoverImg }) => {
     setCoverImg(null);
   };
 
+const AltEditorOverlay = (
+  showAltEditor && (
+    <div
+      onClick={(e) => {
+        e.stopPropagation();
+        setShowAltEditor(false);
+      }}
+      className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center px-4"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-md rounded-2xl bg-zinc-200 dark:bg-zinc-800 p-6 shadow-xl transition-all duration-300"
+      >
+        <button
+          onClick={() => setShowAltEditor(false)}
+          className="absolute top-3 right-3 text-zinc-500 hover:text-red-500 transition-colors duration-200"
+          aria-label="Close"
+        >
+         <IconX className="md:size-[2vw] size-[2.5vh] text-zinc-600 dark:text-zinc-200"/>
+        </button>
+        <h2 className="text-lg font-semibold mb-4 text-zinc-800 dark:text-zinc-100">
+          Add Alt Text
+        </h2>
+        <input
+          type="text"
+          placeholder="Enter alt text..."
+          onChange={(e) => setAltText(e.target.value)}
+          className="w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-zinc-200 dark:bg-zinc-800 px-4 py-2 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-prime"
+        />
+      </div>
+    </div>
+  )
+);
+
+
   return (
     <div className="w-full mt-[3vh]">
       {/* Desktop */}
@@ -63,15 +104,28 @@ const AddThumbnail: React.FC<Props> = ({ coverImg, setCoverImg }) => {
       >
         {previewUrl ? (
           <>
+            {AltEditorOverlay}
+
+            {/* Edit icon button */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowAltEditor(true);
+              }}
+              className="absolute top-2 left-2 bg-white/80 dark:bg-zinc-700/80 backdrop-blur-sm border border-zinc-300 dark:border-zinc-600 rounded-full p-1 hover:scale-105 transition"
+            >
+              <IconAlt className="size-[2vw] text-zinc-700 dark:text-zinc-200"/>
+            </button>
+
             <Image
               width={1200}
-              height={720}
-              loading="eager"
-              priority
+              height={2000}
+              loading="lazy"
               src={previewUrl}
               alt="Thumbnail"
               className="w-full max-h-[28vw] object-contain rounded-lg"
             />
+
             <button
               onClick={handleRemove}
               className="absolute top-2 right-2 bg-zinc-100 dark:bg-zinc-600 text-red-400 rounded-full shadow-md p-1 hover:bg-red-100"
@@ -89,7 +143,9 @@ const AddThumbnail: React.FC<Props> = ({ coverImg, setCoverImg }) => {
       {/* Mobile */}
       <div
         className={`relative md:hidden overflow-hidden transition-all duration-500 ease-in-out cursor-pointer border-2 border-dashed border-prime rounded-xl bg-zinc-200 dark:bg-zinc-700 ${
-          previewUrl ? "h-auto p-1" : "h-[15vh] flex items-center justify-center"
+          previewUrl
+            ? "h-auto p-1"
+            : "h-[15vh] flex items-center justify-center"
         }`}
         onClick={handleClick}
         onDrop={handleDrop}
@@ -97,6 +153,19 @@ const AddThumbnail: React.FC<Props> = ({ coverImg, setCoverImg }) => {
       >
         {previewUrl ? (
           <>
+            {AltEditorOverlay}
+
+            {/* Edit icon button */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowAltEditor(true);
+              }}
+              className="absolute top-2 left-2 bg-white/80 dark:bg-zinc-700/80 backdrop-blur-sm border border-zinc-300 dark:border-zinc-500 rounded-full p-1 hover:scale-105 transition"
+            >
+              <IconAlt className="size-[3vh] text-zinc-700 dark:text-zinc-200"/>
+            </button>
+
             <Image
               width={1200}
               height={720}
@@ -104,8 +173,9 @@ const AddThumbnail: React.FC<Props> = ({ coverImg, setCoverImg }) => {
               priority
               src={previewUrl}
               alt="Thumbnail"
-              className={`w-full max-h-[27vh] object-contain rounded-lg`}
+              className="w-full max-h-[27vh] object-contain rounded-lg"
             />
+
             <button
               onClick={handleRemove}
               className="absolute top-2 right-2 bg-zinc-100 dark:bg-zinc-600 text-red-400 rounded-full shadow-md p-1 hover:bg-red-100"

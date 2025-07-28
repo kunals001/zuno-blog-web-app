@@ -6,7 +6,7 @@ import { processPostImages } from "../utils/processPostImages.js";
 
 export const createPost = async (req, res) => {
   try {
-    const { title, description, tags, category, keywords, status } = req.body;
+    const { title, description, tags, category, keywords, status,altText } = req.body;
     const content = req.body.content;
     const coverImage = req.file;
 
@@ -44,6 +44,7 @@ export const createPost = async (req, res) => {
       newPost = await Post.create({
         author: userId,
         title,
+        altText,
         description,
         content: updatedContent,
         slug,
@@ -58,6 +59,7 @@ export const createPost = async (req, res) => {
       newPost = await Post.create({
         author: userId,
         title,
+        altText,
         description,
         content: updatedContent,
         slug,

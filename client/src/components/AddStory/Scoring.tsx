@@ -1,4 +1,4 @@
-import { IconChevronDown } from "@tabler/icons-react";
+import { IconChevronDown, IconLoader2 } from "@tabler/icons-react";
 import React from "react";
 
 const categories = [
@@ -18,9 +18,10 @@ interface ScoringProps {
   category: string;
   setCategory: React.Dispatch<React.SetStateAction<string>>;
   setStatus: React.Dispatch<React.SetStateAction<string>>;
+  createloading: boolean
 }
 
-const Scoring = ({ category, setCategory, setStatus }: ScoringProps) => {
+const Scoring = ({ category, setCategory, setStatus,createloading }: ScoringProps) => {
   return (
     <div className="mx:px-[1vw] px-[0vh] flex flex-col md:py-[1vw] py-[2vh] md:fixed w-full md:w-[20vw]">
       <div className="w-full relative">
@@ -46,6 +47,7 @@ const Scoring = ({ category, setCategory, setStatus }: ScoringProps) => {
 
       <div className="w-full mt-2 flex flex-col gap-2">
         <button
+          disabled={createloading}
           onClick={() => setStatus("Draft")}
           className="w-full text-zinc-200 text-[2vh] md:text-[1.2vw] md:px-[1vw] md:py-[.3vw] px-[2vh] py-[.8vh] rounded-xl bg-prime hover:bg-prime/80 cursor-pointer transition-all duration-500 ease-in-out"
         >
@@ -53,10 +55,16 @@ const Scoring = ({ category, setCategory, setStatus }: ScoringProps) => {
         </button>
 
         <button
+          disabled={createloading}
           onClick={() => setStatus("Published")}
           className="w-full text-zinc-200 text-[2vh] md:text-[1.2vw] md:px-[1vw] md:py-[.3vw] px-[2vh] py-[.8vh] rounded-xl bg-indigo-500 hover:bg-indigo-600 cursor-pointer transition-all duration-500 ease-in-out"
         >
-          Publish
+          {createloading ? (
+            <div className="flex items-center gap-2">
+              <IconLoader2 className="animate-spin" />
+              Publishing
+            </div>
+          ) : "Publish"}
         </button>
       </div>
     </div>

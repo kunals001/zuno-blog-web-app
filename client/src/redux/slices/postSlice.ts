@@ -12,6 +12,7 @@ export const createPost = createAsyncThunk<
     title: string;
     description: string;
     content: string;
+    altText: string;
     tags?: string[];
     category?: string;
     keywords?: string[];
@@ -31,6 +32,7 @@ export const createPost = createAsyncThunk<
     data.append("title", formData.title);
     data.append("description", formData.description);
     data.append("content", formData.content);
+    data.append("altText", formData.altText);
 
     // Arrays ko properly handle karo
     if (formData.tags && formData.tags.length > 0) {
@@ -100,7 +102,7 @@ const postSlice = createSlice({
       state.createdPost = null;
     },
     // Additional helpful reducer
-    clearError(state) {
+    clearCreateError(state) {
       state.createError = null;
     },
   },
@@ -126,5 +128,5 @@ const postSlice = createSlice({
   },
 });
 
-export const { resetPostState, clearError } = postSlice.actions;
+export const { resetPostState, clearCreateError } = postSlice.actions;
 export default postSlice.reducer;

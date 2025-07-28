@@ -44,6 +44,9 @@ const postSchema = new mongoose.Schema({
     type: [String],
     default: []
   },
+  altText:{
+    type: String
+  },
 
   status: {
     type: String,
