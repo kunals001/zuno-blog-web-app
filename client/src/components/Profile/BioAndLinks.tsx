@@ -1,6 +1,12 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useAppSelector } from "@/redux/hooks";
-import { IconPencil, IconTrash, IconPlus, IconChevronDown, IconChevronUp } from "@tabler/icons-react";
+import {
+  IconPencil,
+  IconTrash,
+  IconPlus,
+  IconChevronDown,
+  IconChevronUp,
+} from "@tabler/icons-react";
 
 interface Props {
   setBio: React.Dispatch<React.SetStateAction<string | null>>;
@@ -48,66 +54,56 @@ const BioAndLinks = ({ setBio, setSocialLinks }: Props) => {
     setBio(val);
   };
 
-  const checkIfNeedsShowMore = () => {
+  const checkIfNeedsShowMore = useCallback(() => {
     const el = bioRef.current;
     if (el && !editingBio) {
-      // Calculate if content exceeds height limits
       const isMobile = window.innerWidth < 768;
-      const maxHeight = isMobile ? window.innerHeight * 0.15 : window.innerWidth * 0.10;
-      
-      // Temporarily set height to auto to get full content height
+      const maxHeight = isMobile ? window.innerHeight * 0.15 : window.innerWidth * 0.1;
+
       const originalHeight = el.style.height;
       el.style.height = "auto";
       const contentHeight = el.scrollHeight;
       el.style.height = originalHeight;
-      
+
       setNeedsShowMore(contentHeight > maxHeight);
     }
-  };
+  }, [editingBio]);
 
-  const adjustHeight = () => {
+  const adjustHeight = useCallback(() => {
     const el = bioRef.current;
     if (el) {
       if (editingBio) {
-        // When editing, always show full height
         el.style.height = "auto";
         el.style.height = el.scrollHeight + "px";
       } else {
-        // When not editing, check if we need show more
         const isMobile = window.innerWidth < 768;
-        const maxHeight = isMobile ? window.innerHeight * 0.15 : window.innerWidth * 0.10;
-        
-        if (showFullBio) {
-          el.style.height = "auto";
-          el.style.height = el.scrollHeight + "px";
-        } else {
-          el.style.height = "auto";
-          const contentHeight = el.scrollHeight;
-          if (contentHeight > maxHeight) {
-            el.style.height = maxHeight + "px";
-          } else {
-            el.style.height = el.scrollHeight + "px";
-          }
-        }
+        const maxHeight = isMobile ? window.innerHeight * 0.15 : window.innerWidth * 0.1;
+
+        el.style.height = "auto";
+        const contentHeight = el.scrollHeight;
+        el.style.height = showFullBio
+          ? contentHeight + "px"
+          : contentHeight > maxHeight
+          ? maxHeight + "px"
+          : contentHeight + "px";
       }
     }
-  };
+  }, [editingBio, showFullBio]);
 
   useEffect(() => {
     adjustHeight();
     checkIfNeedsShowMore();
-  }, [bioInput, showFullBio, editingBio]);
+  }, [bioInput, showFullBio, editingBio, adjustHeight, checkIfNeedsShowMore]);
 
-  // Handle window resize
   useEffect(() => {
     const handleResize = () => {
       adjustHeight();
       checkIfNeedsShowMore();
     };
-    
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [bioInput, showFullBio, editingBio]);
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [adjustHeight, checkIfNeedsShowMore]);
 
   return (
     <div className="w-full mt-2">
@@ -122,8 +118,7 @@ const BioAndLinks = ({ setBio, setSocialLinks }: Props) => {
           maxLength={160}
           className="w-[90vw] md:w-[30vw] outline-none md:p-[0vw] p-[1vh] rounded-lg bg-transparent scrollbar-hide text-[1.5vh] md:text-[1vw] text-zinc-700 dark:text-zinc-200 resize-none placeholder:text-zinc-400 dark:placeholder:text-zinc-500 transition ease-in-out duration-200 overflow-hidden"
         />
-        
-        {/* Show More/Less Button */}
+
         {needsShowMore && !editingBio && (
           <div className="flex justify-center mt-2">
             <button

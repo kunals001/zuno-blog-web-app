@@ -222,7 +222,7 @@ export const updateUser = createAsyncThunk<User,UpdateUserPayload,{ rejectValue:
 
       // Log FormData contents
       console.log("FormData contents:");
-      for (let pair of formData.entries()) {
+      for (const pair of formData.entries()) {
         console.log(pair[0] + ': ' + pair[1]);
       }
 
@@ -382,6 +382,9 @@ export const userSlice = createSlice({
     },
     clearUpdateUserError: (state) => {
       state.updateUserError = null;
+    },
+    clearGetUserError: (state) => {
+      state.getUserError = null;
     },
 
   },
@@ -559,6 +562,7 @@ export const {
   clearResetPasswordError,
   clearLogoutError,
   clearGoogleError,
-  clearUpdateUserError
+  clearUpdateUserError,
+  clearGetUserError
 } = userSlice.actions;
 export default userSlice.reducer;

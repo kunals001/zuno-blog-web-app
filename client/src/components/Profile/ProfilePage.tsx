@@ -114,7 +114,7 @@ const ProfilePage = () => {
       toast.error(updateUserError);
       dispatch(clearUpdateUserError());
     }
-  }, [updateUserError]);
+  }, [updateUserError, dispatch]);
 
   useEffect(() => {
     if (updateSuccess) {

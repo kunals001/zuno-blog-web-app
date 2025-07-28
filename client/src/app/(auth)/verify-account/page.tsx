@@ -4,7 +4,6 @@ import dynamic from "next/dynamic";
 import { IconLoader } from "@tabler/icons-react";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { clearVerifyError, verifyEmail } from "@/redux/slices/userSlice";
-import { useRouter } from "next/navigation";
 import { Redirect } from "@/components/Secure/Redirect";
 import { toast } from "react-hot-toast";
 
@@ -31,7 +30,6 @@ const OnBoardingForm = dynamic(
 
 const Verify = () => {
   const dispatch = useAppDispatch();
-  const router = useRouter();
   const { verifyLoding, verifyError } = useAppSelector((state) => state.user);
   const [code, setCode] = useState("");
 

@@ -3,15 +3,13 @@ import React, { useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { getPostBySlug } from '@/redux/slices/postSlice'
 import { useParams } from 'next/navigation'
-import { useRouter } from 'next/router'
 
-const page = () => {
+const PostBySlug = () => {
 
   const dispatch = useAppDispatch();
   const params = useParams();
-  const router = useRouter();
 
-  const {getSlugPost,getSlugLoading,getSlugError} = useAppSelector((state) => state.post);
+  const {getSlugPost} = useAppSelector((state) => state.post);
 
   const slug = params.slug as string;
 
@@ -21,9 +19,9 @@ const page = () => {
 
   return (
     <div>
-
+      <h1>{getSlugPost?.title}</h1>
     </div>
   )
 }
 
-export default page
+export default PostBySlug

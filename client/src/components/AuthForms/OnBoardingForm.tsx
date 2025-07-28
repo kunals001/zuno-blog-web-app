@@ -2,9 +2,6 @@ import React, { useState } from 'react'
 import AuthLayout from "../Layouts/AuthLayout";
 import dynamic from 'next/dynamic';
 
-const ErrorToast = dynamic(() => import("@/components/Layouts/ErrorLayout"), {
-    ssr: false,
-})
 
 const UploadPic = dynamic(() => import("../Profile/UploadPic"), {
     ssr: false,
@@ -17,6 +14,13 @@ const OnBoardingForm = () => {
 
     const handelBoarding = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+
+        try {
+            console.log(profilePic)
+            console.log(bio)
+        } catch (error) {
+            console.log(error)
+        }
     }
 
   return (
