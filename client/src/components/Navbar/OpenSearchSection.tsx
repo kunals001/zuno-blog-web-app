@@ -53,7 +53,7 @@ const OpenSearchSection: React.FC<OpenSearchSectionProps> = ({
   // Handle suggestion click
   const handleSuggestionClick = (suggestion: any) => {
     if (suggestion.type === 'user') {
-      router.push(`/profile/${suggestion.text}`);
+      router.push(`/user/${suggestion.text}`);
     } else {
       router.push(`/post/${suggestion.slug}`);
     }

@@ -250,6 +250,32 @@ export const updateUser = createAsyncThunk<User,UpdateUserPayload,{ rejectValue:
 );
 
 
+/// ------------------ GetUserByUsername ------------------ ////
+
+export const getUserByUsername = createAsyncThunk<User, string, { rejectValue: string }>(
+  "user/getUserByUsername",
+  async (username: string, { rejectWithValue }) => {
+    const token = getToken();
+    try {
+      const res = await axios.get(`${API_URL}/api/users/get-user/${username}`,{
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return res.data.user;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(
+          error.response?.data.message || "Verification failed"
+        );
+      }
+      return rejectWithValue("Something went wrong");
+    }
+  }
+)
+
+
 //// ----------------- Check Auth ----------------- ////
 
 export const checkAuth = createAsyncThunk(
@@ -271,6 +297,7 @@ export const checkAuth = createAsyncThunk(
 
 interface AuthState {
   user: User | null;
+  getUser: User | null;
   signupLoading: boolean;
   verifyLoding: boolean;
   loginLoading: boolean;
@@ -278,8 +305,8 @@ interface AuthState {
   resetPasswordLoading: boolean;
   logoutLoading: boolean;
   googleLoading: boolean;
-
   updateUserLoading: boolean;
+  getUserLoading: boolean;
 
   registerError: string | null;
   verifyError: string | null;
@@ -288,6 +315,7 @@ interface AuthState {
   resetPasswordError: string | null;
   logoutError: string | null;
   googleError: string | null;
+  getUserError: string | null;
 
   updateUserError: string | null;
 
@@ -298,6 +326,7 @@ interface AuthState {
 
 const initialState: AuthState = {
   user: null,
+  getUser: null,
   signupLoading: false,
   verifyLoding: false,
   loginLoading: false,
@@ -305,8 +334,8 @@ const initialState: AuthState = {
   resetPasswordLoading: false,
   logoutLoading: false,
   googleLoading: false,
-
   updateUserLoading: false,
+  getUserLoading: false,
 
   registerError: null,
   verifyError: null,
@@ -315,7 +344,7 @@ const initialState: AuthState = {
   resetPasswordError: null,
   logoutError: null,
   googleError: null,
-
+  getUserError: null,
   updateUserError: null,
 
   isAuthenticated: false,
@@ -354,6 +383,7 @@ export const userSlice = createSlice({
     clearUpdateUserError: (state) => {
       state.updateUserError = null;
     },
+
   },
   extraReducers: (builder) => {
     builder
@@ -484,6 +514,22 @@ export const userSlice = createSlice({
       .addCase(updateUser.rejected, (state, action) => {
         state.updateUserLoading = false;
         state.updateUserError = action.payload as string;
+      })
+
+      /// ---------------------- Get User --------------------------- ///
+
+      .addCase(getUserByUsername.pending, (state) => {
+        state.getUserLoading = true;
+        state.getUserError = null;
+      })
+      .addCase(getUserByUsername.fulfilled, (state, action) => {
+        state.getUserLoading = false;
+        state.getUserError = null;
+        state.getUser = action.payload;
+      })
+      .addCase(getUserByUsername.rejected, (state, action) => {
+        state.getUserLoading = false;
+        state.getUserError = action.payload as string;
       })
 
       // ---------------------- CHECK AUTH --------------------------- ///
