@@ -6,14 +6,13 @@ import { usePostsSearch } from '@/api/hooks/useSearch';
 import Image from 'next/image';
 import Link from 'next/link';
 import { 
-  IconSearch, 
-  IconHeart, 
-  IconMessageCircle, 
-  IconEye, 
-  IconClock,
-  IconFilter,
-  IconSortDescending
-} from '@tabler/icons-react';
+  Search, 
+  Heart, 
+  MessageCircle, 
+  Eye, 
+  Clock,
+  ArrowDownWideNarrow
+} from 'lucide-react';
 
 const SearchResultsPage: React.FC = () => {
   const searchParams = useSearchParams();
@@ -47,7 +46,7 @@ const SearchResultsPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <IconSearch className="mx-auto text-gray-400 mb-4" size={48} />
+          <Search className="mx-auto text-gray-400 mb-4" size={48} />
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
             No search query provided
           </h1>
@@ -72,7 +71,7 @@ const SearchResultsPage: React.FC = () => {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-4">
-            <IconSearch className="text-blue-500" size={28} />
+            <Search className="text-blue-500" size={28} />
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
               Search Results
             </h1>
@@ -96,7 +95,7 @@ const SearchResultsPage: React.FC = () => {
                 onClick={() => setShowFilters(!showFilters)}
                 className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
-                <IconSortDescending size={16} />
+                <ArrowDownWideNarrow size={16} />
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Sort: {sortBy === 'relevance' ? 'Relevance' : sortBy === 'latest' ? 'Latest' : sortBy === 'popular' ? 'Popular' : 'Most Liked'}
                 </span>
@@ -189,7 +188,7 @@ const SearchResultsPage: React.FC = () => {
                             {post.category}
                           </span>
                           <div className="flex items-center gap-1 text-xs text-gray-500">
-                            <IconClock size={12} />
+                            <Clock size={12} />
                             {post.readTime} min read
                           </div>
                         </div>
@@ -227,15 +226,15 @@ const SearchResultsPage: React.FC = () => {
                         <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
                           <div className="flex items-center gap-4 text-sm text-gray-500">
                             <span className="flex items-center gap-1">
-                              <IconHeart size={14} />
+                              <Heart size={14} />
                               {post.likes.length}
                             </span>
                             <span className="flex items-center gap-1">
-                              <IconMessageCircle size={14} />
+                              <MessageCircle size={14} />
                               {post.comments.length}
                             </span>
                             <span className="flex items-center gap-1">
-                              <IconEye size={14} />
+                              <Eye size={14} />
                               {post.views}
                             </span>
                           </div>

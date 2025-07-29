@@ -4,7 +4,7 @@ import Skeleton from "../Layouts/Skeleton";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { clearUpdateUserError, updateUser } from "@/redux/slices/userSlice";
 import { toast } from "react-hot-toast";
-import { IconLoader2 } from "@tabler/icons-react";
+import { Loader2 } from "lucide-react";
 
 const UploadPic = dynamic(() => import("./UploadPic"), {
   ssr: false,
@@ -141,7 +141,7 @@ const ProfilePage = () => {
           >
             {updateUserLoading ? (
               <div className="flex items-center gap-2">
-                <IconLoader2 className="animate-spin" />
+                <Loader2 className="animate-spin" />
                 Updating...
               </div>
             ) : (

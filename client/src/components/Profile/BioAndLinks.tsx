@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useAppSelector } from "@/redux/hooks";
 import {
-  IconPencil,
-  IconTrash,
-  IconPlus,
-  IconChevronDown,
-  IconChevronUp,
-} from "@tabler/icons-react";
+  Pencil,
+  Trash,
+  Plus,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 
 interface Props {
   setBio: React.Dispatch<React.SetStateAction<string | null>>;
@@ -128,11 +128,11 @@ const BioAndLinks = ({ setBio, setSocialLinks }: Props) => {
             >
               {showFullBio ? (
                 <>
-                  Show Less <IconChevronUp className="w-4 h-4" />
+                  Show Less <ChevronUp className="w-4 h-4" />
                 </>
               ) : (
                 <>
-                  Show More <IconChevronDown className="w-4 h-4" />
+                  Show More <ChevronDown className="w-4 h-4" />
                 </>
               )}
             </button>
@@ -143,7 +143,7 @@ const BioAndLinks = ({ setBio, setSocialLinks }: Props) => {
           onClick={() => setEditingBio(true)}
           className="absolute top-6 md:top-8 right-[1vh] translate-y-[-50%]"
         >
-          <IconPencil className="text-zinc-700 dark:text-zinc-200 md:p-[.5vw] md:size-[2.5vw] size-[3.5vh] p-[.5vh] bg-zinc-200 dark:bg-zinc-600 rounded-full hover:bg-prime hover:text-zinc-200 transition ease-in-out duration-200 cursor-pointer" />
+          <Pencil className="text-zinc-700 dark:text-zinc-200 md:p-[.5vw] md:size-[2.5vw] size-[3.5vh] p-[.5vh] bg-zinc-200 dark:bg-zinc-600 rounded-full hover:bg-prime hover:text-zinc-200 transition ease-in-out duration-200 cursor-pointer" />
         </div>
       </div>
 
@@ -185,7 +185,7 @@ const BioAndLinks = ({ setBio, setSocialLinks }: Props) => {
           onClick={() => setEditingLinks(true)}
           className="absolute top-6 md:top-8 right-[1vh] translate-y-[-50%]"
         >
-          <IconPencil className="text-zinc-700 dark:text-zinc-200 md:p-[.5vw] md:size-[2.5vw] size-[3.5vh] p-[.5vh] bg-zinc-200 dark:bg-zinc-600 rounded-full hover:bg-prime hover:text-zinc-200 transition ease-in-out duration-200 cursor-pointer" />
+          <Pencil className="text-zinc-700 dark:text-zinc-200 md:p-[.5vw] md:size-[2.5vw] size-[3.5vh] p-[.5vh] bg-zinc-200 dark:bg-zinc-600 rounded-full hover:bg-prime hover:text-zinc-200 transition ease-in-out duration-200 cursor-pointer" />
         </div>
 
         {editingLinks && (
@@ -206,7 +206,7 @@ const BioAndLinks = ({ setBio, setSocialLinks }: Props) => {
                       value={link}
                       className="flex-1 p-2 rounded-lg bg-zinc-200 dark:bg-zinc-700 text-sm text-zinc-900 scrollbar-hide dark:text-zinc-100"
                     />
-                    <IconTrash
+                    <Trash
                       onClick={() => handleRemoveLink(index)}
                       className="cursor-pointer text-red-500 hover:scale-110 transition"
                     />
@@ -222,7 +222,7 @@ const BioAndLinks = ({ setBio, setSocialLinks }: Props) => {
                     placeholder="Add new link..."
                     className="flex-1 p-2 rounded-lg bg-zinc-100 dark:bg-zinc-600 text-sm outline-none text-zinc-800 dark:text-zinc-100"
                   />
-                  <IconPlus
+                  <Plus
                     onClick={handleAddLink}
                     className="text-green-500 cursor-pointer hover:scale-110 transition"
                   />

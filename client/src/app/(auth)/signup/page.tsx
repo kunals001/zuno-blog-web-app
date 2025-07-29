@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { IconLoader } from "@tabler/icons-react";
+import { Loader } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { registerUser } from "@/redux/slices/userSlice";
 import { useRouter } from "next/navigation";
@@ -13,7 +13,7 @@ const SignupForm = dynamic(() => import("@/components/AuthForms/SignupForm"), {
   ssr: false,
   loading: () => (
     <div className="w-full h-screen flex items-center justify-center">
-      <IconLoader className="animate-spin md:size-[3vw] size-[3vh] text-[#0ABAB5]" />
+      <Loader className="animate-spin md:size-[3vw] size-[3vh] text-[#0ABAB5]" />
     </div>
   ),
 });

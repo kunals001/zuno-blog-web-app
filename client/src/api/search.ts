@@ -72,6 +72,7 @@ export const searchAPI = {
   getSearchHistory: async (): Promise<SearchHistory[]> => {
     try {
       const token = getToken();
+      
       if (!token) {
         console.warn('No token found for search history');
         return [];
@@ -80,7 +81,7 @@ export const searchAPI = {
       const { data } = await axios.get(`${API_BASE_URL}/api/searchs/search/history`, {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json", // Changed from multipart/form-data
+          "Content-Type": "multipart/form-data", // Changed from multipart/form-data
         },
       });
       return data.data || [];

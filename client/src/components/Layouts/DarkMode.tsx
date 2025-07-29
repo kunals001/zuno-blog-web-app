@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { IconMoonFilled, IconSunFilled } from "@tabler/icons-react";
+import { Moon, Sun } from "lucide-react";
 
 const DarkMode = () => {
   const [theme, setTheme] = useState("light");
@@ -44,8 +44,8 @@ const DarkMode = () => {
             checked={theme === "light"}
           />
         )}
-        <IconSunFilled className="sun absolute w-[70%] h-[70%] text-[#666]" />
-        <IconMoonFilled className="moon absolute w-[70%] h-[70%] text-[#ececec]" />
+        <Sun className="sun absolute w-[70%] h-[70%] text-[#666]" />
+        <Moon className="moon absolute w-[70%] h-[70%] text-[#ececec]" />
         <span className="toggle-bg absolute w-full h-full rounded-full z-[-1]"></span>
       </label>
     </div>

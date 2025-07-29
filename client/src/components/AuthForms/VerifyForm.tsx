@@ -2,7 +2,7 @@ import React from "react";
 import AuthLayout from "../Layouts/AuthLayout";
 import Input from "../Layouts/Input";
 import Link from "next/link";
-import { IconLoader } from "@tabler/icons-react";
+import { Loader } from "lucide-react";
 
 
 type InputType = {
@@ -43,7 +43,7 @@ const VerifyForm: React.FC<InputType> = ({
           >
             {verifyLoading ? (
               <div className="w-full h-full flex items-center justify-center gap-1">
-                <IconLoader className="animate-spin md:size-[1.5vw] size-[3vh] text-[#ededed]" />
+                <Loader className="animate-spin md:size-[1.5vw] size-[3vh] text-[#ededed]" />
                 Verifying...
               </div>
             ) : (

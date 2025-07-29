@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { IconArrowNarrowLeft, IconSearch, IconUser, IconArticle, IconHistory, IconX } from "@tabler/icons-react";
+import { ArrowLeft, Search, User2, History, X, Newspaper } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSearchSuggestions, useSearchHistory, useSearchMutations, useUsersSearch } from "@/api/hooks/useSearch";
 import { SearchType, SearchSuggestion, User } from "@/redux/type";
@@ -177,10 +177,10 @@ const OpenSearchSection: React.FC<OpenSearchSectionProps> = ({
         
         {/* Header */}
         <div className="flex items-center justify-between gap-2 mb-4">
-          <IconArrowNarrowLeft
-            stroke={1}
+          <ArrowLeft
+            
             onClick={() => setOpenSearch(false)}
-            className="md:size-[2.6vw] size-[5vh] w-[6vh] md:w-[3vw] text-zinc-700 dark:text-zinc-200 cursor-pointer hover:bg-zinc-300 dark:hover:bg-zinc-600 transition ease-in-out duration-200 rounded-full md:bg-[#f5f5f5d5] md:dark:bg-zinc-700 bg-zinc-200 dark:bg-zinc-600"
+            className="md:size-[2vw] size-[4vh] w-[6vh] md:w-[3vw] text-zinc-700 dark:text-zinc-200 cursor-pointer hover:bg-zinc-300 dark:hover:bg-zinc-600 transition ease-in-out duration-200 rounded-full md:bg-[#f5f5f5d5] md:dark:bg-zinc-700 bg-zinc-200 dark:bg-zinc-600 stroke-1"
           />
 
           <div className="relative w-full">
@@ -195,7 +195,7 @@ const OpenSearchSection: React.FC<OpenSearchSectionProps> = ({
               className="w-full placeholder:text-zinc-700 dark:placeholder:text-zinc-200 outline-none md:pl-[1vw] md:pr-[4vw] md:py-[.3vw] pl-[1.5vh] pr-[6vh] py-[.5vh] rounded-full border-2 border-zinc-400 dark:border-zinc-600 text-zinc-700 dark:text-zinc-200 bg-transparent text-[1.7vh] md:text-[1vw]"
             />
 
-            <IconSearch 
+            <Search 
               className="absolute top-[50%] right-[2vh] translate-y-[-50%] text-zinc-700 dark:text-zinc-200 cursor-pointer"
               onClick={() => handleSearch()}
             />
@@ -212,7 +212,7 @@ const OpenSearchSection: React.FC<OpenSearchSectionProps> = ({
                 : 'bg-zinc-200 dark:bg-zinc-600 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-300 dark:hover:bg-zinc-500'
             }`}
           >
-            <IconArticle size={16} />
+            <Newspaper size={16} />
             Stories
           </button>
           
@@ -224,7 +224,7 @@ const OpenSearchSection: React.FC<OpenSearchSectionProps> = ({
                 : 'bg-zinc-200 dark:bg-zinc-600 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-300 dark:hover:bg-zinc-500'
             }`}
           >
-            <IconUser size={16} />
+            <User2 size={16} />
             Users
           </button>
         </div>
@@ -347,7 +347,7 @@ const OpenSearchSection: React.FC<OpenSearchSectionProps> = ({
             <div className="space-y-2">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-sm font-medium text-zinc-600 dark:text-zinc-400 flex items-center gap-2">
-                  <IconHistory size={16} />
+                  <History size={16} />
                   Recent Searches
                 </h3>
                 <button
@@ -367,7 +367,7 @@ const OpenSearchSection: React.FC<OpenSearchSectionProps> = ({
                     onClick={() => handleHistoryClick(history.query)}
                     className="flex items-center gap-3 flex-1"
                   >
-                    <IconSearch size={16} className="text-zinc-500" />
+                    <Search size={16} className="text-zinc-500" />
                     <span className="text-sm text-zinc-700 dark:text-zinc-300">
                       {history.query}
                     </span>
@@ -384,7 +384,7 @@ const OpenSearchSection: React.FC<OpenSearchSectionProps> = ({
                     className="opacity-0 group-hover:opacity-100 transition-opacity"
                     disabled={clearHistoryItem.isPending}
                   >
-                    <IconX size={14} className="text-zinc-500 hover:text-zinc-700" />
+                    <X size={14} className="text-zinc-500 hover:text-zinc-700" />
                   </button>
                 </div>
               ))}
@@ -406,14 +406,14 @@ const OpenSearchSection: React.FC<OpenSearchSectionProps> = ({
           {/* Empty States */}
           {showSuggestions && suggestions && suggestions.length === 0 && !suggestionsLoading && (
             <div className="text-center py-8 text-zinc-500 dark:text-zinc-400">
-              <IconSearch className="mx-auto mb-2" size={24} />
+              <Search className="mx-auto mb-2" size={24} />
               <p className="text-sm">No story suggestions found</p>
             </div>
           )}
 
           {showUserResults && userResults && userResultsData.length === 0 && !userResultsLoading && (
             <div className="text-center py-8 text-zinc-500 dark:text-zinc-400">
-              <IconUser className="mx-auto mb-2" size={24} />
+              <User2 className="mx-auto mb-2" size={24} />
               <p className="text-sm">No users found</p>
               <p className="text-xs mt-1">Try searching with different keywords</p>
             </div>
@@ -421,7 +421,7 @@ const OpenSearchSection: React.FC<OpenSearchSectionProps> = ({
 
           {showHistory && (!searchHistory || searchHistory.length === 0) && !historyLoading && (
             <div className="text-center py-8 text-zinc-500 dark:text-zinc-400">
-              <IconHistory className="mx-auto mb-2" size={24} />
+              <History className="mx-auto mb-2" size={24} />
               <p className="text-sm">No search history</p>
               <p className="text-xs mt-1">Your recent searches will appear here</p>
             </div>

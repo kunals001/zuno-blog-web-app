@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import { IconAlt, IconTrash, IconX } from "@tabler/icons-react";
+import { LetterText, Trash2, X } from "lucide-react";
 import Image from "next/image";
 
 interface Props {
@@ -76,7 +76,7 @@ const AltEditorOverlay = (
           className="absolute top-3 right-3 text-zinc-500 hover:text-red-500 transition-colors duration-200"
           aria-label="Close"
         >
-         <IconX className="md:size-[1.5vw] size-[2vh] text-zinc-500 dark:text-zinc-200"/>
+         <X className="md:size-[1.5vw] size-[2vh] text-zinc-500 dark:text-zinc-200"/>
         </button>
         <h2 className="text-lg font-semibold mb-4 text-zinc-800 dark:text-zinc-100">
           Add Alt Text
@@ -118,7 +118,7 @@ const AltEditorOverlay = (
               }}
               className="absolute top-2 left-2 bg-white/80 dark:bg-zinc-700/80 backdrop-blur-sm border border-zinc-300 dark:border-zinc-600 rounded-full p-1 hover:scale-105 transition"
             >
-              <IconAlt className="size-[2vw] text-zinc-500 dark:text-zinc-200" />
+              <LetterText className="size-[2vw] text-zinc-500 dark:text-zinc-200" />
             </button>
 
             <Image
@@ -135,7 +135,7 @@ const AltEditorOverlay = (
               onClick={handleRemove}
               className="absolute top-2 right-2 bg-zinc-100 dark:bg-zinc-600 text-red-400 rounded-full shadow-md p-1 hover:bg-red-100"
             >
-              <IconTrash className=" md:size-[2vw] size-[3vh]" />
+              <Trash2 className=" md:size-[2vw] size-[3vh]" />
             </button>
           </>
         ) : (
@@ -169,7 +169,7 @@ const AltEditorOverlay = (
               }}
               className="absolute top-2 left-2 bg-white/80 dark:bg-zinc-700/80 backdrop-blur-sm border border-zinc-300 dark:border-zinc-600 rounded-full p-1 hover:scale-105 transition"
             >
-              <IconAlt className="size-[3vh] text-zinc-500 dark:text-zinc-200" />
+              <LetterText className="size-[3vh] text-zinc-500 dark:text-zinc-200" />
             </button>
 
             <Image
@@ -186,7 +186,7 @@ const AltEditorOverlay = (
               onClick={handleRemove}
               className="absolute top-2 right-2 bg-zinc-100 dark:bg-zinc-600 text-red-400 rounded-full shadow-md p-1 hover:bg-red-100"
             >
-              <IconTrash className=" md:size-[2vw] size-[3vh]" />
+              <Trash2 className=" md:size-[2vw] size-[3vh]" />
             </button>
           </>
         ) : (

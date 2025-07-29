@@ -1,7 +1,7 @@
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import Skeleton from "../Layouts/Skeleton";
-import { IconBell, IconMenu2, IconSearch } from "@tabler/icons-react";
+import { Bell, Menu, Search } from "lucide-react";
 import { useRef, useState } from "react";
 import { useClickOutside } from "../Layouts/ClickOutside";
 
@@ -98,13 +98,13 @@ const Navbar = () => {
 
         <div className="flex items-center md:gap-[.5vw] gap-[1.5vh]">
           <div className="flex items-center gap-[1.5vh] md:gap-0">
-            <IconSearch
+            <Search
               onClick={() => setOpenSearch(!openSearch)}
               className="md:size-[2.6vw] size-[3.5vh] text-zinc-600 dark:text-zinc-200 cursor-pointer hover:bg-zinc-300 dark:hover:bg-zinc-700 transition ease-in-out duration-200 md:p-[.5vw] rounded-full"
             />
 
            <div ref={bellRef} className="">
-             <IconBell
+             <Bell
               onClick={() => setOpenNotif(!openNotif)}
               className="md:size-[2.6vw] size-[3.5vh] text-zinc-600 dark:text-zinc-200 cursor-pointer hover:bg-zinc-300 dark:hover:bg-zinc-700 transition ease-in-out duration-200 md:p-[.5vw] rounded-full"
             />
@@ -132,7 +132,7 @@ const Navbar = () => {
             <NavUserShow />
           </div>
 
-          <IconMenu2
+          <Menu
             onClick={() => {
               setOpen(!open);
             }}

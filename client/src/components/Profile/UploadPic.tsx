@@ -2,11 +2,11 @@ import React, { useRef, useState, useEffect } from "react";
 import Skeleton from "../Layouts/Skeleton";
 import dynamic from "next/dynamic";
 import {
-  IconCamera,
-  IconTrash,
-  IconSettings,
-  IconSquareRoundedPlus,
-} from "@tabler/icons-react";
+  Camera,
+  Trash,
+  Settings,
+  Plus,
+} from "lucide-react";
 import { useAppSelector } from "@/redux/hooks";
 import Link from "next/link";
 import Image from "next/image";
@@ -110,7 +110,7 @@ const UploadPic: React.FC<UploadPicProps> = ({ setProfilePic }) => {
           onClick={openFilePicker}
           className="absolute bottom-1 right-1 bg-prime  p-1 rounded-full shadow cursor-pointer"
         >
-          <IconCamera className="md:size-[2vw] size-[2.3vh] text-white" />
+          <Camera className="md:size-[2vw] size-[2.3vh] text-white" />
         </button>
 
         {preview && (
@@ -119,17 +119,17 @@ const UploadPic: React.FC<UploadPicProps> = ({ setProfilePic }) => {
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-zinc-200 text-red-300 dark:bg-zinc-600 text-xs px-1 py-0.5 rounded-full"
             title="Remove"
           >
-            <IconTrash className="md:size-[1.5vw] size-[2vh]" />
+            <Trash className="md:size-[1.5vw] size-[2vh]" />
           </button>
         )}
       </div>
 
       <div className="md:hidden absolute top-0 right-[1vh] flex items-center gap-[1vh]">
         <Link href={"/add-story"}>
-          <IconSquareRoundedPlus className="text-zinc-500 datk:text-zinc-200 size-[3.5vh]" />
+          <Plus className="text-zinc-500 datk:text-zinc-200 size-[3.5vh]" />
         </Link>
         <Link href={"/add-story"}>
-          <IconSettings className="text-zinc-500 datk:text-zinc-200 size-[3.5vh]" />
+          <Settings className="text-zinc-500 datk:text-zinc-200 size-[3.5vh]" />
         </Link>
       </div>
 

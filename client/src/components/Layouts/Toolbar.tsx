@@ -2,14 +2,14 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import {
-  IconBold,
-  IconItalic,
-  IconLink,
-  IconList,
-  IconPhoto,
-  IconBrandYoutube,
-  IconCode,
-} from "@tabler/icons-react";
+  Bold,
+  Italic,
+  Link,
+  List,
+  Youtube,
+  Code,
+  ImagePlus,
+} from "lucide-react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   FORMAT_TEXT_COMMAND,
@@ -247,7 +247,7 @@ const Toolbar = () => {
           title="Bold"
           className={`${baseClass} ${isBold ? selectedClass : ""}`}
         >
-          <IconBold className="w-5 h-5" />
+          <Bold className="w-5 h-5" />
         </button>
 
         <button
@@ -256,7 +256,7 @@ const Toolbar = () => {
           title="Italic"
           className={`${baseClass} ${isItalic ? selectedClass : ""}`}
         >
-          <IconItalic className="w-5 h-5" />
+          <Italic className="w-5 h-5" />
         </button>
 
         <button
@@ -265,7 +265,7 @@ const Toolbar = () => {
           title="Bullet List"
           className={`${baseClass} ${isList ? selectedClass : ""}`}
         >
-          <IconList className="w-5 h-5" />
+          <List className="w-5 h-5" />
         </button>
 
         <button
@@ -274,7 +274,7 @@ const Toolbar = () => {
           title="Insert Link"
           className={baseClass}
         >
-          <IconLink className="w-5 h-5" />
+          <Link className="w-5 h-5" />
         </button>
 
         <button
@@ -283,7 +283,7 @@ const Toolbar = () => {
           title="Code Block"
           className={baseClass}
         >
-          <IconCode className="w-5 h-5" />
+          <Code className="w-5 h-5" />
         </button>
 
         <button
@@ -296,7 +296,7 @@ const Toolbar = () => {
           {isImageUploading ? (
             <div className="w-5 h-5 border-2 border-zinc-600 border-t-transparent rounded-full animate-spin"></div>
           ) : (
-            <IconPhoto className="w-5 h-5" />
+            <ImagePlus className="w-5 h-5" />
           )}
         </button>
 
@@ -306,7 +306,7 @@ const Toolbar = () => {
           title="Insert YouTube Video"
           className={baseClass}
         >
-          <IconBrandYoutube className="w-5 h-5" />
+          <Youtube className="w-5 h-5" />
         </button>
 
         <input

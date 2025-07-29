@@ -1,11 +1,11 @@
 import React, { useState, useRef} from "react";
 import {
-  IconLogout,
-  IconSettings,
-  IconUser,
-  IconUserStar,
-  IconWriting,
-} from "@tabler/icons-react";
+  LogOut,
+  Settings,
+  User,
+  UserStar,
+  PenLine,
+} from "lucide-react";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { logoutUser } from "@/redux/slices/userSlice";
 import { useClickOutside } from "../Layouts/ClickOutside";
@@ -41,17 +41,17 @@ const NavUserShow = () => {
     {
       name: "Profile",
       path: "/profile/?tab=user-profile",
-      icon: IconUserStar,
+      icon: UserStar,
     },
     {
       name: "Write",
       path: "/add-story",
-      icon: IconWriting,
+      icon: PenLine,
     },
     {
       name: "Settings",
       path: "/profile/?tab=settings",
-      icon: IconSettings,
+      icon: Settings,
     },
   ];
 
@@ -109,7 +109,7 @@ const NavUserShow = () => {
               onClick={handelLogout}
               className="text-[1.1vw] font-prime font-[500] text-red-400 hover:text-zinc-200 transition ease-in-out duration-200 cursor-pointer dark:bg-zinc-600 bg-zinc-200 hover:bg-[#ff5855ed] px-[1vw] pt-[.2vw] pb-[.3vw] rounded-md w-full text-start flex items-center gap-[.7vw] group"
             >
-              <IconLogout className="size-6 text-red-400 group-hover:text-zinc-200 transition ease-in-out duration-200" />{" "}
+              <LogOut className="size-6 text-red-400 group-hover:text-zinc-200 transition ease-in-out duration-200" />{" "}
               Logout
             </button>
           </div>
@@ -127,7 +127,7 @@ const NavUserShow = () => {
           </button>
 
           <Link href="/login">
-            <IconUser className="size-[3vh] md:hidden text-zinc-700 dark:text-zinc-200" />
+            <User className="size-[3vh] md:hidden text-zinc-700 dark:text-zinc-200" />
           </Link>
         </div>
       )}

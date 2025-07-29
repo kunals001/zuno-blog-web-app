@@ -1,7 +1,7 @@
 import React from "react";
 import AuthLayout from "../Layouts/AuthLayout";
 import Link from "next/link";
-import { IconMail } from "@tabler/icons-react";
+import { Mail } from "lucide-react";
 
 
 const ResetLink
@@ -20,7 +20,7 @@ const ResetLink
           </h1>
 
           <div className="">
-            <IconMail className="md:size-[3vw] size-[7vh] text-[#0ABAB5] mx-auto"/>
+            <Mail className="md:size-[3vw] size-[7vh] text-[#0ABAB5] mx-auto"/>
           </div>
 
           <p className="md:py-[.5vw] py-[1.5vh] text-zinc-600 text-[1.6vh] md:text-[.8vw] text-center ">if you have an account with us, we will send you an email to reset your password</p>

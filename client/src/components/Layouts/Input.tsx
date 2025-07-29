@@ -1,5 +1,5 @@
 import React, { InputHTMLAttributes, useState } from "react";
-import { IconEye, IconEyeOff } from "@tabler/icons-react";
+import { Eye, EyeOff } from "lucide-react";
 
 type InputProps = InputHTMLAttributes<HTMLInputElement> & {
   label: string;
@@ -28,7 +28,7 @@ const Input = ({ label, type = "text", ...props }: InputProps) => {
           className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-zinc-500 hover:text-[#0ABAB5]"
           onClick={() => setShowPassword(!showPassword)}
         >
-          {showPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
+          {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
         </div>
       )}
     </div>

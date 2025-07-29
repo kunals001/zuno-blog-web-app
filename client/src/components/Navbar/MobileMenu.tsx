@@ -1,6 +1,6 @@
 import Link from "next/link";
 import React from "react";
-import { IconX } from "@tabler/icons-react";
+import { X } from "lucide-react";
 
 const MobileMenu = ({
   open,
@@ -25,7 +25,7 @@ const MobileMenu = ({
       }  py-[2vh]`}
     >
       <div className="w-full h-[5vh] flex items-center justify-start px-[1vh]">
-        <IconX
+        <X
           onClick={() => {
             setOpen(!open);
           }}
