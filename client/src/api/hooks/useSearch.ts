@@ -1,4 +1,3 @@
-// hooks/useSearch.ts
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { useDebounce } from 'use-debounce';
 import { searchAPI } from '../search';
@@ -21,6 +20,8 @@ export const useSearchSuggestions = (query: string, type: SearchType) => {
     queryFn: () => searchAPI.getSuggestions(debouncedQuery, type),
     enabled: debouncedQuery.length >= 2,
     staleTime: 2 * 60 * 1000, // 2 minutes
+    retry: 2,
+    retryDelay: 1000,
   });
 };
 
@@ -31,6 +32,8 @@ export const useSearchUsers = (params: SearchParams) => {
     queryFn: () => searchAPI.searchUsers(params),
     enabled: params.query.length > 0,
     placeholderData: keepPreviousData,
+    retry: 2,
+    retryDelay: 1000,
   });
 };
 
@@ -41,6 +44,8 @@ export const useSearchPosts = (params: SearchParams) => {
     queryFn: () => searchAPI.searchPosts(params),
     enabled: params.query.length > 0,
     placeholderData: keepPreviousData,
+    retry: 2,
+    retryDelay: 1000,
   });
 };
 
@@ -50,6 +55,8 @@ export const useSearchHistory = () => {
     queryKey: ['searchHistory'],
     queryFn: searchAPI.getSearchHistory,
     staleTime: 5 * 60 * 1000,
+    retry: 1,
+    retryDelay: 1000,
   });
 };
 
@@ -62,12 +69,18 @@ export const useSearchMutations = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['searchHistory'] });
     },
+    onError: (error) => {
+      console.error('Failed to clear history item:', error);
+    },
   });
 
   const clearAllHistory = useMutation<void, Error, void>({
     mutationFn: searchAPI.clearAllHistory,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['searchHistory'] });
+    },
+    onError: (error) => {
+      console.error('Failed to clear all history:', error);
     },
   });
 
@@ -77,30 +90,45 @@ export const useSearchMutations = () => {
   };
 };
 
-// Combined search hook for both users and posts
-export const useCombinedSearch = (query: string, type: SearchType, page: number = 1) => {
+// Only posts search hook for search page
+export const usePostsSearch = (query: string, page: number = 1, sortBy: string = 'relevance') => {
   const searchParams: SearchParams = {
     query,
-    type,
+    type: 'post',
+    page,
+    limit: 12, // More posts for grid layout
+    sortBy: sortBy as 'relevance' | 'latest' | 'popular' | 'liked'
+  };
+
+  return useQuery<SearchResponse<Post>>({
+    queryKey: ['searchPosts', query, page, sortBy],
+    queryFn: () => searchAPI.searchPosts(searchParams),
+    enabled: query.length > 0,
+    placeholderData: keepPreviousData,
+    staleTime: 2 * 60 * 1000,
+    retry: 2,
+    retryDelay: 1000,
+  });
+};
+
+// Get users with search query (for user search in popup)
+export const useUsersSearch = (query: string, page: number = 1) => {
+  const [debouncedQuery] = useDebounce(query, 300); // Added debounce
+
+  const searchParams: SearchParams = {
+    query: debouncedQuery,
+    type: 'user',
     page,
     limit: 10
   };
 
-  const usersQuery = useSearchUsers({
-    ...searchParams,
-    type: 'user'
+  return useQuery<SearchResponse<User>>({
+    queryKey: ['searchUsers', debouncedQuery, page],
+    queryFn: () => searchAPI.searchUsers(searchParams),
+    enabled: debouncedQuery.length >= 2, // Changed from > 0 to >= 2
+    placeholderData: keepPreviousData,
+    staleTime: 2 * 60 * 1000,
+    retry: 2,
+    retryDelay: 1000,
   });
-
-  const postsQuery = useSearchPosts({
-    ...searchParams,
-    type: 'post'
-  });
-
-  return {
-    users: usersQuery,
-    posts: postsQuery,
-    isLoading: type === 'user' ? usersQuery.isLoading : postsQuery.isLoading,
-    error: type === 'user' ? usersQuery.error : postsQuery.error,
-    data: type === 'user' ? usersQuery.data : postsQuery.data
-  };
 };

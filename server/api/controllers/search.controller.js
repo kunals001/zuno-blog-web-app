@@ -1,3 +1,4 @@
+// controllers/search.controller.js - Fixed version
 import User from "../models/user.model.js";
 import Post from "../models/post.model.js";
 import SearchHistory from "../models/searchHistory.model.js";
@@ -31,10 +32,10 @@ export const SearchUser = async (req, res) => {
           ]
         },
         { isBlocked: false }, // Don't show blocked users
-        { isVerified: true }   // Only show verified users
+        // { isVerified: true }   // Remove this if you want to show all users
       ]
     })
-    .select('username name bio profilePic followers following')
+    .select('username name bio profilePic followers following isVerified')
     .limit(parseInt(limit))
     .skip(skip)
     .sort({ followers: -1 }); // Sort by follower count
@@ -49,7 +50,7 @@ export const SearchUser = async (req, res) => {
           ]
         },
         { isBlocked: false },
-        { isVerified: true }
+        // { isVerified: true }
       ]
     });
 
@@ -65,10 +66,11 @@ export const SearchUser = async (req, res) => {
       followingCount: user.following.length
     }));
 
+    // *** MAIN FIX: Match the expected frontend structure ***
     res.status(200).json({
       success: true,
       data: {
-        users: usersWithStats,
+        results: usersWithStats, // Changed from 'users' to 'results'
         pagination: {
           currentPage: parseInt(page),
           totalPages: Math.ceil(totalUsers / limit),
@@ -169,10 +171,11 @@ export const SearchPost = async (req, res) => {
       isLikedByUser: userId ? post.likes.includes(userId) : false
     }));
 
+    // *** MAIN FIX: Match the expected frontend structure ***
     res.status(200).json({
       success: true,
       data: {
-        posts: postsWithStats,
+        results: postsWithStats, // Changed from 'posts' to 'results'
         pagination: {
           currentPage: parseInt(page),
           totalPages: Math.ceil(totalPosts / limit),
@@ -200,7 +203,7 @@ export const SearchPost = async (req, res) => {
 // Get user's search history
 export const getSearchHistory = async (req, res) => {
   try {
-    const userId = req.user;
+    const userId = req.user?.id || req.user; // Handle both cases
     const { limit = 20 } = req.query;
 
     if (!userId) {
@@ -232,7 +235,7 @@ export const getSearchHistory = async (req, res) => {
 // Clear specific search history item
 export const clearSearchHistoryItem = async (req, res) => {
   try {
-    const userId = req.user;
+    const userId = req.user?.id || req.user; // Handle both cases
     const { historyId } = req.params;
 
     if (!userId) {
@@ -271,7 +274,7 @@ export const clearSearchHistoryItem = async (req, res) => {
 // Clear all search history
 export const clearAllSearchHistory = async (req, res) => {
   try {
-    const userId = req.user;
+    const userId = req.user?.id || req.user; // Handle both cases
 
     if (!userId) {
       return res.status(401).json({
@@ -299,7 +302,7 @@ export const clearAllSearchHistory = async (req, res) => {
 // Get search suggestions
 export const getSearchSuggestions = async (req, res) => {
   try {
-    const { query, type = 'both' } = req.query;
+    const { query, type = 'post' } = req.query; // Changed default to 'post'
 
     if (!query || query.trim().length < 2) {
       return res.status(400).json({
@@ -319,9 +322,9 @@ export const getSearchSuggestions = async (req, res) => {
           { name: { $regex: searchRegex } }
         ],
         isBlocked: false,
-        isVerified: true
+        // isVerified: true // Comment out if you want all users
       })
-      .select('username name profilePic')
+      .select('username name profilePic isVerified')
       .limit(5)
       .sort({ followers: -1 });
 
@@ -408,4 +411,53 @@ const saveSearchHistory = async (userId, query, type) => {
   } catch (error) {
     console.error("Save Search History Error:", error);
   }
+};
+
+
+// ============================================================
+// Optional: Add middleware for better error handling
+// ============================================================
+
+// middleware/errorHandler.js
+export const errorHandler = (err, req, res, next) => {
+  console.error('Error:', err);
+  
+  // Mongoose validation error
+  if (err.name === 'ValidationError') {
+    const errors = Object.values(err.errors).map(e => e.message);
+    return res.status(400).json({
+      success: false,
+      message: 'Validation Error',
+      errors
+    });
+  }
+  
+  // Mongoose duplicate key error
+  if (err.code === 11000) {
+    return res.status(400).json({
+      success: false,
+      message: 'Duplicate field error'
+    });
+  }
+  
+  // Default error
+  res.status(500).json({
+    success: false,
+    message: 'Server Error'
+  });
+};
+
+// ============================================================
+// Debug middleware to log requests
+// ============================================================
+
+export const debugLogger = (req, res, next) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`${req.method} ${req.originalUrl}`, {
+      query: req.query,
+      body: req.body,
+      user: req.user ? 'authenticated' : 'not authenticated'
+    });
+  }
+  next();
 };

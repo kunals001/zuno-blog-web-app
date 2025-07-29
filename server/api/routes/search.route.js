@@ -1,3 +1,4 @@
+
 import express from "express";
 const router = express.Router();
 
@@ -12,7 +13,7 @@ import {
 
 import { protectRoute } from "../middleware/protectRoute.js"; 
 
-// Search routes
+// Search routes - No authentication required for basic search
 router.get("/search/user", SearchUser);
 router.get("/search/post", SearchPost);
 router.get("/search/suggestions", getSearchSuggestions);
