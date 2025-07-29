@@ -1,4 +1,4 @@
-import { IconChevronDown, IconLoader2 } from "@tabler/icons-react";
+import { ChevronDown, Loader2 } from "lucide-react";
 import React from "react";
 
 const categories = [
@@ -42,7 +42,7 @@ const Scoring = ({ category, setCategory, setStatus,createloading }: ScoringProp
           ))}
         </select>
 
-        <IconChevronDown className="absolute top-[50%] right-[2vh] translate-y-[-50%] text-zinc-700 dark:text-zinc-200" />
+        <ChevronDown className="absolute top-[50%] right-[2vh] translate-y-[-50%] text-zinc-700 dark:text-zinc-200" />
       </div>
 
       <div className="w-full mt-2 flex flex-col gap-2">
@@ -63,7 +63,7 @@ const Scoring = ({ category, setCategory, setStatus,createloading }: ScoringProp
         >
           {createloading ? (
             <div className="flex items-center gap-2">
-              <IconLoader2 className="animate-spin" />
+              <Loader2 className="animate-spin" />
               Publishing
             </div>
           ) : "Publish"}

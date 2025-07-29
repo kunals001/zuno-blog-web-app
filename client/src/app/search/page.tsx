@@ -80,7 +80,7 @@ const SearchResultsPage: React.FC = () => {
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
               <p className="text-lg text-gray-700 dark:text-gray-300">
-                Stories for <span className="font-semibold text-blue-600">"{query}"</span>
+                Stories for <span className="font-semibold text-blue-600">&quot;{query}&quot;</span>
               </p>
               {data && (
                 <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -299,7 +299,7 @@ const SearchResultsPage: React.FC = () => {
                   No stories found
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
-                  We couldn't find any stories matching "{query}". Try searching with different keywords or check your spelling.
+                  We couldn&apos;t find any stories matching &quot;{query}&quot;. Try searching with different keywords or check your spelling.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <button

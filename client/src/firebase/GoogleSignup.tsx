@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { clearGoogleError, googleSignup } from "@/redux/slices/userSlice";
 import Image from "next/image";
-import { IconLoader } from "@tabler/icons-react";
+import { Loader } from "lucide-react";
 import { useEffect } from "react";
 import { toast } from "react-hot-toast";
 
@@ -70,7 +70,7 @@ const GoogleSignup = () => {
         />
         {googleLoading ? (
           <div className="">
-            <IconLoader className="animate-spin md:size-[2vw] size-[3vh] text-[#0ABAB5] mx-auto" />
+            <Loader className="animate-spin md:size-[2vw] size-[3vh] text-[#0ABAB5] mx-auto" />
           </div>
         ) : (
           "Continue with Google"

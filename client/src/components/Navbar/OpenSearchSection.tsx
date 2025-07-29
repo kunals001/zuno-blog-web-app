@@ -45,7 +45,7 @@ const OpenSearchSection: React.FC<OpenSearchSectionProps> = ({
         historyError
       });
     }
-  }, [query, selectedType, suggestions, userResults, searchHistory, suggestionsError, userResultsError, historyError]);
+  }, [query, selectedType, suggestions, userResults, searchHistory, suggestionsError, userResultsError, historyError, showSuggestions, showUserResults, showHistory]);
 
   // Focus input when search opens
   useEffect(() => {
