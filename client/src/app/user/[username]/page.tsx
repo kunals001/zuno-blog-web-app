@@ -4,6 +4,20 @@ import { useParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { clearGetUserError, getUserByUsername } from "@/redux/slices/userSlice";
 import { toast } from "react-hot-toast";
+import Skeleton from "@/components/Layouts/Skeleton";
+import dynamic from "next/dynamic";
+
+const Navbar = dynamic(() => import("@/components/Navbar/Navbar"), {
+  ssr: false,
+  loading: () => (
+    <Skeleton
+      width={"w-full md:w-[80vw]"}
+      height={"h-[7vh] md:h-[4vw]"}
+      animation="shimmer"
+      rounded="rounded-xl"
+    />
+  ),
+});
 
 const UserByUsername = () => {
   const dispatch = useAppDispatch();
@@ -11,9 +25,9 @@ const UserByUsername = () => {
 
   const { getUser, getUserError } = useAppSelector((state) => state.user);
 
-  const username = params.username as string;
-
   console.log(getUser);
+
+  const username = params.username as string;
 
   useEffect(() => {
     dispatch(getUserByUsername(username));
@@ -29,10 +43,11 @@ const UserByUsername = () => {
   }, [getUserError, dispatch]);
 
   return (
-    <div className="w-full min-h-screen md:px-[10vw] px-[1vh] mt-2">
-      <h1 className="md:text-[2vw] text-[3.5vh] font-prime font-[700] text-zinc-700 text-center pb-3">
-        {getUser?.username}
-      </h1>
+    <div className="w-full min-h-screen bg-zinc-200 dark:bg-zinc-800">
+      <Navbar />
+      <div className="md:px-[10vw] px-[1vh] mt-2">
+
+      </div>
     </div>
   );
 };

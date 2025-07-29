@@ -2,10 +2,10 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useAppSelector } from "@/redux/hooks";
 import {
   Pencil,
-  Trash,
   Plus,
   ChevronDown,
   ChevronUp,
+  Trash2,
 } from "lucide-react";
 
 interface Props {
@@ -206,7 +206,7 @@ const BioAndLinks = ({ setBio, setSocialLinks }: Props) => {
                       value={link}
                       className="flex-1 p-2 rounded-lg bg-zinc-200 dark:bg-zinc-700 text-sm text-zinc-900 scrollbar-hide dark:text-zinc-100"
                     />
-                    <Trash
+                    <Trash2
                       onClick={() => handleRemoveLink(index)}
                       className="cursor-pointer text-red-500 hover:scale-110 transition"
                     />

@@ -3,9 +3,9 @@ import Skeleton from "../Layouts/Skeleton";
 import dynamic from "next/dynamic";
 import {
   Camera,
-  Trash,
   Settings,
   Plus,
+  Trash2,
 } from "lucide-react";
 import { useAppSelector } from "@/redux/hooks";
 import Link from "next/link";
@@ -119,7 +119,7 @@ const UploadPic: React.FC<UploadPicProps> = ({ setProfilePic }) => {
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-zinc-200 text-red-300 dark:bg-zinc-600 text-xs px-1 py-0.5 rounded-full"
             title="Remove"
           >
-            <Trash className="md:size-[1.5vw] size-[2vh]" />
+            <Trash2 className="md:size-[1.5vw] size-[2vh]" />
           </button>
         )}
       </div>

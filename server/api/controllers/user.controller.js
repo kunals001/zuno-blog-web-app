@@ -434,7 +434,7 @@ export const updateProfile = async (req, res) => {
       });
       
       try {
-        // नया function use करें
+        // नया function use करें (you need to implement this)
         const result = await processProfileImage(profilePic);
         console.log("processProfileImage result:", result);
         
@@ -493,114 +493,63 @@ export const updateProfile = async (req, res) => {
     const savedUser = await user.save();
     console.log("User saved successfully!");
     console.log("Final saved profilePic:", savedUser.profilePic);
+
+    // 🔥 REAL-TIME: Notify followers about profile update
+    const updatedUserInfo = {
+      _id: savedUser._id,
+      name: savedUser.name,
+      username: savedUser.username,
+      profilePic: savedUser.profilePic,
+      bio: savedUser.bio,
+    };
+
+    // Notify all followers
+    savedUser.followers.forEach(followerId => {
+      const followerSocket = connectedUsers.get(followerId.toString());
+      if (followerSocket) {
+        followerSocket.send(JSON.stringify({
+          type: "user-profile-updated",
+          payload: { updatedUser: updatedUserInfo }
+        }));
+      }
+    });
+
     console.log("=== UPDATE PROFILE END ===");
 
     // Response
-    res.status(200).json({
-      success: true,
-      message: "Profile updated successfully",
-      user: {
-        _id: savedUser._id,
-        name: savedUser.name,
-        bio: savedUser.bio,
-        username: savedUser.username,
-        profilePic: savedUser.profilePic, // यहां saved user से लें
-        socialLinks: savedUser.socialLinks,
-        email: savedUser.email,
-        isVerified: savedUser.isVerified,
-      },
-    });
-  } catch (error) {
-    console.error("Update profile error:", error);
-    res.status(500).json({ 
-      success: false, 
-      message: "Server Error: " + error.message 
-    });
-  }
-};
-
-export const getUserByUsername = async (req, res) => {
-  try {
-
-    const userId = req.user;
-
-    if (!userId) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
-    const username = req.params.username;
-    const user = await User.findOne({ username }).select("-password");
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    res.status(200).json({ user });
-  } catch (error) {
-    console.error("Error getting user profile:", error);
-    res.status(500).json({ message: "Internal server error occurred" });
-  }
-};
-
-export const sendFollowRequest = async (req, res) => {
-  try {
-    const targetUser = await User.findById(req.params.id);
-    const currentUser = await User.findById(req.user);
-
-    if (!targetUser || !currentUser)
-      return res.status(404).json({ message: "User not found" });
-
-    if (currentUser.following.includes(targetUser._id)) {
-      return res.status(400).json({ message: "Already following this user" });
-    }
-
-    if (targetUser.followRequests.includes(currentUser)) {
-      return res.status(400).json({ message: "Follow request already sent" });
-    }
-
-    targetUser.followRequests.push(currentUser);
-    await targetUser.save();
-
-    // 👇 Realtime notification
-    const targetSocket = connectedUsers.get(targetUser._id.toString());
-    if (targetSocket) {
-      targetSocket.send(JSON.stringify({
-        type: "follow-request-received",
-        fromUser: {
-          _id: currentUser._id,
-          username: currentUser.username,
-          profilePic: currentUser.profilePic
-        }
-      }));
-    }
-
-    res.status(200).json({ message: "Follow request sent" });
+    res.status(200).json({ message: "Follow request accepted" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-export const acceptFollowRequest = async (req, res) => {
+export const rejectFollowRequest = async (req, res) => {
   try {
-    const currentUser = await User.findById(req.user.id);
+    const currentUser = await User.findById(req.user);
     const requesterId = req.params.id;
 
     if (!currentUser.followRequests.includes(requesterId)) {
       return res.status(400).json({ message: "No such follow request" });
     }
 
-    currentUser.followers.push(requesterId);
     currentUser.followRequests = currentUser.followRequests.filter(
       (id) => id.toString() !== requesterId
     );
-
-    const requester = await User.findById(requesterId);
-    requester.following.push(currentUser._id);
-
     await currentUser.save();
-    await requester.save();
 
-    res.status(200).json({ message: "Follow request accepted" });
+    // 🔥 REAL-TIME: Notify requester (optional)
+    const requesterSocket = connectedUsers.get(requesterId.toString());
+    if (requesterSocket) {
+      requesterSocket.send(JSON.stringify({
+        type: "follow-request-rejected",
+        payload: { rejectedBy: currentUser._id }
+      }));
+    }
+
+    res.status(200).json({ message: "Follow request rejected" });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -608,7 +557,7 @@ export const acceptFollowRequest = async (req, res) => {
 export const unfollowUser = async (req, res) => {
   try {
     const targetUserId = req.params.id;
-    const currentUserId = req.user.id;
+    const currentUserId = req.user;
 
     const currentUser = await User.findById(currentUserId);
     const targetUser = await User.findById(targetUserId);
@@ -633,7 +582,7 @@ export const unfollowUser = async (req, res) => {
     await currentUser.save();
     await targetUser.save();
 
-    // ✅ Real-time Unfollow Notification (if target user online)
+    // 🔥 REAL-TIME: Notify target user
     const socket = connectedUsers.get(targetUserId.toString());
     if (socket) {
       socket.send(JSON.stringify({
@@ -642,7 +591,8 @@ export const unfollowUser = async (req, res) => {
           fromUser: {
             _id: currentUser._id,
             username: currentUser.username,
-            name: currentUser.name
+            name: currentUser.name,
+            profilePic: currentUser.profilePic
           }
         }
       }));
@@ -658,7 +608,7 @@ export const unfollowUser = async (req, res) => {
 export const blockUser = async (req, res) => {
   try {
     const targetUserId = req.params.id;
-    const currentUserId = req.user._id; // From protectRoute middleware
+    const currentUserId = req.user;
 
     // Prevent user from blocking themselves
     if (targetUserId === currentUserId.toString()) {
@@ -666,17 +616,258 @@ export const blockUser = async (req, res) => {
     }
 
     const targetUser = await User.findById(targetUserId);
+    const currentUser = await User.findById(currentUserId);
+
     if (!targetUser) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Mark user as blocked
-    targetUser.isBlocked = true;
+    // Remove from following/followers if exists
+    currentUser.following = currentUser.following.filter(
+      id => id.toString() !== targetUserId
+    );
+    currentUser.followers = currentUser.followers.filter(
+      id => id.toString() !== targetUserId
+    );
+
+    targetUser.following = targetUser.following.filter(
+      id => id.toString() !== currentUserId
+    );
+    targetUser.followers = targetUser.followers.filter(
+      id => id.toString() !== currentUserId
+    );
+
+    // Add to blocked users
+    if (!currentUser.blockedUsers) currentUser.blockedUsers = [];
+    if (!currentUser.blockedUsers.includes(targetUserId)) {
+      currentUser.blockedUsers.push(targetUserId);
+    }
+
+    await currentUser.save();
     await targetUser.save();
+
+    // 🔥 REAL-TIME: Notify target user
+    const socket = connectedUsers.get(targetUserId.toString());
+    if (socket) {
+      socket.send(JSON.stringify({
+        type: "user-blocked",
+        payload: {
+          blockedBy: currentUserId
+        }
+      }));
+    }
 
     res.status(200).json({ message: 'User has been blocked successfully' });
   } catch (error) {
     console.error('Error blocking user:', error);
     res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+export const unblockUser = async (req, res) => {
+  try {
+    const targetUserId = req.params.id;
+    const currentUserId = req.user;
+
+    const currentUser = await User.findById(currentUserId);
+    
+    if (!currentUser.blockedUsers || !currentUser.blockedUsers.includes(targetUserId)) {
+      return res.status(400).json({ message: "User is not blocked" });
+    }
+
+    currentUser.blockedUsers = currentUser.blockedUsers.filter(
+      id => id.toString() !== targetUserId
+    );
+    await currentUser.save();
+
+    // 🔥 REAL-TIME: Notify target user
+    const socket = connectedUsers.get(targetUserId.toString());
+    if (socket) {
+      socket.send(JSON.stringify({
+        type: "user-unblocked",
+        payload: {
+          unblockedBy: currentUserId
+        }
+      }));
+    }
+
+    res.status(200).json({ message: 'User has been unblocked successfully' });
+  } catch (error) {
+    console.error('Error unblocking user:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+export const getFollowRequests = async (req, res) => {
+  try {
+    const userId = req.user;
+    const user = await User.findById(userId)
+      .populate('followRequests', 'username name profilePic createdAt')
+      .select('followRequests');
+
+    res.status(200).json({
+      success: true,
+      followRequests: user.followRequests
+    });
+  } catch (error) {
+    console.error('Error getting follow requests:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+export const getOnlineUsers = async (req, res) => {
+  try {
+    const userId = req.user;
+    const currentUser = await User.findById(userId).select('following');
+    
+    // Get online users from following list
+    const onlineFollowing = currentUser.following.filter(followingId => 
+      connectedUsers.has(followingId.toString())
+    );
+
+    const onlineUsers = await User.find({
+      _id: { $in: onlineFollowing }
+    }).select('username name profilePic');
+
+    res.status(200).json({
+      success: true,
+      onlineUsers: onlineUsers.map(user => ({
+        ...user.toObject(),
+        isOnline: true
+      }))
+    });
+  } catch (error) {
+    console.error('Error getting online users:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+export const getUserByUsername = async (req, res) => {
+  try {
+    const userId = req.user;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const username = req.params.username;
+    const user = await User.findOne({ username })
+      .select("-password")
+      .populate('followers', 'username name profilePic')
+      .populate('following', 'username name profilePic')
+      .populate('followRequests', 'username name profilePic');
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if current user is online
+    const isOnline = connectedUsers.has(user._id.toString());
+
+    // Check relationship with current user
+    const currentUser = await User.findById(userId);
+    const isFollowing = currentUser.following.includes(user._id);
+    const isFollower = currentUser.followers.includes(user._id);
+    const hasPendingRequest = user.followRequests.some(req => req._id.toString() === userId);
+
+    res.status(200).json({ 
+      user: {
+        ...user.toObject(),
+        isOnline,
+        relationship: {
+          isFollowing,
+          isFollower,
+          hasPendingRequest
+        }
+      }
+    });
+  } catch (error) {
+    console.error("Error getting user profile:", error);
+    res.status(500).json({ message: "Internal server error occurred" });
+  }
+};
+
+export const sendFollowRequest = async (req, res) => {
+  try {
+    const targetUser = await User.findById(req.params.id);
+    const currentUser = await User.findById(req.user);
+
+    if (!targetUser || !currentUser)
+      return res.status(404).json({ message: "User not found" });
+
+    if (currentUser.following.includes(targetUser._id)) {
+      return res.status(400).json({ message: "Already following this user" });
+    }
+
+    if (targetUser.followRequests.includes(currentUser._id)) {
+      return res.status(400).json({ message: "Follow request already sent" });
+    }
+
+    targetUser.followRequests.push(currentUser._id);
+    await targetUser.save();
+
+    // 🔥 REAL-TIME: Notify target user
+    const targetSocket = connectedUsers.get(targetUser._id.toString());
+    if (targetSocket) {
+      targetSocket.send(JSON.stringify({
+        type: "follow-request-received",
+        payload: {
+          fromUser: {
+            _id: currentUser._id,
+            username: currentUser.username,
+            name: currentUser.name,
+            profilePic: currentUser.profilePic
+          }
+        }
+      }));
+    }
+
+    res.status(200).json({ message: "Follow request sent" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const acceptFollowRequest = async (req, res) => {
+  try {
+    const currentUser = await User.findById(req.user);
+    const requesterId = req.params.id;
+
+    if (!currentUser.followRequests.includes(requesterId)) {
+      return res.status(400).json({ message: "No such follow request" });
+    }
+
+    currentUser.followers.push(requesterId);
+    currentUser.followRequests = currentUser.followRequests.filter(
+      (id) => id.toString() !== requesterId
+    );
+
+    const requester = await User.findById(requesterId);
+    requester.following.push(currentUser._id);
+
+    await currentUser.save();
+    await requester.save();
+
+    // 🔥 REAL-TIME: Notify requester
+    const requesterSocket = connectedUsers.get(requesterId.toString());
+    if (requesterSocket) {
+      requesterSocket.send(JSON.stringify({
+        type: "follow-request-accepted",
+        payload: {
+          acceptedBy: {
+            _id: currentUser._id,
+            username: currentUser.username,
+            name: currentUser.name,
+            profilePic: currentUser.profilePic
+          }
+        }
+      }));
+    }
+
+    res.status(200).json({ message: "Follow request accepted" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
   }
 };
