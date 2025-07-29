@@ -8,6 +8,7 @@ import { generateTokens } from "../utils/generateToken.js";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { processProfileImage } from "../utils/processProfileImage.js";
+import {connectedUsers} from "../config/websocket.js";
 
 export const registerUser = async (req, res) => {
   try {
@@ -22,12 +23,10 @@ export const registerUser = async (req, res) => {
 
     // 2. Password length check
     if (password.length < 6) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Password must be at least 6 characters",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 6 characters",
+      });
     }
 
     // 3. Username format validation (only alphanumeric)
@@ -51,7 +50,10 @@ export const registerUser = async (req, res) => {
     if (existUser) {
       return res
         .status(400)
-        .json({ success: false, message: "User with this email already exists" });
+        .json({
+          success: false,
+          message: "User with this email already exists",
+        });
     }
 
     // 6. Create verification token
@@ -76,13 +78,11 @@ export const registerUser = async (req, res) => {
 
     // 9. Respond
     res.status(201).json({ success: true, message: "Verify your email" });
-
   } catch (error) {
     console.error("Register error:", error);
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
-
 
 export const verifyEmail = async (req, res) => {
   try {
@@ -113,14 +113,12 @@ export const verifyEmail = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    return res
-      .status(200)
-      .json({
-        success: true,
-        message: "Email verified successfully",
-        accessToken,
-        user,
-      });
+    return res.status(200).json({
+      success: true,
+      message: "Email verified successfully",
+      accessToken,
+      user,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, message: "Server Error" });
@@ -129,7 +127,7 @@ export const verifyEmail = async (req, res) => {
 
 const generateStrongPassword = (name) => {
   const salt = crypto.randomBytes(4).toString("hex"); // 8 chars
-  const namePart = name.slice(0, 3).toLowerCase();    // first 3 letters
+  const namePart = name.slice(0, 3).toLowerCase(); // first 3 letters
   const randomNum = Math.floor(100 + Math.random() * 900); // 3-digit number
 
   return `${namePart}@${salt}${randomNum}`; // final password string
@@ -185,7 +183,7 @@ export const googleSignup = async (req, res) => {
     const rawPassword = generateStrongPassword(name);
     const hashedPassword = await bcrypt.hash(rawPassword, 10);
 
-    const username = await generateUniqueUsername(name); 
+    const username = await generateUniqueUsername(name);
 
     const newUser = await User.create({
       name,
@@ -216,7 +214,6 @@ export const googleSignup = async (req, res) => {
         username: newUser.username,
       },
     });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Server Error" });
@@ -272,13 +269,11 @@ export const loginUser = async (req, res) => {
         profilePic: user.profilePic,
       },
     });
-
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
-
 
 export const logoutUser = (req, res) => {
   res.clearCookie("refreshToken", {
@@ -323,12 +318,10 @@ export const forgotPassword = async (req, res) => {
       )
     );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Reset password link sent to your email",
-      });
+    res.status(200).json({
+      success: true,
+      message: "Reset password link sent to your email",
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, message: "Server Error" });
@@ -381,13 +374,11 @@ export const checkAuth = async (req, res) => {
     const user = await User.findById(req.user).select("-password");
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    res.status(200).json({data: user});
+    res.status(200).json({ data: user });
   } catch (err) {
     res.status(500).json({ message: "Server error" });
   }
 };
-
-
 
 //// ----------------- PROFILE CONTROLLER ------------------- ////
 
@@ -396,7 +387,7 @@ export const updateProfile = async (req, res) => {
     console.log("=== UPDATE PROFILE START ===");
     console.log("req.body:", req.body);
     console.log("req.file:", req.file);
-    
+
     const userId = req.user;
     const { name, bio, socialLinks, username, password } = req.body;
     const profilePic = req.file;
@@ -405,9 +396,11 @@ export const updateProfile = async (req, res) => {
     console.log("Finding user with ID:", userId);
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
-    
+
     console.log("Current user profilePic:", user.profilePic);
 
     // Username update check
@@ -430,29 +423,31 @@ export const updateProfile = async (req, res) => {
         originalname: profilePic.originalname,
         mimetype: profilePic.mimetype,
         size: profilePic.size,
-        buffer: profilePic.buffer ? `Buffer exists (${profilePic.buffer.length} bytes)` : "No buffer"
+        buffer: profilePic.buffer
+          ? `Buffer exists (${profilePic.buffer.length} bytes)`
+          : "No buffer",
       });
-      
+
       try {
         // नया function use करें (you need to implement this)
         const result = await processProfileImage(profilePic);
         console.log("processProfileImage result:", result);
-        
+
         if (result && result.profilePicUrl) {
           user.profilePic = result.profilePicUrl;
           console.log("New profilePic URL set:", user.profilePic);
         } else {
           console.error("No profilePicUrl in result:", result);
-          return res.status(500).json({ 
-            success: false, 
-            message: "Failed to get profile picture URL" 
+          return res.status(500).json({
+            success: false,
+            message: "Failed to get profile picture URL",
           });
         }
       } catch (imageError) {
         console.error("Image processing error:", imageError);
-        return res.status(500).json({ 
-          success: false, 
-          message: "Failed to process profile picture: " + imageError.message 
+        return res.status(500).json({
+          success: false,
+          message: "Failed to process profile picture: " + imageError.message,
         });
       }
       console.log("=== PROFILE PIC UPDATE END ===");
@@ -465,15 +460,18 @@ export const updateProfile = async (req, res) => {
       user.name = name;
       console.log("Name updated to:", name);
     }
-    
+
     if (bio !== undefined) {
       user.bio = bio;
       console.log("Bio updated to:", bio);
     }
-    
+
     if (socialLinks !== undefined) {
       try {
-        user.socialLinks = typeof socialLinks === 'string' ? JSON.parse(socialLinks) : socialLinks;
+        user.socialLinks =
+          typeof socialLinks === "string"
+            ? JSON.parse(socialLinks)
+            : socialLinks;
         console.log("Social links updated to:", user.socialLinks);
       } catch (parseError) {
         console.error("Error parsing socialLinks:", parseError);
@@ -504,13 +502,15 @@ export const updateProfile = async (req, res) => {
     };
 
     // Notify all followers
-    savedUser.followers.forEach(followerId => {
+    savedUser.followers.forEach((followerId) => {
       const followerSocket = connectedUsers.get(followerId.toString());
       if (followerSocket) {
-        followerSocket.send(JSON.stringify({
-          type: "user-profile-updated",
-          payload: { updatedUser: updatedUserInfo }
-        }));
+        followerSocket.send(
+          JSON.stringify({
+            type: "user-profile-updated",
+            payload: { updatedUser: updatedUserInfo },
+          })
+        );
       }
     });
 
@@ -541,10 +541,12 @@ export const rejectFollowRequest = async (req, res) => {
     // 🔥 REAL-TIME: Notify requester (optional)
     const requesterSocket = connectedUsers.get(requesterId.toString());
     if (requesterSocket) {
-      requesterSocket.send(JSON.stringify({
-        type: "follow-request-rejected",
-        payload: { rejectedBy: currentUser._id }
-      }));
+      requesterSocket.send(
+        JSON.stringify({
+          type: "follow-request-rejected",
+          payload: { rejectedBy: currentUser._id },
+        })
+      );
     }
 
     res.status(200).json({ message: "Follow request rejected" });
@@ -568,7 +570,9 @@ export const unfollowUser = async (req, res) => {
 
     const isFollowing = currentUser.following.includes(targetUserId);
     if (!isFollowing) {
-      return res.status(400).json({ message: "You're not following this user" });
+      return res
+        .status(400)
+        .json({ message: "You're not following this user" });
     }
 
     currentUser.following = currentUser.following.filter(
@@ -585,17 +589,19 @@ export const unfollowUser = async (req, res) => {
     // 🔥 REAL-TIME: Notify target user
     const socket = connectedUsers.get(targetUserId.toString());
     if (socket) {
-      socket.send(JSON.stringify({
-        type: "unfollowed",
-        payload: {
-          fromUser: {
-            _id: currentUser._id,
-            username: currentUser.username,
-            name: currentUser.name,
-            profilePic: currentUser.profilePic
-          }
-        }
-      }));
+      socket.send(
+        JSON.stringify({
+          type: "unfollowed",
+          payload: {
+            fromUser: {
+              _id: currentUser._id,
+              username: currentUser.username,
+              name: currentUser.name,
+              profilePic: currentUser.profilePic,
+            },
+          },
+        })
+      );
     }
 
     res.status(200).json({ message: "Unfollowed successfully" });
@@ -619,22 +625,22 @@ export const blockUser = async (req, res) => {
     const currentUser = await User.findById(currentUserId);
 
     if (!targetUser) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
     // Remove from following/followers if exists
     currentUser.following = currentUser.following.filter(
-      id => id.toString() !== targetUserId
+      (id) => id.toString() !== targetUserId
     );
     currentUser.followers = currentUser.followers.filter(
-      id => id.toString() !== targetUserId
+      (id) => id.toString() !== targetUserId
     );
 
     targetUser.following = targetUser.following.filter(
-      id => id.toString() !== currentUserId
+      (id) => id.toString() !== currentUserId
     );
     targetUser.followers = targetUser.followers.filter(
-      id => id.toString() !== currentUserId
+      (id) => id.toString() !== currentUserId
     );
 
     // Add to blocked users
@@ -649,18 +655,20 @@ export const blockUser = async (req, res) => {
     // 🔥 REAL-TIME: Notify target user
     const socket = connectedUsers.get(targetUserId.toString());
     if (socket) {
-      socket.send(JSON.stringify({
-        type: "user-blocked",
-        payload: {
-          blockedBy: currentUserId
-        }
-      }));
+      socket.send(
+        JSON.stringify({
+          type: "user-blocked",
+          payload: {
+            blockedBy: currentUserId,
+          },
+        })
+      );
     }
 
-    res.status(200).json({ message: 'User has been blocked successfully' });
+    res.status(200).json({ message: "User has been blocked successfully" });
   } catch (error) {
-    console.error('Error blocking user:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error("Error blocking user:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -670,31 +678,36 @@ export const unblockUser = async (req, res) => {
     const currentUserId = req.user;
 
     const currentUser = await User.findById(currentUserId);
-    
-    if (!currentUser.blockedUsers || !currentUser.blockedUsers.includes(targetUserId)) {
+
+    if (
+      !currentUser.blockedUsers ||
+      !currentUser.blockedUsers.includes(targetUserId)
+    ) {
       return res.status(400).json({ message: "User is not blocked" });
     }
 
     currentUser.blockedUsers = currentUser.blockedUsers.filter(
-      id => id.toString() !== targetUserId
+      (id) => id.toString() !== targetUserId
     );
     await currentUser.save();
 
     // 🔥 REAL-TIME: Notify target user
     const socket = connectedUsers.get(targetUserId.toString());
     if (socket) {
-      socket.send(JSON.stringify({
-        type: "user-unblocked",
-        payload: {
-          unblockedBy: currentUserId
-        }
-      }));
+      socket.send(
+        JSON.stringify({
+          type: "user-unblocked",
+          payload: {
+            unblockedBy: currentUserId,
+          },
+        })
+      );
     }
 
-    res.status(200).json({ message: 'User has been unblocked successfully' });
+    res.status(200).json({ message: "User has been unblocked successfully" });
   } catch (error) {
-    console.error('Error unblocking user:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error("Error unblocking user:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -702,43 +715,43 @@ export const getFollowRequests = async (req, res) => {
   try {
     const userId = req.user;
     const user = await User.findById(userId)
-      .populate('followRequests', 'username name profilePic createdAt')
-      .select('followRequests');
+      .populate("followRequests", "username name profilePic createdAt")
+      .select("followRequests");
 
     res.status(200).json({
       success: true,
-      followRequests: user.followRequests
+      followRequests: user.followRequests,
     });
   } catch (error) {
-    console.error('Error getting follow requests:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error("Error getting follow requests:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
 export const getOnlineUsers = async (req, res) => {
   try {
     const userId = req.user;
-    const currentUser = await User.findById(userId).select('following');
-    
+    const currentUser = await User.findById(userId).select("following");
+
     // Get online users from following list
-    const onlineFollowing = currentUser.following.filter(followingId => 
+    const onlineFollowing = currentUser.following.filter((followingId) =>
       connectedUsers.has(followingId.toString())
     );
 
     const onlineUsers = await User.find({
-      _id: { $in: onlineFollowing }
-    }).select('username name profilePic');
+      _id: { $in: onlineFollowing },
+    }).select("username name profilePic");
 
     res.status(200).json({
       success: true,
-      onlineUsers: onlineUsers.map(user => ({
+      onlineUsers: onlineUsers.map((user) => ({
         ...user.toObject(),
-        isOnline: true
-      }))
+        isOnline: true,
+      })),
     });
   } catch (error) {
-    console.error('Error getting online users:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error("Error getting online users:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -753,9 +766,13 @@ export const getUserByUsername = async (req, res) => {
     const username = req.params.username;
     const user = await User.findOne({ username })
       .select("-password")
-      .populate('followers', 'username name profilePic')
-      .populate('following', 'username name profilePic')
-      .populate('followRequests', 'username name profilePic');
+      .populate("followers", "username name profilePic")
+      .populate("following", "username name profilePic")
+      .populate("followRequests", "username name profilePic")
+      .populate(
+        "myposts",
+        "title description content coverImage likes comments views readTime createdAt"
+      );
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -768,18 +785,20 @@ export const getUserByUsername = async (req, res) => {
     const currentUser = await User.findById(userId);
     const isFollowing = currentUser.following.includes(user._id);
     const isFollower = currentUser.followers.includes(user._id);
-    const hasPendingRequest = user.followRequests.some(req => req._id.toString() === userId);
+    const hasPendingRequest = user.followRequests.some(
+      (req) => req._id.toString() === userId
+    );
 
-    res.status(200).json({ 
+    res.status(200).json({
       user: {
         ...user.toObject(),
         isOnline,
         relationship: {
           isFollowing,
           isFollower,
-          hasPendingRequest
-        }
-      }
+          hasPendingRequest,
+        },
+      },
     });
   } catch (error) {
     console.error("Error getting user profile:", error);
@@ -809,17 +828,19 @@ export const sendFollowRequest = async (req, res) => {
     // 🔥 REAL-TIME: Notify target user
     const targetSocket = connectedUsers.get(targetUser._id.toString());
     if (targetSocket) {
-      targetSocket.send(JSON.stringify({
-        type: "follow-request-received",
-        payload: {
-          fromUser: {
-            _id: currentUser._id,
-            username: currentUser.username,
-            name: currentUser.name,
-            profilePic: currentUser.profilePic
-          }
-        }
-      }));
+      targetSocket.send(
+        JSON.stringify({
+          type: "follow-request-received",
+          payload: {
+            fromUser: {
+              _id: currentUser._id,
+              username: currentUser.username,
+              name: currentUser.name,
+              profilePic: currentUser.profilePic,
+            },
+          },
+        })
+      );
     }
 
     res.status(200).json({ message: "Follow request sent" });
@@ -852,17 +873,19 @@ export const acceptFollowRequest = async (req, res) => {
     // 🔥 REAL-TIME: Notify requester
     const requesterSocket = connectedUsers.get(requesterId.toString());
     if (requesterSocket) {
-      requesterSocket.send(JSON.stringify({
-        type: "follow-request-accepted",
-        payload: {
-          acceptedBy: {
-            _id: currentUser._id,
-            username: currentUser.username,
-            name: currentUser.name,
-            profilePic: currentUser.profilePic
-          }
-        }
-      }));
+      requesterSocket.send(
+        JSON.stringify({
+          type: "follow-request-accepted",
+          payload: {
+            acceptedBy: {
+              _id: currentUser._id,
+              username: currentUser.username,
+              name: currentUser.name,
+              profilePic: currentUser.profilePic,
+            },
+          },
+        })
+      );
     }
 
     res.status(200).json({ message: "Follow request accepted" });

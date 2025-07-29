@@ -19,13 +19,15 @@ const Navbar = dynamic(() => import("@/components/Navbar/Navbar"), {
   ),
 });
 
+const UserProfile = dynamic(() => import("@/components/SearchUser/UserProfile"), {
+  ssr: false,
+})
+
 const UserByUsername = () => {
   const dispatch = useAppDispatch();
   const params = useParams();
 
-  const { getUser, getUserError } = useAppSelector((state) => state.user);
-
-  console.log(getUser);
+  const { getUserError } = useAppSelector((state) => state.user);
 
   const username = params.username as string;
 
@@ -46,7 +48,7 @@ const UserByUsername = () => {
     <div className="w-full min-h-screen bg-zinc-200 dark:bg-zinc-800">
       <Navbar />
       <div className="md:px-[10vw] px-[1vh] mt-2">
-
+        <UserProfile />
       </div>
     </div>
   );

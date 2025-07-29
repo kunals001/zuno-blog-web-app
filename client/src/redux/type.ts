@@ -6,7 +6,7 @@ export interface PostView {
   viewedAt: string; 
 };
 
-export interface User  {
+export interface User {
   _id: string;
   username: string;
   name: string;
@@ -19,19 +19,29 @@ export interface User  {
   resetpasswordtokenexpire?: string;
   isVerified: boolean;
   profilePic?: string;
-  bio: string;
+  bio?: string;
   socialLinks: string[];
-  followers: string[]; 
-  following: string[]; 
-  followRequests: string[]; 
-  saveposts: string[]; 
-  readPosts: string[]; 
+  followers: string[]; // Changed from string[] to PopulatedUser[]
+  following: string[]; // Changed from string[] to string[]
+  followRequests:  string[]; // Changed from string[] to PopulatedUser[]
+  saveposts: string[];
+  readPosts: string[];
   postViews: PostView[];
-  myposts: string[]; 
+  myposts: Post[]; // Changed from string[] to Post[] if populated
   isAdmin: boolean;
   isBlocked: boolean;
   createdAt?: string;
   updatedAt?: string;
+}
+
+// Extended type for profile page with backend additions
+export interface UserWithRelationship extends User {
+  isOnline?: boolean;
+  relationship?: {
+    isFollowing: boolean;
+    isFollower: boolean;
+    hasPendingRequest: boolean;
+  };
 };
 
 /// ------------------------ Post ------------------------ ///
